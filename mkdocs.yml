@@ -1,0 +1,214 @@
+site_name: TBL Docs
+site_url: https://soumyadeep765.github.io/
+site_description: Official documentation for TBL platform.
+site_author: TeleBotHost
+
+theme:
+  name: material
+  language: en
+  
+  icon:
+    previous: fontawesome/solid/arrow-left
+    next: fontawesome/solid/arrow-right
+    
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: purple
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: deep purple
+      accent: light blue
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+  
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - navigation.indexes
+    - search.highlight
+    - search.suggest
+    - search.highlight
+    - search.share
+    - search.suggest
+    - toc.integrate
+    - content.tooltips
+    - content.action.view
+    - content.code.annotate
+    - content.code.copy
+    
+  font:
+    text: Roboto
+    code: JetBrains Mono
+    
+  meta:
+    viewport: "width=device-width, initial-scale=1, shrink-to-fit=no"
+    description: "Official documentation for TBL - TeleBotHost"
+    author: "TeleBotHost"
+    keywords: "TeleBot, TeleBotHost "
+
+extra:
+  generator: false
+  
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/TeleBotHost
+      name: GitHub
+    - icon: fontawesome/brands/telegram
+      link: https://t.me/TeleBotaven
+      name: Telegram
+  
+  consent:
+    title: Cookie Consent
+    description: >
+      We use cookies to enhance your browsing experience and analyze site traffic.
+    actions:
+      - accept
+      - reject
+    cookie:
+      name: mkdocs-consent
+      expires: 365
+  
+  last_update:
+    date: true
+  
+  tags: true
+
+plugins:
+  - search
+  - minify:
+      minify_html: true
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      pygments_lang_class: true
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - admonition
+  - pymdownx.details
+  - toc:
+      permalink: true
+      toc_depth: 3
+  - footnotes
+  - def_list
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.magiclink:
+      hide_protocol: true
+
+#NaviGation
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - Programming language: used-language.md
+  - What is TBL ?: about-tbl.md
+  - Core Concepts:
+    - Command structure: getting-started-with-tbl/command-structure.md
+    - First Bot: getting-started-with-tbl/first-hello-bot.md
+    - Adding keyboard: getting-started-with-tbl/adding-keyboard.md
+    - Using Alieses: getting-started-with-tbl/adding-aliesses.md
+    - Handing user input: getting-started-with-tbl/handle-need-reply.md
+    - Using * Commnad: getting-started-with-tbl/using-wildcard.md
+  - Learning Tbl: learning-tbl.md
+  - Global Variables:
+    - Global Varibles: globals/index.md
+    - update: globals/update.md
+    - request: globals/request.md
+    - update type: globals/update_type.md
+    - message: globals/message.md
+    - user: globals/user.md
+    - chat: globals/chat.md
+    - bot: globals/bot.md
+    - owner: globals/owner.md
+    - plan: globals/plan.md
+    - params: globals/params.md
+    - options: globals/options.md
+    - tbl_opions: globals/tbl_options.md
+    - content: globals/content.md
+    - msg: globals/msg.md
+    - error: globals/error.md
+    - Http Response: globals/http_response.md
+    - process variable: globals/process.md
+  - Api Instance: 
+    - Api Instance: api-instance/index.md
+    - Api simple use: api-instance/simple.md
+    - Api with callback: api-instance/api-on-run.md
+    - Api with Async : api-instance/api-async.md
+    - Api chain Methods : api-instance/api-chain.md
+    - Api dynamic use cases: api-instance/api-dynamic.md
+    - Api Notes : api-instance/api-notes.md
+  - Bot instance: 
+    - Bot instance: bot-instance/index.md
+    - Command Execution: bot-instance/cmd-execute.md
+    - Reading Commnad Data: bot-instance/read-cmd.md
+    - Getting Bot Users: bot-instance/get-user.md
+    - Storing Bot level Data: bot-instance/data-store.md
+    - Sending Messages (simplified way): bot-instance/sending-msg.md
+  - Bot v/s Api instances: bot-vs-api.md
+  - HTTP Instance: 
+    - HTTP Instance: http-instance/index.md
+    - HTTP Normal Use: http-instance/http-normal.md
+    - HTTP with Callback: http-instance/http-callback.md
+  - User Instance:
+    - User Instance: user-instance/index.md
+    - User Basics: user-instance/basics.md
+    - User Advance: user-instance/advance-use.md
+  - Global Instance: 
+    - Global Instance: global-instance/index.md
+    - Global Basics: global-instance/basics.md
+    - Storage Monitoring: global-instance/storage-monitor.md
+  - Webhook: 
+    - Webhook: webhook-instance/index.md
+    - Webhook Types: webhook-instance/webhook-types.md
+    - User Based Webhook: webhook-instance/user-webhook.md
+    - Global Webhook: webhook-instance/global-webhook.md
+    - Handing Webhook: webhook-instance/handle-webhook.md
+    - Sending Webhook Response: webhook-instance/sending-webhook-response.md
+  - res Instance: res-instance.md
+  - res Instance Advance: res-instance-advance.md
+  - msg Instance: 
+    - msg Instance: msg-instance/index.md
+    - using msg: msg-instance/use-msg.md
+    - msg object: msg-instance/msg-obj.md
+  - Modules:
+    - Modules: modules/index.md
+    - jwt: modules/jwt.md
+    - bcrypt: modules/bcrypt.md
+    - crypto: modules/crypto.md
+    - ParseCSV: modules/parse-csv.md
+    - ParseYML: modules/parse-yml.md
+    - UUID: modules/uuid.md
+    - moment: modules/moment.md
+    - lodash: modules/loadash.md
+    - uaParser: modules/uaparser.md
+    - randomstring: modules/randomstring.md
+    - validator: modules/validator.md
+    - chance: modules/chance.md
+    - math: modules/math.md
+    - qs: modules/qs.md
+    - cheerio: modules/cheerio.md
+    - dayjs: modules/dayjs.md
+    - zod: modules/zod.md
+    - shortid: modules/sortid.md
+    - deepmerge: modules/deepmerge.md
+    - humanizeDuration: modules/humanize-duration.md
+  - TBL Libs:
+    - TBL Libs: libs/index.md
+    - ResourcesLib: libs/resourceslib.md
+    - dateTimeFormat: libs/date-time-format.md
+    - MCL (Membership Checker): libs/mcl.md
+    - random: libs/random.md
+    - refLib: libs/reflib.md
+    - tgutil: libs/tgutil.md
