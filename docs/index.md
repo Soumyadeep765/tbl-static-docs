@@ -37,4 +37,3 @@ No server setup. No maintenance.
 • Developers building Telegram bots fast  
 • Teams managing multiple bots  
 • Anyone who wants reliable bot hosting  
-
