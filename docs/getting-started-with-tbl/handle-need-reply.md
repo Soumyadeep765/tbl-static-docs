@@ -29,7 +29,7 @@ Need Reply : true
 
 Logic (TBL Code)
 ```js 
-Bot.sendMessge("Your name is " + message)
+Bot.sendMessage("Your name is " + message)
 ```
 
 ## How This Works
