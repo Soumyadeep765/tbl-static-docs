@@ -9,5 +9,4 @@ MarkupSafe
 PyYAML
 mkdocs-git-revision-date-localized-plugin
 mkdocs-minify-plugin
-mkdocs-get-deps
 watchdog
