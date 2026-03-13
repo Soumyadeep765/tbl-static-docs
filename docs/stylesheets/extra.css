@@ -191,3 +191,51 @@ border-radius: 50px 50px 0 0 !important;
 .md-consent button {
  border-radius: 20px !important;
 }
+
+/* footer */
+
+.tbl-footer {
+  background:#0f172a;
+  color:#cbd5e1;
+  padding:50px 20px 20px;
+  margin-top:40px;
+}
+
+.tbl-footer-container{
+  max-width:1200px;
+  margin:auto;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:40px;
+}
+
+.tbl-footer h3,
+.tbl-footer h4{
+  color:white;
+  margin-bottom:10px;
+}
+
+.tbl-footer a{
+  display:block;
+  color:#cbd5e1;
+  text-decoration:none;
+  margin-bottom:6px;
+}
+
+.tbl-footer a:hover{
+  color:#38bdf8;
+}
+
+.tbl-footer-quote{
+  margin-top:12px;
+  font-style:italic;
+  color:#94a3b8;
+}
+
+.tbl-footer-bottom{
+  text-align:center;
+  border-top:1px solid rgba(255,255,255,0.08);
+  margin-top:30px;
+  padding-top:15px;
+  font-size:13px;
+}
