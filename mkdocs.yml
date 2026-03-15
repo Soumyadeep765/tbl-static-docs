@@ -102,8 +102,8 @@ markdown_extensions:
       alternate_style: true
 
   - pymdownx.emoji:
-      emoji_index: !!python/name:materialx.emoji.twemoji
-      emoji_generator: !!python/name:materialx.emoji.to_svg
+     emoji_index: !!python/name:material.extensions.emoji.twemoji
+     emoji_generator: !!python/name:material.extensions.emoji.to_svg
 
   - admonition
   - pymdownx.details
@@ -202,6 +202,14 @@ nav:
       - Global Webhook: webhook-instance/global-webhook.md
       - Handling Webhook: webhook-instance/handle-webhook.md
       - Sending Webhook Response: webhook-instance/sending-webhook-response.md
+
+  - Webapp:
+      - Overview: webapp-instance/index.md
+      - Webapp Methods: webapp-instance/webapp-methods.md
+      - Response Methods: webapp-instance/response-methods.md
+      - Render Details: webapp-instance/render-details.md
+      - Practical Examples: webapp-instance/examples.md
+      - Best Practices: webapp-instance/best-practices.md
 
   - res Instance: res-instance.md
   - res Instance Advanced: res-instance-advance.md

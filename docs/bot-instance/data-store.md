@@ -92,10 +92,10 @@ The following data types are supported:
 - **Boolean** – true or false
 - **List** – Arrays (ordered lists)
 - **Date** – Date objects
-- **Json** – Objects or arrays stored as JSON
+- **json** – Objects or arrays stored as json
 
 !!! note
-    When storing complex data, `Json` is recommended for consistency.
+    When storing complex data, `json` is recommended for consistency.
 
 ## Important Notes
 

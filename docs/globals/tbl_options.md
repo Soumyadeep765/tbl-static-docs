@@ -17,11 +17,11 @@ It is **not available** in normal command execution.
 
 If this value is passed:
 
-\`\`\`json
+```json
 {
   "key": "value"
 }
-\`\`\`
+```
 
 Then `tbl_options` will be that exact value.
 

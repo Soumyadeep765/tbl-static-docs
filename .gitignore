@@ -2,3 +2,4 @@ lsite/
 __pycache__/
 .env
 site/
+venv/
