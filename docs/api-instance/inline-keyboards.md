@@ -41,7 +41,7 @@ When someone taps a callback button, Telegram expects a response — even if it'
 
 ```js
 Api.answerCallbackQuery({
-  callback_query_id: update.callback_query.id,
+  callback_query_id: update.callback_query.id, // or, request.id 
   text: "Saved."
 })
 ```

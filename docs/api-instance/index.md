@@ -16,7 +16,9 @@ That sends to whoever triggered the command. TBL fills in the chat automatically
 
 `Bot` is for moving around inside your bot — running another command, storing bot-level data, keeping flows tidy. `Api` is for when you need Telegram itself: inline buttons, message edits, callback answers, stickers, polls, anything the Bot API exposes.
 
-Rough rule: if you're shaping what the user *sees in Telegram*, you're probably in Api territory. If you're deciding *what your bot does next*, look at Bot first. The [Bot vs Api guide](../guides/bot-vs-api.md) goes deeper with side-by-side examples.
+Rough rule: if you're shaping what the user *sees in Telegram*, you're probably in Api territory. If you're deciding *what your bot does next*, look at [Bot](../bot-instance/index.md) first. Once you've seen both, the [Bot vs Api guide](../guides/bot-vs-api.md) goes deeper with side-by-side examples.
+
+Command context (`user`, `chat`, `message`, …) comes from [Global Variables](../globals/index.md) — available in every command alongside `Bot` and `Api`.
 
 ## How calls work
 

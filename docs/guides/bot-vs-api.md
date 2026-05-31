@@ -2,6 +2,8 @@
 
 You'll see both `Bot` and `Api` in almost every TBL project. They overlap just enough to be confusing — both can send a message — but they're built for different jobs.
 
+If you haven't read them yet, start with the [Bot](../bot-instance/index.md) and [Api](../api-instance/index.md) overviews. This page compares them side by side. For built-in context (`user`, `chat`, `update`, …), see [Global Variables](../globals/index.md).
+
 ## The short version
 
 **Bot** runs your bot. **Api** talks to Telegram.

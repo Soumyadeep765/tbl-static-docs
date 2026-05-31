@@ -9,7 +9,7 @@ You'll edit messages constantly in menu-driven bots: swap button labels, replace
 ```js
 Api.editMessageText({
   chat_id: chat.id,
-  message_id: message.message_id,
+  message_id: request.message.message_id,
   text: "Updated content.",
   parse_mode: "Markdown"
 })
@@ -24,7 +24,7 @@ Photos and documents use captions, not message text:
 ```js
 Api.editMessageCaption({
   chat_id: chat.id,
-  message_id: message.message_id,
+  message_id: request.message.message_id,
   caption: "Revised caption."
 })
 ```
@@ -36,7 +36,7 @@ Remove buttons after a choice, or replace the whole menu:
 ```js
 Api.editMessageReplyMarkup({
   chat_id: chat.id,
-  message_id: message.message_id,
+  message_id: request.message.message_id,
   reply_markup: {
     inline_keyboard: [[{ text: "Done", callback_data: "done" }]]
   }
@@ -52,7 +52,7 @@ Sometimes deletion is cleaner:
 ```js
 Api.deleteMessage({
   chat_id: chat.id,
-  message_id: message.message_id
+  message_id: request.message.message_id
 })
 ```
 

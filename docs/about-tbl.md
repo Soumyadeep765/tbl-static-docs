@@ -33,5 +33,6 @@ The tradeoff: less flexibility, faster path to a working bot.
 ## What to read next
 
 - [Command Structure](getting-started-with-tbl/command-structure.md) — triggers, answers, `@`, `!`, `*`  
-- [Bot vs Api](guides/bot-vs-api.md) — two objects, two jobs  
-- [Api](api-instance/index.md) — talking to Telegram in depth
+- [Global Variables](globals/index.md) — `user`, `chat`, `update`, and runtime context  
+- [Bot](bot-instance/index.md) and [Api](api-instance/index.md) — the two main instances  
+- [Bot vs Api](guides/bot-vs-api.md) — two objects, two jobs (after the Bot and Api overviews)

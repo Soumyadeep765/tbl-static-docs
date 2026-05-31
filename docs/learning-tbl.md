@@ -29,5 +29,6 @@ Drop that in a command's logic field, trigger the command on Telegram, you get a
 
 - [Tutorials](tutorials/index.md) if you learn by doing  
 - [Command Structure](getting-started-with-tbl/command-structure.md) for triggers and special commands  
-- [Bot vs Api](guides/bot-vs-api.md) before your commands get complicated  
-- [Api](api-instance/index.md) when you need Telegram features beyond simple sends
+- [Global Variables](globals/index.md) for `user`, `chat`, `update`, and the rest of the built-in context  
+- [Bot](bot-instance/index.md) and [Api](api-instance/index.md) when you start calling instances in commands  
+- [Bot vs Api](guides/bot-vs-api.md) after both overviews — clears up the overlap between the two

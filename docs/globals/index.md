@@ -2,6 +2,8 @@
 
 TBL provides built-in **global variables** in every command. They give you access to the current update, user, chat, and runtime context without any setup or imports.
 
+Read this section before [Bot](../bot-instance/index.md) and [Api](../api-instance/index.md): instances are what you *call*; globals are what you *read* from the current run. After both instance sections, use [Bot vs Api](../guides/bot-vs-api.md) to choose between them.
+
 ## How to Use This Section
 
 Each variable below is documented on its own page with examples and field descriptions. Variables are **read-only** during command execution unless noted otherwise.

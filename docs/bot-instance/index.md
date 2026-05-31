@@ -34,7 +34,7 @@ Methods are case-sensitive. `Bot.runCommand` yes, `Bot.runcommand` no.
 
 Common pattern: Api handles the Telegram UI (edit the menu message, answer the callback), Bot handles what happens next (run the command that processes the order).
 
-The [Bot vs Api guide](../guides/bot-vs-api.md) has a full walkthrough.
+After you read the [Api overview](../api-instance/index.md), the [Bot vs Api guide](../guides/bot-vs-api.md) walks through when to use each.
 
 ## Pages in this section
 

@@ -97,7 +97,7 @@ extra:
 
 copyright: |
   Copyright © 2026 TeleBotHost.
-  Built with ❤️ by [TeleBotHost](https://telebothost.com).
+  Built with ❤️ by TeleBotHost Team.
 
 plugins:
   - search:
@@ -155,7 +155,26 @@ nav:
 
   - Guides:
       - Overview: guides/index.md
-      - Bot vs Api: guides/bot-vs-api.md
+
+  - Global Variables:
+      - Overview: globals/index.md
+      - update: globals/update.md
+      - request: globals/request.md
+      - update_type: globals/update_type.md
+      - message: globals/message.md
+      - user: globals/user.md
+      - chat: globals/chat.md
+      - bot: globals/bot.md
+      - owner: globals/owner.md
+      - plan: globals/plan.md
+      - params: globals/params.md
+      - options: globals/options.md
+      - tbl_options: globals/tbl_options.md
+      - content: globals/content.md
+      - msg (global): globals/msg.md
+      - error: globals/error.md
+      - http_response: globals/http_response.md
+      - process: globals/process.md
 
   - Bot:
       - Overview: bot-instance/index.md
@@ -177,6 +196,8 @@ nav:
       - Dynamic Methods: api-instance/dynamic-methods.md
       - Tips and Limitations: api-instance/tips-and-limitations.md
 
+  - Bot vs Api: guides/bot-vs-api.md
+
   - HTTP:
       - Overview: http-instance/index.md
       - Making Requests: http-instance/making-requests.md
@@ -196,26 +217,6 @@ nav:
       - Overview: msg-instance/index.md
       - Using msg: msg-instance/use-msg.md
       - The msg Object: msg-instance/msg-obj.md
-
-  - Global Variables:
-      - Overview: globals/index.md
-      - update: globals/update.md
-      - request: globals/request.md
-      - update_type: globals/update_type.md
-      - message: globals/message.md
-      - user: globals/user.md
-      - chat: globals/chat.md
-      - bot: globals/bot.md
-      - owner: globals/owner.md
-      - plan: globals/plan.md
-      - params: globals/params.md
-      - options: globals/options.md
-      - tbl_options: globals/tbl_options.md
-      - content: globals/content.md
-      - msg (global): globals/msg.md
-      - error: globals/error.md
-      - http_response: globals/http_response.md
-      - process: globals/process.md
 
   - Webhooks:
       - Overview: webhook-instance/index.md

@@ -67,4 +67,5 @@ Test it by sending `/start` to your bot on Telegram.
 - [Tutorials](tutorials/index.md) — hands-on lessons from `/start` to wildcards
 - [Your First Bot](getting-started-with-tbl/first-hello-bot.md) — step-by-step TBL tutorial
 - [What is TBL?](about-tbl.md) — how the language works
+- [Global Variables](globals/index.md) — built-in context in every command (`user`, `chat`, `update`, …)
 - [Official tutorial with screenshots](https://telebothost.com/tutorials/adding-first-bot)
