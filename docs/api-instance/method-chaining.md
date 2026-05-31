@@ -1,80 +1,50 @@
-## Chained Methods on Api.xxx Responses
+# Method Chaining
 
-Every response object returned from methods like  
-`Api.sendMessage()`, `Api.sendPhoto()` etc.  
-supports **chained methods**.
-
-This means once a message is sent, you can **immediately act on that same message**.
-
-You can edit it, reply to it, pin it, react to it, forward it, or delete it — all using the returned response object.
-
-## Why Chained Methods Exist
-
-Chained methods make message handling:
-
-- Faster
-- Cleaner
-- More readable
-- More powerful
-
-Instead of searching for message IDs or writing extra logic, you directly operate on the message you just sent.
-
-## Basic Example
-
-Send a message and then perform actions on it:
+Send a message with Api, get back an object you can act on immediately — edit it, reply to it, pin it, delete it — without hunting for `message_id`.
 
 ```js
-// Send a message and chain methods
-let data = await Api.sendMessage({ text: "Hello user!" })
+let msg = await Api.sendMessage({ text: "Hello." })
 
-await data.pin()                        // Pin the message
-await data.react("👍")                 // Add a reaction
-await data.editText("Updated text")    // Edit message text
-await data.reply("Replied Message")    // Reply to the message
+await msg.pin()
+await msg.react("👍")
+await msg.editText("Updated.")
+await msg.reply("Follow-up.")
+await msg.delete()
 ```
 
-Here:
+Each method maps to the Telegram API call you'd otherwise write by hand with ids and chat references.
 
-- `data` represents the sent message
-- All actions apply to that exact message
-- No manual IDs are required
+## What supports chaining
 
-## How It Works
+Chaining comes from **message-sending** Api methods — `sendMessage`, `sendPhoto`, and similar. Not every Api call returns a chainable object. `getMe` gives you data; `sendMessage` gives you something you can keep working with.
 
-- `Api.sendMessage()` sends a message
-- Telegram returns message data
-- TBL wraps that response
-- Chained methods become available on it
+If you're unsure, `await` the send and try — if chaining methods exist on the result, you're good.
 
-Each chained method internally calls the correct Telegram API method.
+## Available chained methods
 
-## Supported Chained Methods
-
-### Editing and Updating
+### Editing and updating
 
 - `editText(text, {...options})`
 - `editCaption(caption, {...options})`
 - `editMedia(media, {...options})`
 - `editReplyMarkup(rm, {...options})`
 
-### Message Control
+### Message control
 
 - `delete()`
-- `pin(dn = false)`  
-  `dn` → disable notification
+- `pin(dn = false)` — pass `dn: true` to pin silently
 - `unpin()`
 
 ### Reactions
 
-- `react(emoji, big = false)`  
-  `big` → large reaction
+- `react(emoji, big = false)`
 
-### Forwarding and Copying
+### Forwarding and copying
 
 - `forward(to, {...options})`
 - `copy(to, {...options})`
 
-### Reply Methods
+### Reply methods
 
 - `reply(text, {...options})`
 - `replyPhoto(photo, {...options})`
@@ -89,37 +59,29 @@ Each chained method internally calls the correct Telegram API method.
 - `replyPoll(q, options, {...options})`
 - `replyDice(emoji = "", {...options})`
 
-### Message Info and Utilities
+### Info and utilities
 
-- `get()`  
-  Returns message ID and metadata
-- `downloadFile()`  
-  Download url of attached media if available
+- `get()` — message id and metadata
+- `downloadFile()` — download URL for attached media, if any
 
-### Live Location and Poll Control
+### Live location and polls
 
 - `editLiveLocation(lat, lon, {...options})`
 - `stopLiveLocation({...options})`
 - `stopPoll({...options})`
 
-## Example: Edit Then Delete
+## Tiny example
 
 ```js
-let msg = await Api.sendMessage({ text: "Temporary message" })
-
-await msg.editText("This will be deleted soon")
+let msg = await Api.sendMessage({ text: "Temporary." })
+await msg.editText("This will disappear.")
 await msg.delete()
 ```
 
-## When to Use Chained Methods
+## See also
 
-Use chained methods when:
+- [Editing Messages](editing-messages.md) — same edits via standalone Api calls  
+- [Async Requests](async-requests.md) — why `await` matters here
 
-- You want to act on the message you just sent
-- You need clean and readable logic
-- You want to avoid handling message IDs manually
-- You’re building interactive or dynamic bots
-
-
-???+ Note
-    Chained methods are available only on message responses. All Api calls return chainable responses (But will not work for all only work for message sending methods)
+!!! note
+    Chaining only applies to message-sending Api responses. Other methods return plain response objects.

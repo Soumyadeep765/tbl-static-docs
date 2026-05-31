@@ -1,4 +1,4 @@
-## Storage Monitoring
+# Storage Monitoring
 
 The **Global instance** can be used to **monitor storage usage at the account level**.
 

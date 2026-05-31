@@ -1,4 +1,4 @@
-## Using the HTTP Instance
+# Using the HTTP Instance
 
 The HTTP instance allows your bot to make **external API requests**.
 
@@ -14,7 +14,7 @@ The simplest form sends a request using only a URL.
 
 Example:
 ```js
-//Pass url as String 
+// Pass url as String 
 HTTP.get("https://example.com")
 ```
 

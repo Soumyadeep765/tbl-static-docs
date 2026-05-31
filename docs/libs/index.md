@@ -1,19 +1,22 @@
-## Libs Instance
+# TBL Libraries (Libs)
 
-The **Libs instance** provides direct access to **TBL’s built-in helper libraries**.
+The **Libs instance** provides direct access to **TBL's built-in helper libraries**.
 
-These libraries are designed to handle common tasks such as randomization, date and time operations, resource tracking, referrals, and Telegram-specific utilities.
+These libraries handle common bot tasks: randomization, date and time operations, resource tracking, referrals, and Telegram-specific utilities.
 
-You can access any library using:
+## Usage
 
-Libs.<library>.<method>()
+```js
+Libs.random.int(1, 100)
+Libs.dateTimeFormat.now()
+Libs.tgutil.getFullName(user)
+```
 
-Most methods return **Promises**.  
-Using `await` is optional unless you need the returned value.
+Most methods return **Promises**. Using `await` is optional unless you need the returned value.
 
 ## What Libs Is Used For
 
-Libs helps you avoid writing repetitive logic by offering ready-to-use helpers for:
+Libs helps you avoid repetitive logic by offering ready-to-use helpers for:
 
 - Tracking counters, balances, and shared values
 - Formatting and calculating dates and times
@@ -24,23 +27,14 @@ Libs helps you avoid writing repetitive logic by offering ready-to-use helpers f
 
 ## Available Libraries
 
-- **ResourcesLib**  
-  Manage user-level or global counters, balances, and other persistent values.
-
-- **dateTimeFormat**  
-  Format dates, add or subtract time, and calculate differences between dates.
-
-- **MCL (Membership Checker Lib)**  
-  Check whether a user is a member of specific channels or groups and perform related checks.
-
-- **random**  
-  Generate random numbers, strings, colors, dates, and more.
-
-- **refLib**  
-  Create referral links and track invited or referred users.
-
-- **tgutil**  
-  Telegram-specific utilities for names, mentions, links, and text escaping.
+| Library | Description |
+| --- | --- |
+| [ResourcesLib](resourceslib.md) | User-level or global counters, balances, and persistent values |
+| [dateTimeFormat](date-time-format.md) | Format dates, add or subtract time, calculate differences |
+| [MCL](mcl.md) | Check channel or group membership |
+| [random](random.md) | Generate random numbers, strings, colors, and dates |
+| [refLib](reflib.md) | Create referral links and track invited users |
+| [tgutil](tgutil.md) | Telegram names, mentions, links, and text escaping |
 
 ## Notes
 
@@ -48,3 +42,5 @@ Libs helps you avoid writing repetitive logic by offering ready-to-use helpers f
 - No setup or imports are required
 - Designed for simplicity and performance
 - Works seamlessly with commands and callbacks
+
+For general-purpose npm-style utilities, see [Modules](../modules/index.md).

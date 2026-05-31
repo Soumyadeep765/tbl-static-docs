@@ -1,110 +1,41 @@
 # Response Methods (`res`)
 
-The `res` object allows **Webhook** and **Webapp** commands to send structured HTTP responses.
+This page is a quick reference for **`res`** methods in webhook and Webapp commands.
 
-It supports JSON, HTML, XML, text, redirects, and template rendering.
+For full explanations, examples, and notes, see the canonical [Response (res) overview](../res-instance.md).
 
-## `set(key, value)`
+## Method Summary
 
-Sets HTTP headers on the response object.
+| Method | Purpose |
+| --- | --- |
+| `set(key, value)` | Set HTTP response headers |
+| `status(code)` | Set HTTP status code |
+| `send(body)` | Send any content type (auto-detected) |
+| `json(obj)` | Send JSON with `application/json` |
+| `html(content)` | Send HTML (EJS auto-rendered if detected) |
+| `xml(content)` | Send XML with `application/xml` |
+| `text(content)` | Send plain text (EJS auto-rendered if detected) |
+| `redirect(url)` | Redirect to a URL or command |
+| `render(path, options)` | Render another command as the response |
 
-```javascript
-res.set("Content-Type", "application/json")
-   .set("X-Custom-Header", "my-value")
+## Quick Examples
+
+```js
+// JSON API response
+res.status(200).json({ status: "success", data: result })
+
+// HTML page
+res.html("<h1>Welcome</h1>")
+
+// Redirect
+res.redirect("https://example.com/done")
+
+// Render a template command
+res.render("dashboard.html", { data: { stats: statsData } })
 ```
 
-## `status(code)`
+## Related Pages
 
-Sets the HTTP response status code.
-
-```javascript
-res.status(200)
-res.status(404)
-res.status(500)
-```
-
-## `send(body)`
-
-Sends a response with any content type.
-
-```javascript
-res.send("Hello World")
-res.send({ message: "Success", data: { id: 1 } })
-res.status(201).send("Resource created")
-```
-
-## `json(obj)`
-
-Sends a JSON response with `application/json` content type.
-
-```javascript
-res.json({
-  status: "success",
-  user: user.name,
-  data: processedData
-})
-```
-
-## `html(content)`
-
-Sends an HTML response. Auto-renders EJS templates if tags are detected.
-
-```javascript
-res.html("<h1>Welcome</h1><p>Hello World</p>")
-
-res.html(`
-  <h1>Welcome <%= user.first_name %></h1>
-  <p>Your ID: <%= user.id %></p>
-  <% if (user.premium) { %>
-    <div class='premium'>Premium User</div>
-  <% } %>
-`)
-```
-
-## `xml(content)`
-
-Sends an XML response with `application/xml` content type.
-
-```javascript
-res.xml('<?xml version="1.0"?><response><status>success</status></response>')
-```
-
-## `text(content)`
-
-Sends a plain text response. Auto-renders EJS templates if tags are detected.
-
-```javascript
-res.text("This is plain text")
-
-const textTemplate = "Hello <%= name %>, welcome!"
-res.text(textTemplate)
-```
-
-## `redirect(url)`
-
-Redirects the request to a different URL.
-
-```javascript
-res.redirect("https://example.com/success")
-res.redirect("/another-command")
-```
-
-## `render(commandPath, options)`
-
-Renders another command output as response.
-
-```javascript
-res.render("user-profile")
-
-res.render("api-data.json", {
-  data: { user: { name: "John", age: 30 } }
-})
-
-res.render("dashboard.html", {
-  data: {
-    user: user,
-    stats: userStats,
-    params: params
-  }
-})
-```
+- [Response (res) overview](../res-instance.md) — full method documentation
+- [res.render() Guide](../res-instance-advanced.md) — content types, template context, and examples
+- [Template Rendering](render-details.md) — short guide to template data and query params

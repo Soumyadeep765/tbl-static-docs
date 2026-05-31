@@ -1,49 +1,37 @@
 # What is TBL?
 
-**TBL (Tele Bot Lang)** is the scripting language used by TeleBotHost to build and run Telegram bots.
+**TBL (Tele Bot Language)** is what you write inside TeleBotHost to make a bot do things.
 
-It is made specifically for bot logic and avoids everything that is not needed for Telegram bots.
+It's not a general-purpose language for building websites or CLI tools. It's for Telegram bots — receiving updates, sending replies, storing user data, calling external APIs when you need to. TeleBotHost handles hosting; TBL handles bot behavior.
 
-## What is TBL Used For?
+New to the platform? [Getting Started](getting-started.md). Want to write code? [Learning TBL](learning-tbl.md).
 
-TBL is used to handle everyday bot tasks like replying to messages, reacting to commands, processing user input, calling external APIs, and storing small pieces of data related to users or the bot itself.
+## Commands, not event loops
 
-It focuses only on what a Telegram bot needs to do and nothing more.
+Most Node bot frameworks look like this: register listeners, keep a process alive, hope nothing leaks. TBL flips that.
 
-## How TBL Works
+Telegram sends an update. TBL finds the matching **command** and runs it. The command finishes. Nothing stays running in the background waiting for the next message — the next update starts a fresh execution.
 
-TBL follows a command-based execution model.
+That makes behavior easier to reason about. One update, one command, one path through the code.
 
-Instead of running event listeners or background processes, the bot reacts to incoming updates. When something happens on Telegram, TBL finds the matching command and runs its logic.
+## Short-lived executions
 
-This makes bot behavior predictable and easy to understand.
+Each run is sandboxed and time-bounded. Your command does its work — send messages, read storage, call HTTP — and exits. Under load, many users can trigger commands at once without one long-running script getting tangled.
 
-## TBL Behavior
+You won't find background timers or daemons in TBL by design. If something should happen "later," it's because a new update arrived or you chained work through `on_run` / another command.
 
-TBL is designed to be safe and controlled.
+## Async when it helps
 
-Each execution is isolated, runs for a short time, and then ends. There is no permanent process running in the background.
+Some calls take time — Telegram's API, an external HTTP request. TBL supports `await` where you need the result before continuing. It doesn't push async everywhere; only where waiting actually matters.
 
-Because of this design, bots stay fast and stable even when many users interact at the same time.
+## Why the limits exist
 
-## Execution Style
+TBL deliberately isn't Node.js. You can't install arbitrary npm packages or open raw sockets. That frustrates people who want a full server — and protects everyone else from accidental infinite loops, runaway memory, or bots that become impossible to debug.
 
-TBL runs only when needed.
+The tradeoff: less flexibility, faster path to a working bot.
 
-A user sends a message, the bot handles it, and the execution finishes. Nothing keeps running after that unless a new update arrives.
+## What to read next
 
-This on-demand model keeps resource usage low and performance high.
-
-## Asynchronous Behavior
-
-TBL allows async operations where required, but avoids unnecessary complexity.
-
-There are no long-running timers, uncontrolled loops, or hidden background tasks. Everything happens in a clear and predictable flow.
-
-## Why TBL Feels Different
-
-TBL is not trying to be a full programming language like Node.js or Python.
-
-It is intentionally limited and focused. These limits help prevent common mistakes, improve security, and make bot development simpler.
-
-Because of this, developers spend more time building bot logic and less time managing infrastructure.
+- [Command Structure](getting-started-with-tbl/command-structure.md) — triggers, answers, `@`, `!`, `*`  
+- [Bot vs Api](guides/bot-vs-api.md) — two objects, two jobs  
+- [Api](api-instance/index.md) — talking to Telegram in depth

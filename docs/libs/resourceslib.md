@@ -1,4 +1,4 @@
-## ResourcesLib
+# ResourcesLib
 
 ResourcesLib is used to manage **persistent numeric resources** at both **user level** and **global level**.
 

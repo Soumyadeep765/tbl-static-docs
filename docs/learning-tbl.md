@@ -1,33 +1,33 @@
 # Learning TBL
 
-TBL (Tele Bot Lang) is basically **JavaScript**, with built-in features made for Telegram bots.
+TBL looks like JavaScript because it mostly is — same syntax for variables, `if`, loops, objects. What's different is what's *already there*: `Bot`, `Api`, `user`, `chat`, no `npm install`, no Express server.
 
-You write normal JavaScript logic, and TeleBotHost already gives you everything needed to talk to Telegram.
+You write logic inside commands. Telegram sends an update, TBL picks a command, your code runs, execution ends. That's the whole lifecycle.
 
-## How TBL Works
+## Sync by default
 
-- TBL uses JavaScript syntax
-- Telegram-related features are built in
-- No imports or setup needed
+Lines run in order. Most Bot and Api calls work that way out of the box.
 
-## Sync and Async Behavior
-
-TBL is mostly **synchronous**, so code runs line by line.
-
-Some operations are **asynchronous**, and for those cases `await` and `Promise` are supported.
-
-Only required async behavior is allowed, keeping bots safe and predictable.
-
-## Simple TBL Example
-
-A very simple example that sends a message:
+When you need a response before continuing — grab a message id, check whether send succeeded — add `await`:
 
 ```js
-Bot.sendMessage("Hello from my first TBL bot!");
+let sent = await Api.sendMessage({ text: "One moment..." })
+await sent.editText("Ready.")
 ```
 
-That’s all you need to start.
+Don't sprinkle `await` on calls where you ignore the result.
 
-## What’s Next
+## Your first line of code
 
-After this, you can learn about variables, user input, and async requests to build real bot logic.
+```js
+Bot.sendMessage("Hello from TBL.");
+```
+
+Drop that in a command's logic field, trigger the command on Telegram, you get a reply. Everything else builds from there.
+
+## Where to go
+
+- [Tutorials](tutorials/index.md) if you learn by doing  
+- [Command Structure](getting-started-with-tbl/command-structure.md) for triggers and special commands  
+- [Bot vs Api](guides/bot-vs-api.md) before your commands get complicated  
+- [Api](api-instance/index.md) when you need Telegram features beyond simple sends

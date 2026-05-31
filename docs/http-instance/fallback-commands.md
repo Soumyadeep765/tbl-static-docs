@@ -1,4 +1,4 @@
-## Using HTTP with Fallback Commands
+# Using HTTP with Fallback Commands
 
 TBL allows you to define **success** and **error fallback commands** when making HTTP requests.
 

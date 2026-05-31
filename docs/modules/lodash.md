@@ -1,4 +1,4 @@
-## lodash
+# lodash
 
 lodash is a utility library for **array, object, and function operations**.
 

@@ -1,4 +1,4 @@
-## humanizeDuration
+# humanizeDuration
 
 humanizeDuration converts **milliseconds into human-readable text**.
 

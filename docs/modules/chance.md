@@ -1,4 +1,4 @@
-## chance
+# chance
 
 chance is used to **generate random data** such as names, addresses, and phone numbers.
 

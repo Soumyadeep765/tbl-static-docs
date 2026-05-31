@@ -1,5 +1,28 @@
-# tbl-static-docs
+# TeleBotHost TBL Documentation
 
-**Upcomimng docs for [TeleBotHost](https://TeleBotHost.com) using mkdocs**
+Official documentation for [TeleBotHost](https://telebothost.com), built with [MkDocs Material](https://squidfunk.github.io/mkdocs-material/).
 
-https://docs.telebothost.com
+**Live site:** [https://docs.telebothost.com](https://docs.telebothost.com)
+
+## Local development
+
+```bash
+pip install -r requirements.txt
+mkdocs serve
+```
+
+Open [http://127.0.0.1:8000](http://127.0.0.1:8000) to preview changes.
+
+## SEO system
+
+Per-page meta tags (description, keywords, Open Graph, Twitter Card, JSON-LD) are managed in:
+
+- `hooks/seo_pages.yaml` — edit descriptions and keywords per page
+- `hooks/seo.py` — MkDocs hook that injects meta and builds `sitemap.xml`
+
+After deploy, verify:
+
+- `https://docs.telebothost.com/sitemap.xml`
+- `https://docs.telebothost.com/robots.txt`
+
+To add SEO for a new page, add an entry under `pages:` in `hooks/seo_pages.yaml` using the docs-relative path (e.g. `api-instance/new-page.md`).

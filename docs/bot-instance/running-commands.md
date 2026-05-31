@@ -30,8 +30,8 @@ You can pass custom data to the target command.
 ```js
 // Run with options
 
-/* 
-Bot.runCommnad("command", options)
+/*
+Bot.runCommand("command", options)
 */
 
 Bot.runCommand("/ok", { key: 111 })

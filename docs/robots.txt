@@ -1,0 +1,8 @@
+# TeleBotHost TBL Documentation
+User-agent: *
+Allow: /
+
+# Block build artifacts if ever exposed
+Disallow: /search/
+
+Sitemap: https://docs.telebothost.com/sitemap.xml

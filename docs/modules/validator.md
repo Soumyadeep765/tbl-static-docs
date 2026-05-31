@@ -1,4 +1,4 @@
-## validator
+# validator
 
 validator is used to **validate strings** such as emails, URLs, and other formats.
 

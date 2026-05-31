@@ -4,6 +4,10 @@ In TBL, `msg` is a **simplified version of `update`** that is available **only f
 
 It is designed to make working with normal messages easier.
 
+!!! note "Not the same as the msg instance"
+    This page documents the **global `msg` variable** (read-only message context).  
+    For message-sending methods like `msg.replyText()`, see the [msg instance](../msg-instance/index.md).
+
 ## How `msg` Works
 
 - When the update type is a **message**, `msg` is available

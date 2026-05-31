@@ -1,4 +1,4 @@
-## msg as an Object
+# msg as an Object
 
 The **msg instance** also acts as a **message object**.
 

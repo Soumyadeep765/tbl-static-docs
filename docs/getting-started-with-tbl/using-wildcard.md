@@ -52,10 +52,10 @@ This happens for:
 - Normal text
 - Unknown commands
 - Random input
-- All telegram update types
+- All Telegram update types
 
 !!! tip
-    `*` Command able to capture all types of telegram update 
+    The `*` command can capture all Telegram update types when no other command matches.
 
 ## Example Behavior
 

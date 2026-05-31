@@ -1,4 +1,4 @@
-## JWT
+# JWT
 
 JWT is used for creating and verifying **JSON Web Tokens**.
 

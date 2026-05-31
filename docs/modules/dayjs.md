@@ -1,4 +1,4 @@
-## dayjs
+# dayjs
 
 dayjs is a **lightweight alternative to Moment.js** for date and time operations.
 

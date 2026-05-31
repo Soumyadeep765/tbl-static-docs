@@ -1,10 +1,14 @@
-# `res.render()` In-Depth
+# Template Rendering with res.render()
+
+This page covers how **`res.render()`** passes data into rendered commands and templates.
+
+For the complete method reference and practical examples, see the [res.render() Guide](../res-instance-advanced.md).
 
 ## Automatic Content Type Detection
 
-`res.render()` detects the content type from file extension.
+`res.render()` sets the correct `Content-Type` from the file extension:
 
-```javascript
+```js
 res.render("page.html")   // text/html
 res.render("data.json")   // application/json
 res.render("script.js")   // application/javascript
@@ -15,9 +19,9 @@ res.render("plain-text")  // text/plain
 
 ## Data Passing and Template Context
 
-All rendering methods can access multiple data sources.
+Pass data using the second argument:
 
-```javascript
+```js
 // Webapp URL: /webapp/showProfile?section=settings&view=compact
 
 res.render("profile-template.html", {
@@ -27,9 +31,19 @@ res.render("profile-template.html", {
     preferences: userPrefs
   }
 })
-
-// In profile-template.html you can access:
-// - user, profile, preferences
-// - params (from URL query string)
-// - All TBL variables (msg, Api, State, etc.)
 ```
+
+Inside the rendered template you can access:
+
+- Custom fields from `data` (e.g. `profile`, `preferences`)
+- `params` — URL query parameters (`{ section: "settings", view: "compact" }`)
+- Global TBL variables (`Api`, `Bot`, `msg`, `request`, etc.)
+- `user` — **only in user-based webhooks**, not in public Webapp URLs
+
+!!! warning
+    Webapp URLs are public and unsigned. Do not expose sensitive user data through public Webapp endpoints.
+
+## See Also
+
+- [res.render() Guide](../res-instance-advanced.md) — full documentation with examples
+- [Response (res) overview](../res-instance.md) — all `res` methods

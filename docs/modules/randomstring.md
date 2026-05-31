@@ -1,4 +1,4 @@
-## randomstring
+# randomstring
 
 randomstring is used to generate **random alphanumeric strings**.
 

@@ -1,4 +1,4 @@
-## uaParser
+# uaParser
 
 uaParser is used to **parse user-agent strings** and extract information about the browser, operating system, and device.
 

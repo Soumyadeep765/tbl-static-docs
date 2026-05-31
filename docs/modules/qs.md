@@ -1,4 +1,4 @@
-## qs
+# qs
 
 qs is used to **parse and format query strings**.
 

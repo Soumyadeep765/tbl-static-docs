@@ -1,4 +1,4 @@
-## deepmerge
+# deepmerge
 
 deepmerge is used to **deeply merge objects**.
 

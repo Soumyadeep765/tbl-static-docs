@@ -1,4 +1,4 @@
-## crypto
+# crypto
 
 The **crypto** utility provides **cryptographic functions** such as hashing, encryption, and decryption.
 

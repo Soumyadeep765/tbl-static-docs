@@ -1,4 +1,4 @@
-## ParseYML
+# ParseYML
 
 ParseYML is used to **parse YAML strings into JSON objects**.
 

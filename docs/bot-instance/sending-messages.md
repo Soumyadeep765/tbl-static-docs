@@ -1,4 +1,4 @@
-## Sending Messages and Media with Bot
+# Sending Messages and Media with Bot
 
 These Bot methods send messages or media to the **current chat**.
 
@@ -191,4 +191,4 @@ are **not available** in the Bot instance.
 - Method names are case-sensitive
 - Errors can be handled using the `!` command
 
-[chained]: ../api-instance/api-chain.md
+[chained]: ../api-instance/method-chaining.md

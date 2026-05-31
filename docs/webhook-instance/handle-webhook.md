@@ -1,4 +1,4 @@
-## Handling Webhooks
+# Handling Webhooks
 
 Handling webhooks in TBL is **very easy**.
 

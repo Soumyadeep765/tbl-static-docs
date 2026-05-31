@@ -1,96 +1,51 @@
-# Your First TBL Bot — Hello Bot
+# Your First Bot
 
-Let’s build your very first Telegram bot using TBL.
+Let's get something working on Telegram in the next few minutes.
 
-This bot will do one simple thing:  
-when a user sends `/start`, the bot replies with a friendly **Hello message**.
+The bot will respond to `/start` with a hello message. No logic field required — just a command name and an answer.
 
-No code logic yet — just a command and an answer.
+## Open the command editor
 
-## What We Are Building
+Dashboard → your bot → **Commands** → **Add Command**.
 
-We will create:
+Everything your bot does lives here.
 
-- One command
-- One automatic reply
-- A working Telegram bot response
+## Fill in two fields
 
-This is the easiest way to understand how TBL works.
+**Command:** `/start`
 
-## Step 1 — Open Your Bot Panel
+**Answer:**
 
-- Go to your bot dashboard on TeleBotHost
-- Open the **Commands** section for the bot you added earlier
-- Click **Add Command**
+```
+Hello 👋
+Welcome to my first TBL bot!
+```
 
-This is where all bot behavior starts.
+Save it. That's the whole bot for now.
 
-## Step 2 — Create the Command
+## What happens when someone types /start
 
-Fill the command fields like this:
+Telegram delivers the update. TBL matches `/start`, sends the answer, done. The answer goes out *before* any logic runs — so for simple replies you often don't need a logic field at all.
 
-In command field:  
-`/start`
+## Formatting the answer
 
-Answer:  
-`Hello 👋  
-Welcome to my first TBL bot!`
+The answer field accepts [Telegram Markdown](https://core.telegram.org/bots/api#formatting-options). Bold, italic, line breaks — useful for welcome text.
 
-That’s it.
+```
+*Welcome!*
+Choose an option below.
+```
 
-No logic is required for this step.
+Start plain. Add formatting once the message sends reliably.
 
-## How This Works
+## Test it
 
-When a user sends `/start`:
+Open your bot in Telegram, send `/start`. You should see the hello message right away.
 
-- Telegram sends the update
-- TBL matches the `/start` command
-- The answer is sent instantly
-- Execution ends
+If nothing comes back, check the bot is launched in the dashboard and you're messaging the correct bot username.
 
-This happens automatically.
+## What's next
 
-!!! info
-    The answer is sent before any code logic. If no logic exists, the answer alone is enough.
+[Adding a Keyboard](adding-keyboard.md) — give users buttons so they don't have to type commands.
 
-## Answer Supports Markdown
-
-The **Answer field supports Telegram Markdown**, which means you can format text to make messages more readable and attractive.
-
-You can use Markdown to:
-
-- Make text **bold** or _italic_
-- Show `monospace` text
-- Create line breaks
-- Add simple emphasis
-
-This is useful for welcome messages, help text, and menus.
-
-!!! tip
-    Keep formatting simple to avoid Markdown parsing issues.
-
-### Learn Telegram Markdown
-
-To understand what formatting is supported, see the official Telegram documentation:
-
-https://core.telegram.org/bots/api#formatting-options
-
-## Test Your Bot
-
-- Open your bot in Telegram
-- Send `/start`
-- You should see your Hello message instantly
-
-If you see the message, your bot is working 🎉
-
-## What You Learned
-
-With this simple bot, you learned that:
-
-- Bots in TBL are command-based
-- A command can work without any code
-- The Answer field supports Telegram Markdown
-- Formatting can improve message clarity
-- `/start` is the entry point for most bots
-
+Or read [Command Structure](command-structure.md) if you want the full picture of how triggers and special commands work.

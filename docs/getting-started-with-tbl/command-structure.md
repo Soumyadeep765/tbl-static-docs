@@ -202,7 +202,7 @@ It is used for:
 - Sending error messages
 - Preventing silent crashes
 
-!!! alert
+!!! warning
     Always define a `!` command to handle unexpected errors safely.
 
 ### @@ — Post-Processing Command

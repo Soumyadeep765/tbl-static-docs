@@ -1,4 +1,4 @@
-## tgutil
+# tgutil
 
 tgutil provides **Telegram-specific helper utilities** for working with users, text formatting, links, and buttons.
 

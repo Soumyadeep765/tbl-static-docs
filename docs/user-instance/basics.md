@@ -1,4 +1,4 @@
-## Basic Operations
+# Basic User Operations
 
 Use the User instance to **store and read data at the user level**.
 

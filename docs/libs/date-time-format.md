@@ -1,4 +1,4 @@
-## dateTimeFormat
+# dateTimeFormat
 
 dateTimeFormat provides utilities for **date and time formatting, calculations, and comparisons**.
 

@@ -1,4 +1,4 @@
-## Global Webhooks
+# Global Webhooks
 
 Global webhooks execute commands **without any user context**.
 

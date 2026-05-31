@@ -52,14 +52,16 @@ Keyboards are simple to define using text.
 
 - Buttons in the same row are separated by commas
 - New rows are created using a new line
+
 !!! warning
     A keyboard always requires an Answer.  
     Buttons cannot be sent without a message, so make sure the Answer field is filled whenever you use a keyboard.
+
 Examples:
 
 - `Yes,No` → one row with two buttons  
 - `Yes\nNo` → two rows with one button each  
-- `Yes,No\nBoth` → two rows, First row: Yes, No  , Second row: Both  
+- `Yes,No\nBoth` → two rows: first row `Yes, No`, second row `Both`
 
 !!! tip
     You can mix rows and button counts freely to design your menu.

@@ -1,4 +1,4 @@
-## random
+# random
 
 The **random** library provides utilities for generating **random values** of different types.
 

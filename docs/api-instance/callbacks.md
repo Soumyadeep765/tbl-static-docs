@@ -1,105 +1,62 @@
-# Using Callback Commands with on_run
+# Callbacks with on_run
 
-Sometimes you want to **continue execution in another command** after an Api call finishes.
+Some Api calls finish later. Instead of blocking the whole command with `await`, you can tell TBL to run another command when Telegram responds.
 
-TBL provides `on_run` for this purpose.
-
-`on_run` lets you tell TBL **which command to run next** when an Api call completes.
-
-## What is on_run?
-
-`on_run` is an option you can pass to **any Api call**.
-
-When the Api request finishes:
-
-- The specified command is executed
-- The response data is passed using [options]
-
-This is useful for splitting logic into clean, separate commands.
-
-## Why Use on_run?
-
-Using `on_run` helps you:
-
-- Keep commands small and readable
-- Separate API calls from response handling
-- Avoid long and complex command logic
-- Reuse response-handling commands
-
-Think of it as **“do this, then continue there”**.
-
-## Basic Example
-
-Calling an Api method and continuing in another command:
+That's `on_run`:
 
 ```js
-// Get bot info and continue in another command
-Api.getMe({
-  on_run: "afterGetMe"
-})
+Api.getMe({ on_run: "afterGetMe" })
 ```
 
-Here:
+When `getMe` completes, the `afterGetMe` command runs automatically. The response lands in [`options`](../globals/options.md).
 
-- `Api.getMe` calls Telegram
-- When it finishes, the command `afterGetMe` is triggered automatically
+## Why bother?
 
-## Handling the Callback Command
+Splitting work across commands keeps each one readable. The first command starts the Api call. The second handles whatever came back. No nested if-blocks stretching down the page.
 
-Inside the `afterGetMe` command, the Api response is available in `options`.
+You'll see this pattern in bots that call several Telegram methods in sequence but don't want one giant command file.
+
+## Reading the response
+
+Inside `afterGetMe`:
 
 ```js
-// Inside "afterGetMe" command
 if (options.ok) {
   Api.sendMessage({
-    text: "Bot username: @" + options.result.username
+    text: "Running as @" + options.result.username
   })
+} else {
+  Api.sendMessage({ text: "Couldn't fetch bot info." })
 }
 ```
 
-### What `options` Contains
+`options.ok` tells you whether Telegram accepted the call. `options.result` holds the payload — shape depends on which Api method you used.
 
-In callback commands:
+TBL passes this automatically. You don't serialize it yourself.
 
-- `options.ok` → whether the Api call succeeded
-- `options.result` → data returned by Telegram
-- `options` structure depends on the Api method used
+## Flow
 
-You don’t need to manually pass data — TBL does it automatically.
+```
+Command A  →  Api.getMe({ on_run: "B" })  →  Telegram responds  →  Command B runs with options
+```
 
-## How the Flow Works
+Command A ends after firing the request. Command B picks up the thread.
 
-Step by step:
+## When to use on_run vs await
 
-- A command calls `Api.method({ on_run })`
-- Telegram processes the request
-- TBL receives the response
-- The callback command is executed
-- Response data is available via `options`
+**`await`** when the next few lines in the *same* command need the result. Fetch chat info, then immediately send a message based on it — keep it together.
 
-No polling, no waiting, no manual wiring.
+**`on_run`** when the follow-up is logically a separate step, or when you want to reuse the same handler command from multiple places.
 
-## When to Use Callback Commands
+Both are valid. It's mostly about how you like to organize commands.
 
-Use `on_run` when:
+## Requirements
 
-- You need the result of an Api call
-- You want to keep logic organized
-- You want to continue execution cleanly
-- One command depends on the result of another action
+- `on_run` must name a real command in your bot
+- The callback command runs like any other — same globals, same instances
+- Errors in the original call still surface through `options`; runtime typos still hit your `!` handler
 
-## Important Notes
+## See also
 
-- `on_run` must be a valid command name
-- The callback command receives [options] automatically
-- Callback commands run like normal commands
-- Errors can still be handled using the `!` command
-
-## Summary
-
-- `on_run` lets you continue execution in another command
-- It works with any Api call
-- Response data is available via [options]
-- Helps keep bot logic clean and modular
-
-[options]: ../globals/options.md
+- [Async Requests](async-requests.md) — `await` in one command  
+- [options variable](../globals/options.md) — full picture of what gets passed

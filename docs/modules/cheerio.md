@@ -1,4 +1,4 @@
-## cheerio
+# cheerio
 
 cheerio is used to **parse and manipulate HTML** in Node.js, similar to jQuery.
 

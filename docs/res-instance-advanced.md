@@ -6,6 +6,8 @@ It automatically detects the response content type, renders templates when neede
 
 This makes it ideal for building **web pages, APIs, dashboards, and webapps** using TBL.
 
+For all `res` methods, see the [Response (res) overview](res-instance.md). For a shorter template guide, see [Template Rendering](webapp-instance/render-details.md).
+
 ## Automatic Content Type Detection
 
 `res.render()` automatically sets the correct `Content-Type` based on the file extension.

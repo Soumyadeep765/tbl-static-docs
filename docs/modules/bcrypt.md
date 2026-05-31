@@ -1,4 +1,4 @@
-## bcrypt
+# bcrypt
 
 bcrypt is used for **secure password hashing and verification**.
 

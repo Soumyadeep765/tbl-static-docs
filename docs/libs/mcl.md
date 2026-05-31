@@ -1,4 +1,4 @@
-## MCL (Membership Checker Lib)
+# MCL (Membership Checker Lib)
 
 MCL is used to **validate whether a user is a member of one or more Telegram channels or groups**.
 

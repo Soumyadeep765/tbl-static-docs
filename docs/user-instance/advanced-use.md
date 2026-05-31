@@ -1,4 +1,4 @@
-## Custom Usage
+# Advanced User Instance Usage
 
 This section covers **advanced User instance usage**.
 

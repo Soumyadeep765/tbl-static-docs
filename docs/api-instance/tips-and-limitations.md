@@ -1,81 +1,49 @@
-## Notes About Api.xxx
+# Tips and Limitations
 
-The `Api` instance is designed for **direct communication with Telegram**.
+A few things about `Api` that aren't obvious until they bite you.
 
-Every call you make using `Api.xxx()` is sent straight to the Telegram Bot API.
+## Two different kinds of errors
 
-## Invalid Api Method Calls
-
-If you call a method that **does not exist**, for example:
+**You typo'd the method name.**
 
 ```js
 Api.hitMe()
 ```
 
-This is a **TBL-side error**, not a Telegram error.
+TBL doesn't recognize `hitMe`. That's a runtime error in your command — execution stops, and your `!` handler can catch it if you've defined one.
 
-What happens:
+**Telegram rejected a valid call.**
 
-- TBL throws a runtime error
-- The error can be handled using the `!` command
-- Execution stops for that command
+Wrong chat, user blocked the bot, bad parameter — the method existed, the request reached Telegram, Telegram said no. That usually **doesn't** throw. The command keeps going. The failure is logged in TeleBotHost's error panel.
 
-!!! warning
-    Calling a non-existent Api method will always trigger an error.
-    Make sure the method exists or use `Api.call()` for dynamic methods.
-
-## Telegram API Errors
-
-Errors returned **by Telegram itself** behave differently.
-
-For example:
-
-- Invalid parameters
-- Permission issues
-- Chat not found
-- Bot blocked by user
-
-In these cases:
-
-- The Api call does **not crash execution**
-- The error is **logged in the platform’s bot error logs**
-- The command continues running unless you explicitly check the response
-
-Telegram API errors are considered **silent by default**.
-
-## Handling Telegram Errors with await
-
-If you use `await`, you can manually inspect the Telegram response.
+If the failure matters to your logic, use `await` and inspect `ok`:
 
 ```js
-let res = await Api.sendMessage({ text: "Hello!" })
+let res = await Api.sendMessage({ text: "Reminder." })
 
 if (!res.ok) {
-  Api.sendMessage({ text: "Failed to send message" })
+  // handle it — maybe the user blocked you
 }
 ```
 
-This allows you to:
+## Prefer built-in methods
 
-- Detect Telegram-side failures
-- Handle them gracefully
-- Avoid relying only on platform logs
+If `Api.sendMessage` exists, use it. Reach for `Api.call("sendMessage", {...})` only when TBL hasn't added a wrapper yet. Built-in methods are easier to read and less typo-prone.
 
-!!! tip
-    Use `await` when you need confirmation that a Telegram action succeeded.
+## Case sensitivity
 
-## Error Handling Summary
+`Api.sendMessage` works. `Api.sendmessage` doesn't. Same for every method name.
 
-- Invalid `Api.xxx` method → TBL error → handled by `!`
-- Telegram API error → silent → logged on platform
-- `await` lets you manually detect Telegram failures
+## Chat context
 
-## Best Practices
+Most calls assume the current chat. Explicit `chat_id` overrides that — and introduces a new way to get it wrong. Double-check the bot is actually allowed to message that chat.
 
-- Use valid Api method names
-- Prefer built-in Api methods when available
-- Use `Api.call()` for unsupported Telegram methods
-- Use `await` when the result matters
-- Always define a `!` command for safety
+## Always have a `!` command
 
-Understanding this difference helps you debug bots faster and write more reliable logic.
+Not Api-specific, but worth repeating: define the `!` error handler command. Something goes wrong in production, users see a message instead of silence.
+
+## Reference
+
+When in doubt, cross-check parameters against the [Telegram Bot API docs](https://core.telegram.org/bots/api). TBL passes them through faithfully.
+
+For methods Telegram has but TBL hasn't wrapped yet, see [Dynamic Methods](dynamic-methods.md).

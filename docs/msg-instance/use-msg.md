@@ -1,4 +1,4 @@
-## Using the msg Instance
+# Using the msg Instance
 
 The **msg instance** is used to interact with the **current Telegram message**.
 
@@ -164,5 +164,5 @@ data.pin()
 
 More details about [chained] methods: **[Api chained]**
 
-[chained]: ../api-instance/api-chain.md
-[Api chained]: ../api-instance/api-chain.md
+[chained]: ../api-instance/method-chaining.md
+[Api chained]: ../api-instance/method-chaining.md

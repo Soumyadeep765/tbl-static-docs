@@ -1,4 +1,4 @@
-## math
+# math
 
 math provides **mathematical functions** such as square root, powers, and trigonometry.
 

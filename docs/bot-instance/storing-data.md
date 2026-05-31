@@ -1,4 +1,4 @@
-## Bot Data Store
+# Bot Data Store
 
 The **Bot Data Store** is a simple **key–value storage** that belongs to the bot itself.
 

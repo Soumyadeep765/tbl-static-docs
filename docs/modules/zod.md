@@ -1,4 +1,4 @@
-## zod
+# zod
 
 zod is a **schema validation library** used for structured data validation.
 

@@ -1,4 +1,4 @@
-## refLib
+# refLib
 
 refLib provides tools for **creating and tracking referral systems**.
 

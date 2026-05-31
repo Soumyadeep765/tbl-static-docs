@@ -1,4 +1,4 @@
-## UUID
+# UUID
 
 UUID is used to generate **unique identifiers**.
 

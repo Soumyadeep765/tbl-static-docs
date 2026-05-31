@@ -1,79 +1,60 @@
-# Using await with Api Calls
+# Async Requests
 
-In TBL, some `Api` methods return a response.  
-You can use **`await`** to get that response **immediately** and continue logic in the same command.
-
-This is useful when your next step depends on the result of an Api call.
-
-## How await Works in TBL
-
-When you use `await`:
-
-- Execution pauses at that line
-- The Api call finishes
-- The response is returned
-- Execution continues with the result
-
-This allows **step-by-step logic** inside one command.
-
-## Basic Example
-
-Get bot information and use it right away:
+Put `await` in front of an Api call when the next line needs what Telegram sent back.
 
 ```js
 let me = await Api.getMe()
 
 if (me.ok) {
-  Api.sendMessage({
-    text: "My bot id is " + me.result.id
-  })
+  Api.sendMessage({ text: "Bot id: " + me.result.id })
 }
 ```
 
-Here:
+Execution pauses at the `await`, the request completes, and `me` holds the response. Then the command continues.
 
-- `Api.getMe()` is called
-- The result is stored in `me`
-- The response is checked
-- A message is sent using the returned data
+## What you get back
 
-## Another Example
-
-Send a message and store the response:
+Responses follow Telegram's shape: typically `ok` (boolean) and `result` (the useful payload). Failed calls set `ok` to false — check it when the failure would change your logic.
 
 ```js
-let sent = await Api.sendMessage({
-  text: "Hello again!"
-})
+let sent = await Api.sendMessage({ text: "Hello again." })
+
+if (!sent.ok) {
+  // user blocked the bot, chat gone, etc.
+}
 ```
 
-The `sent` variable now contains information about the message that was sent.
+Without that check, the failure only appears in your platform error logs. The command keeps running as if nothing went wrong.
 
-This is useful when you need:
+## Message sends return something useful
 
-- Message IDs
-- Status confirmation
-- Result-based logic
+When you `await Api.sendMessage`, the return value is also a chainable object — edit, delete, pin the message you just created. See [Method Chaining](method-chaining.md).
 
-## When to Use await
+```js
+let msg = await Api.sendMessage({ text: "Loading..." })
+await msg.editText("Done.")
+```
 
-Use `await` when:
+## Don't await everything
 
-- You need the Api response immediately
-- Logic depends on the result
-- You want everything in one command
+If you fire a message and don't care about the response, skip `await`:
 
-If you don’t need the response, you can call `Api.xxx()` without `await`.
+```js
+Api.sendMessage({ text: "Got it, processing." })
+// command continues immediately
+```
 
-## Important Notes
+Extra awaits add wait time without benefit.
 
-- Only supported Api calls can be awaited
-- Code still runs safely inside TBL
-- Avoid unnecessary awaits to keep commands fast
+## Works with dynamic calls too
 
-## Summary
+```js
+let chat = await Api.call("getChat", { chat_id: chat.id })
+```
 
-- `await` lets you get Api responses inline
-- Results are stored in variables
-- Logic stays simple and readable
-- Best for sequential, result-based flows
+Same rules — check `ok`, read `result`.
+
+## See also
+
+- [Callbacks](callbacks.md) — defer handling to another command with `on_run`  
+- [Tips and Limitations](tips-and-limitations.md) — TBL errors vs Telegram errors

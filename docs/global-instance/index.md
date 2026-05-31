@@ -1,4 +1,4 @@
-## Global Instance
+# Global Instance
 
 The **Global instance** is used to **store and manage data at the account level**.
 

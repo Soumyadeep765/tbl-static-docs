@@ -1,4 +1,4 @@
-## Getting Bot Users
+# Getting Bot Users
 
 `Bot.getUsers()` returns an **array of user or chat IDs** that have interacted with your bot.
 

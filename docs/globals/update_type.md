@@ -12,8 +12,8 @@ Some common values of `update_type` include:
 - `chat_member`
 - `channel_post`
 - `poll`
-- `message_reaction` 
- And more...
+- `message_reaction`
+- And more...
 
 The value depends on the type of update received from Telegram.
 
@@ -25,6 +25,4 @@ The value depends on the type of update received from Telegram.
 
 ## Learn More
 
-For a full list of Telegram update types, see the official documentation:
-
-https://core.telegram.org/bots/api#update
+For a full list of Telegram update types, see the [Telegram Bot API Update object](https://core.telegram.org/bots/api#update).

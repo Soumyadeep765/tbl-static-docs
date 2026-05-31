@@ -1,4 +1,4 @@
-## Basic Operations
+# Basic Global Operations
 
 Use the Global instance to **store and read data at the account level**.
 

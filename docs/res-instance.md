@@ -1,19 +1,13 @@
-## Response Object (res)
+# Response Object (res)
 
-The **res instance** is used to send **custom HTTP responses** from webhook and Webapp commands.
+The **res instance** sends **custom HTTP responses** from webhook and Webapp commands.
 
-It allows your bot to behave like an HTTP API or web endpoint.
+It lets your bot behave like an HTTP API or web endpoint. You can return JSON, HTML, XML, plain text, redirects, and rendered templates (EJS).
 
-Using `res`, you can return:
+Once a response is sent with `res`, command execution ends.
 
-- JSON
-- HTML
-- XML
-- Plain text
-- Redirects
-- Rendered templates (EJS)
-
-Once a response is sent using `res`, execution ends.
+!!! info "Availability"
+    The `res` instance is available in **webhook commands** and **Webapp commands** — not in normal Telegram message commands.
 
 ## Response Methods
 
@@ -122,7 +116,7 @@ Redirect responses are sent immediately.
 
 ### render(commandPath, options)
 
-Renders another command’s output as the response.
+Renders another command's output as the response.
 
 Content type is detected automatically based on the target.
 
@@ -150,10 +144,12 @@ res.render("dashboard.html", {
 })
 ```
 
+For advanced `res.render()` usage, see the [res.render() Guide](res-instance-advanced.md).
+
 ## Notes
 
-- The `res` instance is available **only in webhook and Webapp commands**
 - Sending a response ends execution
 - Headers, status, and body can be chained
 - EJS rendering works automatically for HTML and text
 - If no response is sent, a default **2xx** response is returned
+- The `user` object in templates is available in **user-based webhooks**, not in public Webapp URLs

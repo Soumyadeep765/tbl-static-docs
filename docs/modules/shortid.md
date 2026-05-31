@@ -1,4 +1,4 @@
-## shortid
+# shortid
 
 shortid is used to generate **short unique identifiers**.
 
