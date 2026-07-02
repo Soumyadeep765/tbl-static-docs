@@ -1,4 +1,7 @@
-# User Instance
+# User Instance (Deprecated)
+
+!!! warning "Deprecated API"
+    The synchronous `User` storage API is deprecated. Please use the modern, asynchronous [`db.user`](../db-instance/index.md) API instead for all new development.
 
 The **User instance** is used to **store and manage data at the user level**.
 

@@ -1,4 +1,7 @@
-# Global Instance
+# Global Instance (Deprecated)
+
+!!! warning "Deprecated API"
+    The synchronous `Global` storage API is deprecated. Please use the modern, asynchronous [`db.global`](../db-instance/index.md) API instead for all new development.
 
 The **Global instance** is used to **store and manage data at the account level**.
 

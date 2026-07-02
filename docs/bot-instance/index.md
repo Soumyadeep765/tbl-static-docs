@@ -43,7 +43,8 @@ After you read the [Api overview](../api-instance/index.md), the [Bot vs Api gui
 | [Running Commands](running-commands.md) | `runCommand`, passing options |
 | [Reading Commands](reading-commands.md) | Inspect another command's code or config |
 | [Sending Messages](sending-messages.md) | Text, keyboards, media via Bot |
-| [Storing Data](storing-data.md) | Key-value storage at bot level |
+| [Storing Data (Deprecated)](storing-data.md) | Key-value storage at bot level |
 | [Listing Users](listing-users.md) | Query users who've interacted |
+| [Broadcasting](broadcasting.md) | High-throughput distributed user broadcasts |
 
 If you're sending inline buttons or editing messages after send, you'll still need [Api](../api-instance/index.md) for that part.

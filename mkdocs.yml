@@ -147,6 +147,9 @@ nav:
   - Tutorials:
       - Overview: tutorials/index.md
       - Command Structure: getting-started-with-tbl/command-structure.md
+      - Command Matching & Flow: getting-started-with-tbl/matching-order.md
+      - Special Commands: getting-started-with-tbl/special-commands.md
+      - Dynamic Handlers: getting-started-with-tbl/dynamic-commands.md
       - Your First Bot: getting-started-with-tbl/first-hello-bot.md
       - Adding a Keyboard: getting-started-with-tbl/adding-keyboard.md
       - Using Aliases: getting-started-with-tbl/adding-aliases.md
@@ -181,8 +184,9 @@ nav:
       - Running Commands: bot-instance/running-commands.md
       - Reading Commands: bot-instance/reading-commands.md
       - Sending Messages: bot-instance/sending-messages.md
-      - Storing Data: bot-instance/storing-data.md
+      - Storing Data (Deprecated): bot-instance/storing-data.md
       - Listing Users: bot-instance/listing-users.md
+      - Broadcasting: bot-instance/broadcasting.md
 
   - Api:
       - Overview: api-instance/index.md
@@ -203,12 +207,21 @@ nav:
       - Making Requests: http-instance/making-requests.md
       - Fallback Commands: http-instance/fallback-commands.md
 
-  - User Storage:
+  - Database (db):
+      - Overview: db-instance/index.md
+      - Bot Storage (db.bot): db-instance/bot.md
+      - User Storage (db.user): db-instance/user.md
+      - Global Storage (db.global): db-instance/global.md
+      - Unified Methods: db-instance/unified-methods.md
+      - Advanced Operations: db-instance/advanced-operations.md
+      - Analytics & Stats: db-instance/analytics.md
+
+  - User Storage (Deprecated):
       - Overview: user-instance/index.md
       - Basics: user-instance/basics.md
       - Advanced Usage: user-instance/advanced-use.md
 
-  - Global Storage:
+  - Global Storage (Deprecated):
       - Overview: global-instance/index.md
       - Basics: global-instance/basics.md
       - Storage Monitoring: global-instance/storage-monitor.md
