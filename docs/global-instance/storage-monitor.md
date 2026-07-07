@@ -1,11 +1,10 @@
-# Storage Monitoring (Deprecated)
+# Storage Monitoring (Removed)
 
-!!! warning "Deprecated"
-    The synchronous `Global` storage metrics API is deprecated. Please transition to [`db.getStorageStats()`](../db-instance/analytics.md) instead.
+!!! danger "Removed"
+    `Global.getStorageInfo`, `Global.getStorageUsage`, `Global.isStorageNearLimit`, and `Global.getAvailableStorage` have been **removed**. They are not available in command scripts.
 
-For legacy support, the following monitoring calls are available:
+Use [`db.getStorageStats()`](../db-instance/analytics.md) instead.
 
-*   `Global.getStorageInfo()`: Detailed storage metrics.
-*   `Global.getStorageUsage()`: Storage usage percentage (0-100).
-*   `Global.isStorageNearLimit()`: Returns `true` if usage exceeds 90%.
-*   `Global.getAvailableStorage()`: Available storage in MB.
+## Replacement
+
+Storage analytics are now part of the `db` instance. See [Analytics & Stats](../db-instance/analytics.md) for current monitoring methods and usage.

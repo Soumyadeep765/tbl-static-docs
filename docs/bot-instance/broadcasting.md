@@ -1,68 +1,204 @@
-# Distributed Broadcasting
+# Broadcasting
 
-The `Bot` namespace provides built-in methods to initialize and control high-throughput, distributed broadcasts across your bot's users.
+`Bot.broadcast()` starts a **distributed mass-messaging job** that runs a command (or sends a Telegram method) for every matching user. TBL handles chunking, queue management, rate limits, and flood protection in the background.
 
----
+## Quick start
 
-## 1. `Bot.broadcast(params)`
-Initiates a broadcast job. TBL handles chunking, execution routing, flood limits, and queue management in the background.
-
-### Parameters:
-*   `command` *(string)*: TBL command name (e.g. `"promo"`) to execute for each user.
-*   `method` *(string)*: Telegram method to invoke (defaults to `"sendMessage"` if `command` is omitted).
-*   `body` *(object)*: Body parameters for the Telegram method.
-*   `filters` *(object)*: Query filters to target specific user groups (e.g., `{ chatType: "private" }`).
-*   `plan` *(string)*: Speed plan, either `"fast"` or `"slow"`. Defaults to automatic owner plan resolution.
-
-### Usage Example:
-```javascript
-// Start a promo broadcast to all private chats
-const job = await Bot.broadcast({
+```js
+let job = await Bot.broadcast({
   command: "send_promo",
   filters: { chatType: "private" }
-});
-Bot.sendMessage(`Broadcast started! Job ID: ${job.broadcastId}`);
+})
+
+Bot.sendMessage(`Broadcast started! ID: ${job.broadcastId}, targets: ${job.totalTargetChats}`)
 ```
 
----
+## `Bot.broadcast(params)`
 
-## 2. Managing Broadcasts
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `command` | `string` | One of `command` or `body` | TBL command to run per user (e.g. `"promo"`) |
+| `method` | `string` | No | Telegram method if no command (default: `"sendMessage"`) |
+| `body` | `object` | One of `command` or `body` | Telegram method body (e.g. `{ text: "Hello!" }`) |
+| `filters` | `object` | No | User targeting filters (see below) |
+| `plan` | `string` | No | Speed: `"fast"` or `"slow"`. Auto-resolved from owner plan if omitted |
+| `on_create` | `string` | No | Command to run when the job is created (receives job data in `options`) |
+| `on_complete` | `string` | No | Command to run when the job finishes |
+
+**Returns:**
+
+```js
+{
+  broadcastId: "uuid-string",
+  totalTargetChats: 4523,
+  totalBatches: 10
+}
+```
+
+### Using a command
+
+The command runs once per user with a fake update context (private chat, that user's ID):
+
+```js
+await Bot.broadcast({
+  command: "weekly_digest",
+  filters: { chatType: "private", premiumOnly: true }
+})
+```
+
+Inside `/weekly_digest`, globals like `user` and `chat` reflect each target user.
+
+### Using a Telegram method directly
+
+Skip a command and send a raw Telegram API call:
+
+```js
+await Bot.broadcast({
+  method: "sendMessage",
+  body: { text: "System maintenance tonight at 2 AM." },
+  filters: { chatType: "all" }
+})
+```
+
+### Filters
+
+| Filter | Values | Description |
+| --- | --- | --- |
+| `chatType` | `"private"`, `"group"`, `"channel"`, `"all"`, or array | Target chat types. `"group"` includes supergroups |
+| `premiumOnly` | `true` / `false` | Filter by Telegram Premium status |
+
+```js
+// All non-blocked private users
+await Bot.broadcast({ command: "promo", filters: { chatType: "private" } })
+
+// Premium groups only
+await Bot.broadcast({ command: "vip_alert", filters: { chatType: "group", premiumOnly: true } })
+
+// Multiple chat types
+await Bot.broadcast({ command: "update", filters: { chatType: ["private", "group"] } })
+```
+
+Blocked users are always excluded from broadcasts.
+
+### Speed plans
+
+| Plan | When used |
+| --- | --- |
+| `"fast"` | Premium/Elite owner plans (auto-selected) |
+| `"slow"` | Free/Freemium plans (auto-selected) |
+
+Override explicitly: `plan: "fast"` or `plan: "slow"`.
+
+### Lifecycle hooks
+
+```js
+await Bot.broadcast({
+  command: "newsletter",
+  filters: { chatType: "private" },
+  on_create: "broadcast_started",    // runs once when job is created
+  on_complete: "broadcast_finished"  // runs when all batches complete
+})
+```
+
+Hook commands receive the job record in [`options`](../globals/options.md).
+
+## Managing broadcasts
 
 ### `Bot.stopBroadcast(broadcastId)`
-Stops a currently running broadcast job immediately.
-```javascript
-await Bot.stopBroadcast("job-12345");
+
+Stop a running job immediately.
+
+```js
+await Bot.stopBroadcast(job.broadcastId)
+// { success: true, message: "Broadcast stopped successfully" }
 ```
 
 ### `Bot.getBroadcastStats(broadcastId)`
-Retrieves real-time processing statistics for a job.
-```javascript
-const stats = await Bot.getBroadcastStats("job-12345");
-/* returns: {
-  processed_count,
-  success_count,
-  fail_count,
-  pruned_count,
-  status: "processing" | "completed" | "stopped"
-} */
+
+Get the full job record with real-time counters.
+
+```js
+let stats = await Bot.getBroadcastStats(job.broadcastId)
 ```
 
-### `Bot.listBroadcasts(status)`
-Retrieves a list of broadcast jobs filtered by their current status.
-```javascript
-const activeJobs = await Bot.listBroadcasts(['processing', 'queued']);
+| Field | Description |
+| --- | --- |
+| `broadcast_id` | Job UUID |
+| `status` | `"processing"`, `"completed"`, `"stopped"` |
+| `total_chats` | Total target users |
+| `processed_count` | Users processed so far |
+| `success_count` | Successful deliveries |
+| `fail_count` | Failed deliveries |
+| `pruned_count` | Skipped (blocked/deleted) |
+| `total_batches` | Total batch count |
+| `completed_batches` | Batches finished |
+| `created_at` | Job start time |
+| `finished_at` | Job end time (if done) |
+
+### `Bot.listBroadcasts(status?)`
+
+List broadcast jobs for the current bot.
+
+```js
+// Active jobs (default)
+let active = await Bot.listBroadcasts()
+
+// Specific statuses
+let all = await Bot.listBroadcasts(["processing", "queued", "pending", "completed"])
 ```
 
----
+Default filter: `["processing", "queued", "pending"]`.
 
-## 3. Important Broadcast Constraints
+## Broadcast execution limits
 
-To ensure optimal performance and security during large broadcasts, the execution context of commands triggered via broadcast has the following limitations:
+Commands triggered by broadcast run in a **restricted context**:
 
-1.  **Disabled Global Namespaces**:
-    *   `TBL` and `HTTP` objects are **not accessible** during broadcast runs.
-    *   `User` storage operations are **disabled** inside broadcast commands.
-    *   Calling `sleep()` is **disabled** to avoid halting the batch throughput.
-2.  **Early Termination Rules**:
-    *   **Failed Deliveries**: If the first **20 consecutive** dispatches fail (e.g. token invalid or blocked), the broadcast stops automatically.
-    *   **Script Failures**: If the command script throws runtime/compilation errors **15 times** across any batch, the broadcast is aborted to prevent error loops.
+| Disabled | Reason |
+| --- | --- |
+| `TBL` instance | Prevents clone/transfer during batch |
+| `HTTP` instance | Prevents blocking the batch worker |
+| `User` storage | Disabled inside broadcast commands |
+| `sleep()` | Prevents halting batch throughput |
+| `msg` global | `null` in broadcast context |
+
+Available: `Bot`, `Api`, `db`, globals (`user`, `chat`, `options`, etc.).
+
+## Auto-termination rules
+
+Broadcasts stop automatically when:
+
+| Condition | Threshold |
+| --- | --- |
+| Consecutive delivery failures | **20** in a row (invalid token, blocked, etc.) |
+| Script runtime errors | **15** total across any batch |
+
+## Full example
+
+```js
+// /admin_broadcast command
+let job = await Bot.broadcast({
+  command: "promo_message",
+  filters: {
+    chatType: "private",
+    premiumOnly: false
+  },
+  on_create: "on_broadcast_start"
+})
+
+Bot.sendMessage(`Started broadcast ${job.broadcastId} for ${job.totalTargetChats} users.`)
+
+// Later — check progress
+let stats = await Bot.getBroadcastStats(job.broadcastId)
+Bot.sendMessage(`Progress: ${stats.processed_count}/${stats.total_chats} (${stats.success_count} ok)`)
+
+// Stop if needed
+await Bot.stopBroadcast(job.broadcastId)
+```
+
+## Important notes
+
+- `Bot.broadcast()` must be **awaited** — it returns a Promise
+- At least one of `command` or `body` is required
+- The current bot ID is set automatically — no need to pass `botIds`
+- Design broadcast commands to be fast and self-contained — no `sleep()`, no HTTP calls
+- For querying users without broadcasting, use [`Bot.getUsers`](listing-users.md)

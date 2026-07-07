@@ -16,6 +16,8 @@ First argument: exact Telegram method name. Second: parameter object, same as th
 
 **Use `Api.call` when they don't.** New Telegram feature, niche method, something not wrapped yet — call it directly.
 
+Recent additions already wrapped as built-in methods include `sendRichMessage`, `verifyUser`, `answerChatJoinRequestQuery`, and `getManagedBotToken`. Check the [Api overview](index.md#bot-api-101-support) before reaching for `Api.call`.
+
 ## Responses work the same
 
 You can `await` dynamic calls. You get `ok` and `result`. You can pass `on_run`. Same contract as `Api.getChat` would have if it were built in.
@@ -30,6 +32,10 @@ let res = await Api.call("getChatMember", {
 ## Parameters are on you
 
 TBL doesn't validate dynamic calls against Telegram's schema. Wrong parameter name? Telegram errors. Check the [official API docs](https://core.telegram.org/bots/api) — parameter names must match exactly.
+
+## `bot_token` and `Api.call`
+
+`Api.call()` does **not** accept `bot_token`. It always uses the current bot's token. To call Telegram with a different token, use a built-in [Bot Admin Method](bot-admin-methods.md) such as `Api.getMe({ bot_token: process.env.OTHER_TOKEN })`.
 
 ## Example
 

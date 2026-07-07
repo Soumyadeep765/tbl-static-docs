@@ -1,44 +1,110 @@
-# Bot-Level Storage (db.bot)
+# Bot-Level Storage (`db.bot`)
 
-The `db.bot` collection is used to store settings, configuration, and state that apply bot-wide.
+`db.bot` stores data **shared across all users** of the current bot — feature flags, cached API responses, bot-wide counters, and configuration.
 
----
+| Property | Value |
+| --- | --- |
+| Scope | One bot (all users) |
+| Isolation | Private to the bot — other bots cannot read it unless you pass `bot_id` for a bot you own |
+| Default context | Current bot (`bot.id`) |
 
-## Isolation and Scope
+## Methods
 
-*   **Scope**: Shared across all users interacting with the same bot.
-*   **Isolation**: Private to the specific bot. Data saved in `db.bot` cannot be accessed by other bots on the same owner account unless explicitly shared.
+Inherits all [unified CRUD methods](unified-methods.md) plus:
 
----
+| Method | Description |
+| --- | --- |
+| `clearAllData(options?)` | Delete all bot + user async data for this bot |
 
-## Common Use Cases
+Also supports [advanced operations](advanced-operations.md): `incr`, `decr`, `push`, `pull`, `mget`.
 
-*   **Maintenance Modes**: Disabling or restricting bot commands globally.
-*   **Global Feature Flags**: Enabling or disabling specific features for all users.
-*   **External API Caching**: Caching expensive query results to optimize API rate limits.
-*   **Aggregate Metrics**: Tracking total clicks, messages, or overall command execution counts.
+## Examples
 
----
+### Maintenance mode
 
-## Code Examples
+```js
+let maintenance = await db.bot.get("maintenance_mode", false)
 
-### 1. Checking Maintenance Mode
-```javascript
-const isMaintenance = await db.bot.get('maintenance_mode', false);
-
-if (isMaintenance) {
-  return Bot.sendMessage('The bot is currently undergoing maintenance. Please try again later.');
+if (maintenance) {
+  return Bot.sendMessage("Bot is under maintenance. Try again later.")
 }
 ```
 
-### 2. Incrementing Global Command Run Count
-```javascript
-const totalRuns = await db.bot.incr('total_commands_run', 1);
-logger.info(`Commands have been run ${totalRuns} times bot-wide.`);
+### Bot-wide counter
+
+```js
+let totalRuns = await db.bot.incr("total_commands_run", 1)
+Bot.sendMessage(`Commands run: ${totalRuns}`)
 ```
 
-### 3. Setting a Cache Expiration (TTL)
-```javascript
-// Cache the list of active promotions for 1 hour (3600 seconds)
-await db.bot.set('promotions_cache', activePromotions, { ttl: 3600 });
+### Cached data with TTL
+
+```js
+await db.bot.set("promotions_cache", promoList, { ttl: 3600 })
+
+let cached = await db.bot.get("promotions_cache", [])
 ```
+
+### Feature flag
+
+```js
+await db.bot.set("new_ui_enabled", true)
+
+if (await db.bot.has("new_ui_enabled")) {
+  Bot.runCommand("/new_menu")
+}
+```
+
+### Batch read
+
+```js
+let config = await db.bot.mget(["version", "maintenance", "max_items"])
+let version = config.version || 1
+```
+
+### Paginated listing
+
+```js
+let page = await db.bot.getAll({ offset: 0, limit: 30 })
+for (let [key, value] of Object.entries(page)) {
+  Bot.inspect(key + ": " + value)
+}
+```
+
+### Cross-bot access
+
+If you own multiple bots, target another with `bot_id`:
+
+```js
+let flag = await db.bot.get("shared_flag", false, { bot_id: 99 })
+await db.bot.set("synced_at", Date.now(), { bot_id: 99 })
+```
+
+Ownership is verified — you can only access bots on your account.
+
+### Reset all bot data
+
+```js
+// Delete only bot-level keys
+await db.bot.delAll()
+
+// Delete bot-level AND all user-level async data
+let res = await db.bot.clearAllData()
+Bot.inspect(`Deleted ${res.total_deleted} records`)
+```
+
+## Common use cases
+
+- Maintenance and feature flags
+- Bot-wide analytics counters (`incr`)
+- API response caching with TTL
+- Shared configuration across all users
+- Admin toggles and bot settings
+
+## Important notes
+
+- Replaces deprecated `Bot.set` / `Bot.get` (1 MB sync limit) — migrate to `db.bot`
+- Always `await` and check `{ ok }` on writes
+- For per-user data, use [`db.user`](user.md)
+- For data shared across multiple bots, use [`db.global`](global.md)
+- Secrets belong in dashboard [ENV variables](../globals/process.md), not `db.bot`

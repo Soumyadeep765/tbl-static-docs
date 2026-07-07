@@ -2,11 +2,9 @@
 
 This guide walks you through creating and running your first Telegram bot on **TeleBotHost**.
 
-
 ## 1. Open TeleBotHost
 
 Go to the [TeleBotHost console](https://console.telebothost.com/).
-
 
 ## 2. Log In or Sign Up
 
@@ -15,7 +13,6 @@ Go to the [TeleBotHost console](https://console.telebothost.com/).
 
 After logging in, you will see the dashboard.
 
-
 ## 3. Create a Telegram Bot
 
 1. Open Telegram
@@ -23,7 +20,6 @@ After logging in, you will see the dashboard.
 3. Send `/newbot`
 4. Set a bot name and username
 5. Copy the bot token provided
-
 
 ## 4. Add the Bot on TeleBotHost
 
@@ -34,7 +30,6 @@ After logging in, you will see the dashboard.
 
 Your bot will appear in the bot list.
 
-
 ## 5. Open the Bot Panel
 
 Click your bot in the dashboard to open its management panel.
@@ -42,9 +37,9 @@ Click your bot in the dashboard to open its management panel.
 From here you can:
 
 - Add and edit commands
-- Write TBL code
+- Write TBL code in the Logic field
+- Set Answer, Keyboard, aliases, **public web**, and parse mode
 - Start or stop the bot
-
 
 ## 6. Start the Bot
 
@@ -52,20 +47,26 @@ Click **Launch Bot** to start your bot.
 
 Your bot is now online and ready to respond on Telegram.
 
-
 ## 7. Add Your First Command
 
 1. Open the **Commands** section
 2. Add a command such as `/start`
-3. Save the command
+3. Fill in the **Answer** field (e.g. `Hello! Welcome to my bot.`)
+4. Save the command
 
 Test it by sending `/start` to your bot on Telegram.
 
+!!! tip "Formatting"
+    The Answer field supports [Markdown](getting-started-with-tbl/markdown-and-formatting.md) by default — try `*bold*` and `_italic_`.
 
 ## What's Next
 
-- [Tutorials](tutorials/index.md) — hands-on lessons from `/start` to wildcards
-- [Your First Bot](getting-started-with-tbl/first-hello-bot.md) — step-by-step TBL tutorial
-- [What is TBL?](about-tbl.md) — how the language works
-- [Global Variables](globals/index.md) — built-in context in every command (`user`, `chat`, `update`, …)
-- [Official tutorial with screenshots](https://telebothost.com/tutorials/adding-first-bot)
+| Step | Page |
+| --- | --- |
+| Understand command flow | [Command Flow overview](getting-started-with-tbl/index.md) |
+| Hands-on tutorial | [Your First Bot](getting-started-with-tbl/first-hello-bot.md) |
+| Add buttons | [Adding a Keyboard](getting-started-with-tbl/adding-keyboard.md) |
+| Inline button taps | [Handling Callbacks](getting-started-with-tbl/handling-callbacks.md) |
+| Static web page | [Public Web Commands](getting-started-with-tbl/public-web-commands.md) |
+| How TBL works | [What is TBL?](about-tbl.md) |
+| Screenshots walkthrough | [Official tutorial](https://telebothost.com/tutorials/adding-first-bot) |

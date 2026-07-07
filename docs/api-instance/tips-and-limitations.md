@@ -44,6 +44,10 @@ Not Api-specific, but worth repeating: define the `!` error handler command. Som
 
 ## Reference
 
-When in doubt, cross-check parameters against the [Telegram Bot API docs](https://core.telegram.org/bots/api). TBL passes them through faithfully.
+When in doubt, cross-check parameters against the [Telegram Bot API docs](https://core.telegram.org/bots/api). TBL passes them through faithfully. The platform targets **[Bot API 10.1](https://core.telegram.org/bots/api-changelog#june-11-2026)** compatibility — see the [Api overview](index.md#bot-api-101-support) for newly supported methods.
 
 For methods Telegram has but TBL hasn't wrapped yet, see [Dynamic Methods](dynamic-methods.md).
+
+## `bot_token` on admin methods
+
+A subset of bot-admin methods (`getMe`, `setWebhook`, `getMyCommands`, etc.) accept an optional `bot_token` to act on behalf of another bot. Store alternate tokens in dashboard [ENV variables](../globals/process.md) — never hard-code them. See [Bot Admin Methods](bot-admin-methods.md).

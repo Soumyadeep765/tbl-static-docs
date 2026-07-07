@@ -1,45 +1,149 @@
 # Advanced Operations
 
-The `db` API provides high-value atomic functions to safely increment numeric values and modify list arrays without race conditions.
+Beyond basic CRUD, each collection supports **counters**, **lists**, and **batch reads**. All methods are `async` and accept an optional `options` object for scoping (`bot_id`, `user_id`, `ttl`, `type`).
+
+Available on: `db.bot`, `db.user`, `db.global`.
 
 ---
 
-## Atomic Counters
+## Counters
 
-### `incr(key, amount, options)`
-Increment a numeric field by a specified amount (defaults to `1`). Returns the new value. If the key does not exist, it defaults to `0` before incrementing.
+### `incr(key, amount?, options?)`
 
-```javascript
-// Increment user balance by 10
-const newBalance = await db.user.incr('balance', 10);
-// newBalance = 10 (or current balance + 10)
+Increment a numeric value. Missing keys start at `0`.
+
+```js
+let balance = await db.user.incr("credits", 10)
+let visits = await db.bot.incr("page_views")        // +1 default
+let network = await db.global.incr("total_signups", 1)
 ```
 
-### `decr(key, amount, options)`
-Decrement a numeric field by a specified amount (defaults to `1`). Returns the new value.
+**Returns:** the new number.
 
-```javascript
-// Deduct 1 credit from bot remaining credits
-const remaining = await db.bot.decr('credits', 1);
+**Throws:** `Error` if the underlying `set` fails (e.g. storage limit exceeded).
+
+### `decr(key, amount?, options?)`
+
+Decrement a numeric value. Same behavior as `incr` with a negative amount.
+
+```js
+let remaining = await db.user.decr("lives", 1)
+let pool = await db.bot.decr("credits_pool", 5)
 ```
+
+!!! note "Concurrency"
+    `incr` and `decr` use read-modify-write (get → add → set) with a pending-write flush. They are safe for typical bot workloads but not Redis-atomic under extreme concurrent writes to the same key.
 
 ---
 
-## List Operations
+## List operations
 
-### `push(key, value, options)`
-Natively append an item to an array field. If the key does not exist, it creates a new array with the item. Returns the updated array.
+### `push(key, value, options?)`
 
-```javascript
-// Append a page index to the user's history log
-const history = await db.user.push('history', 'settings_page');
-// history = ['settings_page']
+Append a value to an array. If the current value is not an array, it is wrapped first.
+
+```js
+await db.user.push("history", "settings_page")
+// ["settings_page"]
+
+await db.user.push("history", "profile_page")
+// ["settings_page", "profile_page"]
 ```
 
-### `pull(key, value, options)`
-Remove all occurrences of a specified value from an array field. Returns the updated array.
+**Returns:** the updated array. **Throws** on failure.
 
-```javascript
-// Remove 'active' status tag from a bot tags list
-const remainingTags = await db.bot.pull('tags', 'active');
+### `pull(key, value, options?)`
+
+Remove all occurrences of `value` from an array (strict equality `===`).
+
+```js
+await db.bot.pull("tags", "beta")
+await db.user.pull("achievements", "first_login")
 ```
+
+If the current value is not an array, returns it unchanged. **Throws** on failure.
+
+---
+
+## Batch read
+
+### `mget(keys, options?)`
+
+Read multiple keys in one call. More efficient than separate `get` calls.
+
+```js
+let data = await db.user.mget(["credits", "level", "language"])
+
+let credits = data.credits ?? 0
+let level = data.level ?? 1
+```
+
+**Returns:** `{ key: value, ... }` — keys that don't exist are **omitted** (not `null`).
+
+```js
+// Bot supports object syntax for keys
+let props = await db.bot.mget({ keys: ["a", "b", "c"] })
+```
+
+There is no `mset` — write keys individually with `set`.
+
+---
+
+## Options by collection
+
+| Option | `db.bot` | `db.user` | `db.global` |
+| --- | --- | --- | --- |
+| `bot_id` | ✓ | ✓ | — |
+| `user_id` | — | ✓ | — |
+| `ttl` | ✓ (via set) | ✓ (via set) | ✓ (via set) |
+| `type` | ✓ (via set) | ✓ (via set) | ✓ (via set) |
+
+---
+
+## Examples
+
+### Reward system
+
+```js
+let cost = 50
+let balance = await db.user.get("credits", 0)
+
+if (balance < cost) {
+  return Bot.sendMessage("Not enough credits.")
+}
+
+await db.user.decr("credits", cost)
+await db.user.push("purchases", "item_sword")
+Bot.sendMessage("Purchased!")
+```
+
+### Tag management
+
+```js
+await db.bot.push("active_features", "dark_mode")
+
+if (params === "remove_dark_mode") {
+  await db.bot.pull("active_features", "dark_mode")
+}
+
+let features = await db.bot.get("active_features", [])
+```
+
+### Leaderboard counter
+
+```js
+let score = await db.user.incr("weekly_score", 10)
+let highScore = await db.bot.get("high_score", 0)
+
+if (score > highScore) {
+  await db.bot.set("high_score", score)
+  Bot.sendMessage("New high score!")
+}
+```
+
+## Important notes
+
+- `incr` / `decr` / `push` / `pull` **throw** on failure — wrap in try/catch or use the `!` handler
+- `set` / `del` return `{ ok: false }` instead of throwing — different error pattern
+- All operations count toward the **10 calls/second** rate limit
+- See [Unified Methods](unified-methods.md) for CRUD and [Analytics](analytics.md) for storage monitoring

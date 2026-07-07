@@ -1,49 +1,75 @@
 # The `chat` Variable
 
-In TBL, `chat` contains **details about the current chat** where the interaction happened.
+In TBL, `chat` contains **details about the current chat** where the interaction happened — private, group, supergroup, or channel.
 
-This can be a **private chat**, **group**, or **channel**.
+## Properties
 
-## What `chat` Contains
+### Telegram fields
 
-The `chat` variable is a **JSON object** that describes the chat context.
+All standard [Telegram Chat](https://core.telegram.org/bots/api#chat) fields are included when present:
 
-It may include information such as:
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | `number` | Chat ID |
+| `type` | `string` | `"private"`, `"group"`, `"supergroup"`, or `"channel"` |
+| `title` | `string` | Group or channel title (groups/channels) |
+| `username` | `string` | Public username (if set) |
+| `first_name` | `string` | First name (private chats) |
 
-- Chat ID
-- Chat type (private, group, channel)
-- Chat username or title
-- Block status
-- Whether the chat was just created
+### TBL-added fields
 
-## Demo Chat Object
+| Field | Type | Description |
+| --- | --- | --- |
+| `chatid` | `number` | Alias for `id` |
+| `chatId` | `number` | Alias for `id` |
+| `chat_type` | `string` | Alias for `type` |
+| `just_created` | `boolean` | `true` if this is the chat's first interaction (private chats) |
+| `created_at` | `string \| null` | When the chat was first seen (private chats) |
+| `last_interaction` | `string \| null` | Last interaction timestamp (private chats) |
 
-Example structure of the `chat` object:
+## Example
 
 ```json
 {
   "id": 5723455420,
-  "first_name": "Soumyadeep ∞",
-  "username": "soumyadeepdas765",
   "type": "private",
+  "first_name": "Alice",
+  "username": "alice_smith",
   "chatid": 5723455420,
   "chatId": 5723455420,
-  "blocked": false,
-  "block_reason": null,
-  "blocked_at": null,
-  "just_created": true
+  "chat_type": "private",
+  "just_created": true,
+  "created_at": "2025-07-07T08:30:00.000Z",
+  "last_interaction": "2025-07-07T08:30:00.000Z"
 }
 ```
 
 ## When `chat` Is Available
 
-- For most message-based updates, `chat` is available
-- For some system or webhook updates, it may be `null`
+| Context | Value |
+| --- | --- |
+| Message, callback, or member update | Object with chat fields |
+| Global webhook with no chat context | `null` |
+| Some system-only updates | `null` |
+
+## Usage Examples
+
+```javascript
+// Respond differently by chat type
+if (chat.chat_type === 'private') {
+  Bot.sendMessage(chat.id, 'Thanks for messaging me directly!')
+} else if (chat.chat_type === 'supergroup') {
+  Bot.sendMessage(chat.id, 'Hello group!')
+}
+
+// Welcome new private chats
+if (chat.just_created) {
+  Bot.sendMessage(chat.id, 'Nice to meet you!')
+}
+```
 
 ## Important Notes
 
-- `chat` is either an **object or null**
-- It is read-only
-- It exists only during the current command execution
-
-The `chat` variable helps your bot understand **where** the interaction is happening.
+- `chat` is either an **object** or **`null`** — always check before accessing fields
+- It is read-only and exists only during the current command execution
+- Use `chat.id` (or `chat.chatid`) when sending messages via [Api](../api-instance/index.md) or [Bot](../bot-instance/index.md)

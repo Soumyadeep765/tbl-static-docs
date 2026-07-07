@@ -1,42 +1,50 @@
 # The `request` Variable
 
-In TBL, `request` is a **simplified version of `update`**
+In TBL, `request` points to the **active payload** for the current update. TBL automatically maps the relevant part of the update so you don't have to dig through the full `update` object.
 
-TBL automatically detects the type of Telegram update and maps the relevant part into `request`.
+## Telegram Updates
 
-## How `request` Works
+For normal Telegram commands, `request` is the sub-object that triggered the command:
 
-For normal Telegram updates:
+| `update_type` | `request` equals |
+| --- | --- |
+| `message` | `update.message` |
+| `callback_query` | `update.callback_query` |
+| `inline_query` | `update.inline_query` |
+| `chat_member` | `update.chat_member` |
+| Other types | The matching sub-object on `update` |
 
-- If the update type is `message`, then `request` is equal to `update.message`
-- If the update type is something else, `request` points to that specific part of the update
+```javascript
+// Handle callback queries without parsing update manually
+if (update_type === 'callback_query') {
+  let data = request.data
+  Bot.sendMessage(request.from.id, `You pressed: ${data}`)
+}
+```
 
-This means you don’t need to manually check update types in most cases.
+## Webhook and Webapp Mode
 
-!!! info
-    `request` helps you work with the useful data directly, without parsing the full update JSON.
+When a command runs via [Webhook](../webhook-instance/index.md) or [Webapp](../webapp-instance/index.md), `request` contains **HTTP request data** instead of a Telegram sub-object.
 
-## `request` in Webhook Mode
+| Field | Type | Description |
+| --- | --- | --- |
+| `url` | `string` | Request URL |
+| `method` | `string` | HTTP method (`GET`, `POST`, etc.) |
+| `headers` | `Object` | Request headers |
+| `ip` | `string` | Client IP address |
+| `query` | `Object` | URL query parameters |
+| `body` | `Object \| null` | POST body (webhook POST requests) |
 
-!!! info 
-     ignore if you don't know abou `Webhook` feature in TBL.
+```javascript
+// Webhook command: read query params
+let page = request.query.page || '1'
 
-When a command is triggered via **webhook**, `request` contains HTTP request data instead of Telegram message data.
-
-It may include:
-
-- Request IP
-- Request body
-- URL parameters
-- Headers
-- Method and metadata
-
-This makes `request` useful for building APIs, dashboards, and external integrations.
+// Webhook POST: read body
+let name = request.body?.name
+```
 
 ## Important Notes
 
-- `request` is read-only
-- It exists only during command execution
-- Its structure depends on how the command was triggered
-
-For simple bots, you can use `request` instead of working with raw `update`.
+- `request` is read-only and exists only during command execution
+- Its structure depends on how the command was triggered (Telegram update vs HTTP request)
+- For webhook routing details, see [Webhook](../webhook-instance/index.md)

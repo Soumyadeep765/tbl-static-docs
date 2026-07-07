@@ -1,121 +1,147 @@
-# Using the HTTP Instance
+# Making Requests
 
-The HTTP instance allows your bot to make **external API requests**.
+Every HTTP method is available as `HTTP.<method>(url, options?)` or `HTTP.<method>({ url, ...options })`.
 
-You can call any HTTP method using:
+## Supported methods
 
-`HTTP.method(...)`
+| Method | Typical use |
+| --- | --- |
+| `HTTP.get` | Fetch data, read resources |
+| `HTTP.post` | Create resources, submit forms, send JSON |
+| `HTTP.put` | Replace a resource |
+| `HTTP.patch` | Partial update |
+| `HTTP.delete` | Remove a resource |
+| `HTTP.head` | Headers only (no body) |
+| `HTTP.options` | CORS preflight / capability check |
 
-All common HTTP methods are supported, such as **GET**, **POST**, **PUT**, **PATCH**, and **DELETE**.
+Method names are **case-insensitive** on the proxy (`HTTP.GET` and `HTTP.get` both work).
 
-## Simple Request
+## Simple GET
 
-The simplest form sends a request using only a URL.
-
-Example:
 ```js
-// Pass url as String 
-HTTP.get("https://example.com")
-```
+// Fire and forget
+HTTP.get("https://api.example.com/ping")
 
-## Using await to Get Response Data
+// Await the response
+let res = await HTTP.get("https://api.example.com/ping")
 
-To access the response data, use `await`.
-
-Example:
-```js
-let res = await HTTP.get("https://example.com")
-```
-The returned value contains full information about the HTTP response.
-
-!!! tip
-    Use `await` when you need to read the response body, status, or headers.
-
-## Flexible Request Options
-
-For more control, you can pass an options object.
-
-Example:
-```js
-HTTP.get({
-  url: "https://example.com",
-  body: null,
-  headers: {
-    Authorization: "Bearer TOKEN"
-  },
-  params: {key: 1},
-  timeout: 5000, //max 15s/15,000ms
-  redirect: true,
-  maxRedirect: 3
-})
-
-//Or 
-HTTP.get("https://example.com", { options }) 
-```
-
-
-### Available Options
-
-- `url` – Request URL  
-- `body` – Request body (used in POST, PUT, etc.)  
-- `headers` – Custom request headers  
-- `timeout` – Request timeout in milliseconds  
-- `redirect` – Enable or disable redirects  
-- `maxRedirect` – Maximum redirect count (up to 3)
-
-!!! note
-    Redirects are limited to avoid infinite loops.
-
-## Demo HTTP Response
-
-Example response object returned by an HTTP request:
-
-```json
-{
-  "ok": true,
-  "status": 200,
-  "statusText": "",
-  "content": "OK",
-  "data": "OK",
-  "isJson": false,
-  "headers": {
-    "server": "nginx/1.24.0 (Ubuntu)",
-    "date": "Mon, 22 Dec 2025 17:03:56 GMT",
-    "content-type": "text/html; charset=utf-8",
-    "content-length": "2",
-    "connection": "keep-alive",
-    "x-powered-by": "Express",
-    "etag": "W/\"2-nOO9QiTIwXgNtWtBJezz8kv3SLc\""
-  },
-  "cookies": [],
-  "url": "https://example.com",
-  "redirected": false,
-  "redirectCount": 0
+if (res.ok) {
+  Bot.sendMessage(chat.id, res.data.status)
 }
 ```
 
-## Understanding the Response
+## POST with JSON body
 
-- `ok` – Whether the request succeeded  
-- `status` – HTTP status code  
-- `content` – Raw response body (string)  
-- `data` – Parsed data (if JSON)  
-- `headers` – Response headers  
-- `cookies` – Cookies returned by the server  
+Objects are automatically serialized to JSON. `Content-Type: application/json` is set for you.
 
-!!! info
-    When `isJson` is true, `data` contains the parsed JSON response.
+```js
+let res = await HTTP.post("https://api.example.com/users", {
+  body: {
+    name: user.first_name,
+    telegram_id: user.id
+  }
+})
+```
 
-## Learn More
+`data` is an alias for `body`:
 
-For a full breakdown of response fields, see : [HTTP Response]
+```js
+await HTTP.post("https://api.example.com/users", {
+  data: { name: "Alice" }
+})
+```
 
-## Important Notes
+## PUT, PATCH, DELETE
 
-!!! warning
-    External API failures do not crash your bot.
-    Always check `res.ok` before using the response data.
+```js
+await HTTP.put("https://api.example.com/users/42", {
+  body: { name: "Bob" }
+})
 
-The HTTP instance is best used for **external integrations**, **data fetching**, and **service communication**.
+await HTTP.patch("https://api.example.com/users/42", {
+  body: { email: "bob@example.com" }
+})
 
-[HTTP Response]: ../globals/http_response.md#the-response-variable
+let res = await HTTP.delete("https://api.example.com/users/42")
+```
+
+## Query parameters
+
+Append query string params without manual URL building:
+
+```js
+await HTTP.get("https://api.example.com/search", {
+  query: { q: "telegram", page: 1, limit: 20 }
+})
+// → https://api.example.com/search?q=telegram&page=1&limit=20
+```
+
+`params` is an alias for `query`.
+
+## Object syntax
+
+Pass everything in one object — useful for callbacks and long option lists:
+
+```js
+await HTTP.get({
+  url: "https://api.example.com/data",
+  headers: { Authorization: "Bearer " + process.env.API_TOKEN },
+  query: { format: "json" },
+  timeout: 8000,
+  success: "/onData",
+  error: "/onDataError"
+})
+```
+
+## Custom headers
+
+Default headers are added automatically (User-Agent, Accept, Connection). Override or extend with `headers`:
+
+```js
+await HTTP.get("https://api.example.com/private", {
+  headers: {
+    Authorization: "Bearer " + process.env.API_TOKEN,
+    Accept: "application/xml",
+    "X-Request-Id": "req-001"
+  }
+})
+```
+
+Default User-Agent format: `TBL/1.0.0 (Telegram Bot Lang; AppID:TBLAPP; +TBL-BOT-<botId>)`.
+
+## With fallback commands
+
+```js
+HTTP.post({
+  url: "https://api.example.com/order",
+  body: { item: params, user_id: user.id },
+  success: "/orderConfirmed",
+  error: "/orderFailed",
+  tbl_options: { orderRef: params }
+})
+```
+
+The current command continues immediately — callback commands run when the request completes. See [Fallback Commands](fallback-commands.md).
+
+## Checking results inline
+
+```js
+let res = await HTTP.get("https://api.example.com/price/BTC")
+
+if (!res.ok) {
+  Bot.sendMessage(chat.id, "Price unavailable (" + res.status + ")")
+  return
+}
+
+Bot.sendMessage(chat.id, "BTC: $" + res.data.price)
+```
+
+## Important notes
+
+- URLs must include the protocol: `https://` or `http://`
+- External failures do **not** crash your command — always check `res.ok`
+- Default timeout follows your [plan](../globals/plan.md) — see [Limits](limits.md)
+- For full option reference, see [Request Options](request-options.md)
+- For response fields, see [Responses](responses.md)
+- For streaming, see [Streaming](streaming.md)
+- For proxies, see [HTTP Proxies](proxies.md) and [Cloudflare Worker Proxy](cf-proxy.md)

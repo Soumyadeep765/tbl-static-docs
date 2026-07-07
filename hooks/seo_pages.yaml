@@ -44,6 +44,51 @@ pages:
     keywords: "TBL command structure, Telegram bot commands, wildcard command, error handler command, bot triggers"
     priority: 0.88
 
+  getting-started-with-tbl/index.md:
+    description: "Command flow in TBL — matching, execution pipeline, callbacks, markdown formatting, and public web commands per bot."
+    keywords: "TBL command flow, command matching bot, execution pipeline TeleBotHost"
+    priority: 0.9
+
+  getting-started-with-tbl/command-fields.md:
+    description: "TBL command editor fields — Answer, Logic, Keyboard, aliases, need reply, parse mode, and is_web public web."
+    keywords: "TBL command fields, is_web public web, parse mode Markdown answer"
+    priority: 0.85
+
+  getting-started-with-tbl/matching-order.md:
+    description: "Command matching priority in TBL — exact match, aliases, callback_data, dynamic handlers, and wildcard fallback."
+    keywords: "TBL command matching, callback_data routing, alias priority bot"
+    priority: 0.82
+
+  getting-started-with-tbl/execution-flow.md:
+    description: "TBL execution flow — @ init, answer before logic, need reply sessions, ! error handler, @@ post-processor."
+    keywords: "TBL execution flow, answer before logic, special commands pipeline"
+    priority: 0.82
+
+  getting-started-with-tbl/special-commands.md:
+    description: "TBL special commands — /start, @ initialization, ! error handler, @@ post-processor, * wildcard."
+    keywords: "TBL special commands, at command, error handler, wildcard fallback"
+    priority: 0.8
+
+  getting-started-with-tbl/dynamic-commands.md:
+    description: "Dynamic handlers in TBL — /handle_{update_type}, callback_query, inline query, channel updates."
+    keywords: "TBL dynamic handlers, handle_callback_query, inline query command"
+    priority: 0.78
+
+  getting-started-with-tbl/markdown-and-formatting.md:
+    description: "Format TBL command answers with Markdown or HTML, use modules.md2html, and tgutil escape helpers."
+    keywords: "TBL Markdown formatting, md2html bot, parse_mode answer"
+    priority: 0.8
+
+  getting-started-with-tbl/public-web-commands.md:
+    description: "Serve static HTML and assets per bot with is_web commands at /public/{bot_id} — no sandbox logic."
+    keywords: "TBL is_web command, public web bot page, static landing page command"
+    priority: 0.82
+
+  getting-started-with-tbl/handling-callbacks.md:
+    description: "Handle inline button callbacks in TBL — callback_data matching, answerCallbackQuery, edit message on tap."
+    keywords: "TBL callback handler, inline keyboard tutorial, answerCallbackQuery"
+    priority: 0.85
+
   getting-started-with-tbl/first-hello-bot.md:
     description: "Build your first TBL bot with a /start command and answer field. No code required — test on Telegram in under five minutes."
     keywords: "first Telegram bot, /start command TBL, hello bot tutorial, TeleBotHost first bot"
@@ -99,9 +144,9 @@ pages:
     keywords: "Bot.sendMessage TBL, send photo Bot instance, bot media Telegram, TeleBotHost send message"
     priority: 0.78
 
-  bot-instance/storing-data.md:
-    description: "Bot-level key-value storage in TBL. Persist settings, counters, and shared data that belongs to the bot — not individual users."
-    keywords: "Bot data store TBL, bot storage TeleBotHost, key value bot data, persistent bot settings"
+  bot-instance/bot-properties.md:
+    description: "Bot.set and Bot.get are deprecated in TBL. Migrate to db.bot for bot-wide storage — includes 1 MB legacy limit, comparison table, and migration examples."
+    keywords: "Bot storage deprecated TBL, db.bot migration, bot properties limit, TeleBotHost bot data"
     priority: 0.78
 
   bot-instance/listing-users.md:
@@ -160,7 +205,7 @@ pages:
     priority: 0.75
 
   http-instance/index.md:
-    description: "HTTP instance in TBL for external API requests. Fetch data from your server, payment APIs, and third-party services from bot commands."
+    description: "HTTP instance in TBL for external API requests. GET, POST, PUT, streaming, proxy, cfProxy, and callback chaining from bot commands."
     keywords: "HTTP instance TBL, external API bot, fetch URL Telegram bot, TeleBotHost HTTP requests"
     priority: 0.8
 
@@ -169,25 +214,55 @@ pages:
     keywords: "HTTP.get TBL, HTTP POST bot, external API integration Telegram, await HTTP response"
     priority: 0.78
 
+  http-instance/cf-proxy.md:
+    description: "cfProxy in TBL — route HTTP through your Cloudflare Worker. Deploy cf-http-router, setup, and why to use it."
+    keywords: "TBL cfProxy, Cloudflare Worker proxy bot, cf-http-router deploy, workers.dev HTTP proxy"
+    priority: 0.76
+
+  http-instance/proxies.md:
+    description: "HTTP proxy support in TBL — HTTP, HTTPS, SOCKS4, SOCKS5 protocols, authentication, URL format, and examples."
+    keywords: "TBL HTTP proxy, SOCKS5 bot proxy, HTTP proxy Telegram bot, proxy authentication TBL"
+    priority: 0.75
+
+  http-instance/request-options.md:
+    description: "HTTP request options in TBL — timeout, redirects, responseType, proxy, cfProxy, success/error callbacks, and tbl_options."
+    keywords: "TBL HTTP options, HTTP proxy bot, cfProxy workers.dev, responseType stream TBL"
+    priority: 0.76
+
+  http-instance/responses.md:
+    description: "HTTP response object in TBL — ok, status, data, cookies, responseType, error codes, and callback globals."
+    keywords: "TBL HTTP response, res.ok TBL, http_response global, HTTP error codes bot"
+    priority: 0.76
+
+  http-instance/streaming.md:
+    description: "HTTP streaming in TBL — responseType stream, SSE, chunk reading, collect, cancel, and plan-based stream limits."
+    keywords: "TBL HTTP streaming, SSE bot, responseType stream TBL, stream.collect TeleBotHost"
+    priority: 0.75
+
   http-instance/fallback-commands.md:
     description: "HTTP fallback commands in TBL — route success and error responses to different commands using tbl_options and http_response."
     keywords: "HTTP callback TBL, fallback command HTTP, http_response variable, HTTP error handling bot"
     priority: 0.75
 
+  http-instance/limits.md:
+    description: "HTTP limits in TBL — plan timeouts, response size caps, redirect limits, streaming lifetime, and proxy rules."
+    keywords: "TBL HTTP limits, HTTP timeout bot, response size limit TBL, stream timeout TeleBotHost"
+    priority: 0.74
+
   user-instance/index.md:
-    description: "User instance in TBL — per-user key-value storage. Save preferences, game state, and session data tied to each Telegram user."
-    keywords: "User instance TBL, per-user storage Telegram bot, user data TeleBotHost, bot user preferences"
-    priority: 0.82
+    description: "Deprecated User instance in TBL — migrate to async db.user. Legacy sync per-user storage reference and availability table."
+    keywords: "User instance deprecated TBL, migrate db.user, legacy user storage bot"
+    priority: 0.72
 
   user-instance/basics.md:
-    description: "Save, read, and delete per-user data in TBL with the User instance. Basic key-value operations and bulk clear patterns."
-    keywords: "User.set TBL, user storage bot, read user data Telegram, delete user key TBL"
-    priority: 0.78
+    description: "Legacy User.get, User.set, User.del in TBL — synchronous cache API. Deprecated in favor of db.user."
+    keywords: "User.get User.set deprecated, TBL legacy user storage"
+    priority: 0.68
 
   user-instance/advanced-use.md:
-    description: "Advanced User instance in TBL — object-based writes, operating on another user's data, and admin-style user data access."
-    keywords: "advanced user storage TBL, user_id bot data, admin user data Telegram bot"
-    priority: 0.72
+    description: "Migrate User to db.user in TBL. User is current-user only; cross-user admin requires db.user with user_id."
+    keywords: "migrate User db.user, User current user only, admin user_id db.user"
+    priority: 0.68
 
   global-instance/index.md:
     description: "Global instance in TBL for bot-wide shared storage. Counters, feature flags, and values visible across all users and commands."
@@ -205,18 +280,28 @@ pages:
     priority: 0.7
 
   msg-instance/index.md:
-    description: "msg instance in TBL for message actions — reply, edit, delete, forward, reactions, and chat actions on the current message."
-    keywords: "msg instance TBL, reply edit delete message, Telegram message methods TeleBotHost"
+    description: "msg instance in TBL — reply, edit, delete, react on the current Telegram message. Availability, aliases, rate limits."
+    keywords: "msg instance TBL, msg.reply editText, Telegram message methods TeleBotHost"
     priority: 0.82
 
-  msg-instance/use-msg.md:
-    description: "Full msg instance method reference in TBL. replyText, replyPhoto, editText, delete, forward, react, and chained message helpers."
-    keywords: "msg.replyText TBL, msg edit delete, message methods Telegram bot, msg instance reference"
+  msg-instance/replying.md:
+    description: "Reply with msg in TBL — text, photo, video, audio, stickers, polls, dice, location, and contact methods."
+    keywords: "msg.reply TBL, msg.replyPhoto replyVideo, reply message Telegram bot"
     priority: 0.8
 
-  msg-instance/msg-obj.md:
-    description: "The msg object in TBL — available properties, message context requirements, and case sensitivity for msg instance methods."
-    keywords: "msg object TBL, message properties Telegram, msg instance case sensitive"
+  msg-instance/editing.md:
+    description: "Edit messages with msg in TBL — editText, editCaption, editMedia, keyboards, live location, and polls."
+    keywords: "msg.editText TBL, editCaption editMedia, edit message Telegram bot"
+    priority: 0.78
+
+  msg-instance/actions.md:
+    description: "msg actions in TBL — delete, pin, react, forward, copy, chat actions, and business message read."
+    keywords: "msg.delete TBL, msg.react pin forward, sendChatAction bot"
+    priority: 0.78
+
+  msg-instance/message-data.md:
+    description: "msg message data in TBL — Telegram fields, getters, business messages, and availability rules."
+    keywords: "msg object TBL, message properties Telegram, msg.getText isBusiness"
     priority: 0.72
 
   globals/index.md:
@@ -334,13 +419,18 @@ pages:
     keywords: "handle webhook TBL, webhook command logic, request object webhook bot"
     priority: 0.75
 
+  webhook-instance/limits-and-security.md:
+    description: "Webhook and webapp rate limits, HMAC signatures, payload sizes, and security best practices in TBL."
+    keywords: "webhook rate limit TBL, webhook signature HMAC, webapp security TeleBotHost"
+    priority: 0.75
+
   webhook-instance/sending-webhook-response.md:
     description: "Return custom HTTP responses from webhook commands in TBL using the res instance — JSON, status codes, and execution rules."
     keywords: "webhook HTTP response TBL, res.json webhook, custom API response Telegram bot"
     priority: 0.72
 
   webapp-instance/index.md:
-    description: "Webapp URLs in TBL — public unsigned links for dashboards, pages, and lightweight web integrations on TeleBotHost."
+    description: "Webapp URLs in TBL — dynamic unsigned endpoints and public web links for dashboards, APIs, and bot commands."
     keywords: "Webapp TBL, public bot URL, Telegram webapp TeleBotHost, Webapp.getUrl"
     priority: 0.82
 
@@ -348,6 +438,11 @@ pages:
     description: "Webapp.getUrl and URL design in TBL. Build public web links with query parameters for bot commands."
     keywords: "Webapp.getUrl TBL, public web link bot, Webapp URL parameters"
     priority: 0.75
+
+  webapp-instance/public-web.md:
+    description: "Public web in TBL — serve static is_web commands at /public/{bot_id} per bot, without the sandbox. Landing pages and assets."
+    keywords: "public web TBL, is_web command, static bot landing page, TeleBotHost public URL"
+    priority: 0.8
 
   webapp-instance/examples.md:
     description: "Webapp and webhook JSON API examples in TBL — user-based endpoints, public dashboards, and CORS response patterns."
@@ -359,34 +454,64 @@ pages:
     keywords: "Webapp best practices TBL, public URL security bot, Webapp vs webhook TeleBotHost"
     priority: 0.7
 
-  res-instance.md:
+  res-instance/index.md:
     description: "The res instance in TBL — send JSON, HTML, XML, text, redirects, and rendered templates from webhook and Webapp commands."
     keywords: "res instance TBL, HTTP response bot, res.json res.html webhook, Telegram bot API endpoint"
     priority: 0.82
 
-  webapp-instance/response-methods.md:
-    description: "Quick reference for res methods in TBL — set, status, send, json, html, redirect, and render for webhook/Webapp commands."
-    keywords: "res methods TBL, res.status res.redirect, HTTP response methods bot"
+  res-instance/headers-and-status.md:
+    description: "Set HTTP headers and status codes with res.set and res.status in TBL webhook and webapp commands."
+    keywords: "res.set TBL, res.status webhook, HTTP headers bot response"
     priority: 0.7
 
-  res-instance-advanced.md:
-    description: "res.render() in depth for TBL — template context, content-type detection, EJS rendering, and user data in webhooks."
-    keywords: "res.render TBL, EJS template bot, render command webhook, template context TBL"
-    priority: 0.75
+  res-instance/send-json-text-xml.md:
+    description: "Send JSON, plain text, and XML with res.json, res.text, res.xml, and res.send in TBL."
+    keywords: "res.json TBL, res.text webhook, res.xml bot API"
+    priority: 0.7
 
-  webapp-instance/render-details.md:
-    description: "Template rendering with res.render in TBL — pass data, query params, and available variables inside rendered commands."
-    keywords: "template rendering TBL, res.render params, webhook template data"
+  res-instance/html-and-ejs.md:
+    description: "HTML responses and EJS templates with res.html and res.renderEJS in TBL."
+    keywords: "res.html TBL, EJS bot template, HTML webhook response"
+    priority: 0.7
+
+  res-instance/redirect.md:
+    description: "HTTPS redirects with res.redirect and webhook redirect prefetch in TBL."
+    keywords: "res.redirect TBL, HTTPS redirect webhook"
     priority: 0.68
 
+  res-instance/render.md:
+    description: "res.render() in TBL — template context, content-type detection, and data passing."
+    keywords: "res.render TBL, EJS template bot, render command webhook"
+    priority: 0.75
+
+  res-instance/defaults-and-protection.md:
+    description: "Default webhook responses, HTML age-gate protection, and HTML injection in TBL res."
+    keywords: "res default response TBL, HTML protection webhook"
+    priority: 0.65
+
   modules/index.md:
-    description: "Preloaded modules in TBL — lodash, jwt, bcrypt, validator, moment, zod, and more without npm install on TeleBotHost."
-    keywords: "TBL modules, lodash jwt bot, preloaded libraries TeleBotHost, modules.object TBL"
+    description: "TBL modules — JWT, crypto, lodash, zod, ethers, marketHub, md2html, and 15+ sandboxed npm utilities."
+    keywords: "TBL modules, modules.ethers marketHub, modules.md2html, preloaded libraries TeleBotHost"
     priority: 0.8
 
+  modules/ethers.md:
+    description: "ethers.js v6 in TBL — sandboxed HTTP JSON-RPC, contract reads, wallet signing, with RPC call limits."
+    keywords: "modules.ethers TBL, Ethereum bot, JSON-RPC provider Telegram, Web3 TBL"
+    priority: 0.58
+
+  modules/market-hub.md:
+    description: "marketHub in TBL — live crypto and fiat prices from CoinGecko and Frankfurter. Convert, search, top coins."
+    keywords: "modules.marketHub TBL, crypto price bot, BTC price Telegram, fiat exchange rate"
+    priority: 0.6
+
+  modules/md2html.md:
+    description: "md2html in TBL — convert Telegram Markdown to HTML for parse_mode HTML messages in bots."
+    keywords: "modules.md2html TBL, Telegram markdown HTML, md2html bot formatting"
+    priority: 0.55
+
   modules/jwt.md:
-    description: "JWT module in TBL — sign and verify JSON Web Tokens inside bot commands with modules.jwt."
-    keywords: "jwt TBL module, sign token bot, verify JWT Telegram bot"
+    description: "JWT module in TBL — sign, verify, and decode JSON Web Tokens with modules.JWT."
+    keywords: "JWT TBL module, sign token bot, verify JWT Telegram bot"
     priority: 0.55
 
   modules/bcrypt.md:
@@ -410,13 +535,8 @@ pages:
     priority: 0.5
 
   modules/uuid.md:
-    description: "UUID module in TBL — generate UUID v4 identifiers in bot commands with modules.uuid."
-    keywords: "UUID TBL module, generate UUID bot, unique id Telegram bot"
-    priority: 0.5
-
-  modules/moment.md:
-    description: "moment module in TBL — format and manipulate dates in bot commands with modules.moment."
-    keywords: "moment TBL, date format bot, moment.js TeleBotHost module"
+    description: "UUID module in TBL — generate UUID v4 and v6 identifiers with modules.UUID."
+    keywords: "UUID TBL module, uuidv4 uuidv6 bot, unique id Telegram bot"
     priority: 0.5
 
   modules/lodash.md:
@@ -439,16 +559,6 @@ pages:
     keywords: "validator TBL, validate email bot, input validation Telegram bot"
     priority: 0.55
 
-  modules/chance.md:
-    description: "chance module in TBL — generate random names, numbers, and test data in bot commands."
-    keywords: "chance TBL module, random data bot, fake name generator Telegram"
-    priority: 0.5
-
-  modules/math.md:
-    description: "math module in TBL — math utilities such as sqrt and calculations inside bot command logic."
-    keywords: "math module TBL, math utilities bot, calculate Telegram bot"
-    priority: 0.45
-
   modules/qs.md:
     description: "qs module in TBL — parse and stringify query strings in bot commands with modules.qs."
     keywords: "qs module TBL, query string parse bot, URL params module"
@@ -469,11 +579,6 @@ pages:
     keywords: "zod TBL module, schema validation bot, validate input zod Telegram"
     priority: 0.5
 
-  modules/shortid.md:
-    description: "shortid module in TBL — generate short unique identifiers for links and references in bot commands."
-    keywords: "shortid TBL, short id generator bot, unique short code Telegram"
-    priority: 0.45
-
   modules/deepmerge.md:
     description: "deepmerge module in TBL — deep merge JavaScript objects in bot command logic."
     keywords: "deepmerge TBL, merge objects bot, deep merge module TeleBotHost"
@@ -485,8 +590,8 @@ pages:
     priority: 0.45
 
   libs/index.md:
-    description: "TBL Libs — TeleBotHost-specific helpers: ResourcesLib, tgutil, refLib, MCL membership checks, and random utilities."
-    keywords: "TBL Libs, ResourcesLib tgutil, TeleBotHost libraries, Libs instance bot"
+    description: "TBL Libs — built-in helpers: random, dateTimeFormat, tgutil, ResourcesLib, refLib, MCL. Sync/async, 2s timeout, sandbox."
+    keywords: "TBL Libs, ResourcesLib tgutil, TeleBotHost libraries, Libs MCL refLib"
     priority: 0.78
 
   libs/resourceslib.md:
@@ -515,6 +620,6 @@ pages:
     priority: 0.6
 
   libs/tgutil.md:
-    description: "tgutil in TBL — Telegram text utilities: full names, user links, HTML escape, and inline button helpers."
-    keywords: "tgutil TBL, Telegram mention link, escape HTML bot, user full name Telegram"
+    description: "tgutil in TBL — Telegram names, mentions, chat links, message links, HTML/Markdown escaping, and entity parsing."
+    keywords: "tgutil TBL, Telegram mention link, escape HTML bot, getFullName user"
     priority: 0.65

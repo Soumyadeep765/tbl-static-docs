@@ -1,17 +1,36 @@
 # Guides
 
-These pages answer the questions that come up once you've got a bot running but aren't sure which tool to reach for.
+These pages answer questions that come up once you've got a bot running but aren't sure which tool to reach for.
 
-They sit between the tutorials (step-by-step walkthroughs) and the reference sections (method lists and variable docs). Read them when you're planning a feature, not when you're looking up a single method name.
+They sit between the [Command Flow](../getting-started-with-tbl/index.md) guides (how commands work) and the reference sections (method lists and variable docs).
 
-## What's here
+## Command & interaction guides
 
-More guides will land here over time — things like structuring multi-step flows, handling errors without scaring users, and when webhooks beat normal commands.
+| Guide | When to read |
+| --- | --- |
+| [Command Flow](../getting-started-with-tbl/index.md) | Understand matching, execution, fields |
+| [Handling Callbacks](../getting-started-with-tbl/handling-callbacks.md) | Inline buttons, `answerCallbackQuery`, edit message |
+| [Markdown & Formatting](../getting-started-with-tbl/markdown-and-formatting.md) | Bold/italic answers, `md2html` |
+| [Public Web Commands](../getting-started-with-tbl/public-web-commands.md) | Static `is_web` pages per bot |
+| [Handling User Input](../getting-started-with-tbl/handle-need-reply.md) | Multi-step input flows |
 
-**[Bot vs Api](bot-vs-api.md)** lives in the sidebar right after the [Bot](../bot-instance/index.md) and [Api](../api-instance/index.md) sections on purpose: read those overviews first, then use the comparison guide when both objects start to blur together.
+## Instance comparison
+
+**[Bot vs Api](bot-vs-api.md)** — lives in the sidebar after the [Bot](../bot-instance/index.md) and [Api](../api-instance/index.md) sections. Read those overviews first, then use the comparison when both objects start to blur together.
+
+## Choosing a web surface
+
+| Need | Use |
+| --- | --- |
+| Static landing page | [Public web](../webapp-instance/public-web.md) (`is_web`) |
+| Dynamic API with `db` | [Webapp](../webapp-instance/index.md) |
+| Signed per-user action | [User webhook](../webhook-instance/user-webhook.md) |
+| Cron / system trigger | [Global webhook](../webhook-instance/global-webhook.md) |
 
 ## Where to go next
 
-If you haven't built a bot yet, start with [Getting Started](../getting-started.md) and [Your First Bot](../getting-started-with-tbl/first-hello-bot.md).
+Haven't built a bot yet? [Getting Started](../getting-started.md) → [Your First Bot](../getting-started-with-tbl/first-hello-bot.md).
 
-For context in every command, see [Global Variables](../globals/index.md). For instance reference, see [Bot](../bot-instance/index.md) and [Api](../api-instance/index.md), then [Bot vs Api](bot-vs-api.md).
+For context in every command: [Global Variables](../globals/index.md).
+
+For instance reference: [Bot](../bot-instance/index.md), [Api](../api-instance/index.md), [Bot vs Api](bot-vs-api.md).

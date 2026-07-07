@@ -1,43 +1,54 @@
 # The `bot` Variable
 
-In TBL, `bot` contains **information about the current bot** running the command.
+In TBL, `bot` contains **information about the current bot** running the command. It provides the bot's identity, owner email, and platform status.
 
-It provides details about the bot’s identity, owner, and platform status.
+## Properties
 
-## What `bot` Contains
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | `number` | Internal bot ID on the platform |
+| `bot_id` | `number` | Numeric Telegram bot ID |
+| `first_name` | `string` | Bot display name |
+| `username` | `string` | Telegram @username |
+| `name` | `string` | Alias for `username` |
+| `owner` | `string` | Owner email address |
+| `status` | `string` | `"working"` when the bot is active, `"stopped"` otherwise |
+| `created_at` | `string` | Bot creation timestamp |
+| `updated_at` | `string` | Last update timestamp |
 
-The `bot` variable is a **JSON object** with platform-level information about the bot.
-
-It may include:
-
-- Internal bot ID on TeleBotHost
-- Telegram bot ID
-- Bot name
-- Owner information
-- Bot status
-- Creation and update timestamps
-
-## Demo Bot Object
-
-Example structure of the `bot` object:
+## Example
 
 ```json
 {
   "id": 42,
-  "token": "123456:ABC...",
-  "name": "DemoBot",
   "bot_id": 987654321,
-  "owner": "somemail@telebothost.com",
+  "first_name": "DemoBot",
+  "username": "demobot",
+  "name": "demobot",
+  "owner": "owner@example.com",
   "status": "working",
-  "created_at": "2025-01-01",
-  "updated_at": "2025-01-10"
+  "created_at": "2025-01-01T00:00:00.000Z",
+  "updated_at": "2025-01-10T00:00:00.000Z"
 }
+```
+
+## Usage Examples
+
+```javascript
+// Greet with the bot's display name
+Bot.sendMessage(user.id, `Welcome! I'm ${bot.first_name}.`)
+
+// Check if the bot is running
+if (bot.status !== 'working') {
+  Bot.sendMessage(user.id, 'Bot is currently offline.')
+}
+
+// Log bot identity for admin commands
+Bot.inspect(`Bot @${bot.username} (ID ${bot.id})`)
 ```
 
 ## Important Notes
 
-- `bot` is read-only
-- It exists only during command execution
-- It represents platform-level information, not Telegram updates
-
-The `bot` variable is useful for admin tools, logging, and bot management logic.
+- `bot` is read-only and exists only during command execution
+- It represents platform-level bot metadata, not Telegram update data
+- The Telegram bot token is **not** exposed as a global variable — use the [Api instance](../api-instance/index.md) to call the Telegram API

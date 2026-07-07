@@ -1,50 +1,65 @@
-# The plan Variable
+# The `plan` Variable
 
-In TBL, `plan` contains subscription and feature details of the bot owner's plan. It specifies the resource limits, rate limits, and features available for the current bot.
+In TBL, `plan` contains the **resolved subscription limits and features** for the bot owner. TBL uses these values internally to enforce timeouts, buffer sizes, and rate limits — you can also read them to gate features in your bot logic.
 
----
+## Properties
 
-## Subscription Tier Limits Reference
+| Field | Type | Description |
+| --- | --- | --- |
+| `name` | `string` | Plan name: `"Free"`, `"Freemium"`, `"Premium"`, or `"Elite"` |
+| `premium` | `boolean` | Whether the plan is a premium tier |
+| `ads` | `boolean` | Whether ads are shown |
+| `prop_limit.per_account` | `number` | Max storage properties per account |
+| `timeout` | `number` | Max script runtime in **milliseconds** |
+| `buffer_size` | `number` | Max Buffer allocation in **bytes** |
+| `parallel_process` | `number` | Max concurrent Promise executions |
+| `support_contact` | `boolean` | Support access enabled |
+| `sleep` | `number` | Max total `sleep()` duration in **seconds** |
+| `rate_limit.perMinute` | `number` | Web/webapp requests per minute |
+| `rate_limit.perDay` | `number` | Web/webapp requests per day |
 
-Below is a detailed comparison of resource and rate limits across the different TBL subscription tiers.
+## Tier Comparison
 
-| Tier Name | Premium Status | Timeout (seconds) | Buffer Size (KB/MB) | Parallel Processes | Max Sleep (seconds) | Rate Limits (Min / Day) |
+| Tier | Premium | Timeout | Buffer | Parallel | Max Sleep | Rate (min / day) |
 | --- | --- | --- | --- | --- | --- | --- |
-| **Free** | false | 15s | 512 KB | 10 | 10s | 15 / min, 5,000 / day |
-| **Freemium** | false | 15s | 512 KB | 10 | 10s | 30 / min, 5,000 / day |
-| **Premium** | true | 30s | 5 MB | 20 | 20s | 60 / min, 10,000 / day |
-| **Elite** | true | 60s | 10 MB | 40 | 50s | 120 / min, 20,000 / day |
+| **Free** | No | 15s | 512 KB | 10 | 10s | 15 / 5,000 |
+| **Freemium** | No | 15s | 512 KB | 10 | 10s | 30 / 5,000 |
+| **Premium** | Yes | 30s | 5 MB | 20 | 20s | 60 / 10,000 |
+| **Elite** | Yes | 60s | 10 MB | 40 | 50s | 120 / 20,000 |
 
----
-
-## What the Limits Mean
-
-*   **Timeout**: The maximum time (in seconds) a command script is allowed to execute before being forcefully terminated.
-*   **Buffer Size**: The maximum memory allocation allowed for safe buffer creations within scripts.
-*   **Parallel Processes**: The maximum number of concurrently executing updates or RPC calls allowed per instance.
-*   **Max Sleep**: The maximum duration allowed when calling `sleep()`.
-*   **Rate Limits**: The fixed-window limits applied to incoming updates (per minute and per day) to protect system resources.
-
----
-
-## Example plan Object Structure
+## Example Object
 
 ```json
 {
   "name": "Elite",
   "premium": true,
   "ads": false,
-  "prop_limit": {
-    "per_account": 100
-  },
+  "prop_limit": { "per_account": 100 },
   "timeout": 60000,
   "buffer_size": 10485760,
   "parallel_process": 40,
   "support_contact": true,
   "sleep": 50,
-  "rate_limit": {
-    "perMinute": 120,
-    "perDay": 20000
-  }
+  "rate_limit": { "perMinute": 120, "perDay": 20000 }
 }
 ```
+
+## Usage
+
+```javascript
+// Gate a premium feature
+if (!plan.premium) {
+  return Bot.sendMessage(user.id, 'This feature requires a Premium plan.')
+}
+
+// Show plan info to the owner
+if (user.id === owner.id) {
+  Bot.sendMessage(user.id, `Your plan: ${plan.name} (${plan.timeout / 1000}s timeout)`)
+}
+```
+
+## Important Notes
+
+- `plan` is read-only and frozen during command execution
+- `timeout` and `buffer_size` are in milliseconds and bytes respectively; `sleep` is in seconds
+- Raw subscription dates are on [owner.plan](owner.md); resolved limits are on `plan`

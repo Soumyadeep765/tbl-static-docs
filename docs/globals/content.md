@@ -1,33 +1,52 @@
 # The `content` Variable
 
-In TBL, `content` contains the **response body returned from an HTTP request**.
-
-It represents the main data received from the server.
+In TBL, `content` contains the **response body** from a completed HTTP request. It is only available inside **HTTP callback commands** — commands that run after an [HTTP](../http-instance/index.md) request finishes.
 
 ## How `content` Works
 
-When you make an HTTP request:
+`content` is a shortcut for `http_response.response.content`. Depending on the response type, it may be:
 
-- The response body is converted to text
-- That text is stored in `content`
-- The value is usually **stringified data**
+| Response type | `content` value |
+| --- | --- |
+| JSON API | Parsed object or JSON string |
+| Plain text | String body |
+| Binary | `Buffer` |
+| Stream | Stream object (see [http_response](http_response.md)) |
 
-For example, if an API returns JSON, `content` will contain it as a string.
+```javascript
+// Inside an HTTP success callback command (/fetchData)
+let body = content
 
-## Demo Example
-
-Example value of `content`:
-
-```json
-"{\"status\":true,\"message\":\"Hello from API\"}"
+// If JSON was auto-parsed, use response.data instead
+let data = response.data
 ```
 
-You can then parse or process this value in your logic if needed.
+## Example
+
+After fetching an API that returns JSON:
+
+```json
+{
+  "status": true,
+  "message": "Hello from API"
+}
+```
+
+`content` may contain the parsed object or the raw string depending on the response. Use `response.data` when `response.isJson` is `true` for the parsed result.
+
+## Related Globals
+
+In HTTP callback commands, these are also available:
+
+| Global | Same as |
+| --- | --- |
+| `http_response` | Full request + response wrapper |
+| `response` | `http_response.response` |
+| `headers` | `response.headers` |
+| `cookies` | `response.cookies` |
 
 ## Important Notes
 
-- `content` contains text data
-- It exists only during command execution
-- Its value depends on the HTTP response
-
-The `content` variable is mainly used when working with external APIs.
+- `content` is only set in HTTP callback commands — not in webhook body responses or normal Telegram commands
+- It exists only during the callback command execution
+- Prefer `response.data` for parsed JSON and `response.content` for the raw body

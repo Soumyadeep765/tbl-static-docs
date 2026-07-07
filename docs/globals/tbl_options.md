@@ -1,36 +1,50 @@
 # The `tbl_options` Variable
 
-In TBL, `tbl_options` contains **exactly what you pass to a callback command**.
+In TBL, `tbl_options` holds **custom data you pass to a callback command** when chaining HTTP requests or API calls. It is not available in normal command execution.
 
-It is not wrapped or modified.
+## When `tbl_options` Is Set
 
-## How `tbl_options` Is Used
+| Flow | How to pass |
+| --- | --- |
+| HTTP request callback | Pass `tbl_options` in the HTTP request options |
+| API method callback | Pass `tbl_options` in the API call options |
 
-The `tbl_options` variable is used when:
+```javascript
+// HTTP: pass data to the success callback
+HTTP.get('https://api.example.com/data', {
+  success: '/onData',
+  tbl_options: { page: 2, userId: user.id }
+})
 
-- A command is executed as a callback
-- A value is explicitly passed for the next command
-
-It is **not available** in normal command execution.
-
-## Example Value
-
-If this value is passed:
-
-```json
-{
-  "key": "value"
-}
+// API: pass data to a callback command
+Api.sendMessage(chat.id, 'Done!', {
+  tbl_options: { step: 3 }
+})
 ```
 
-Then `tbl_options` will be that exact value.
+## Reading in the Callback Command
 
-You can access it directly:
+```javascript
+// Inside /onData (HTTP callback)
+let page = tbl_options.page
+let userId = tbl_options.userId
+```
 
-tbl_options.key
+## Value When Not Set
 
-## Notes
+If nothing is passed, `tbl_options` is **`null`** — not `undefined`.
+
+## `tbl_options` vs `options`
+
+| Variable | Source |
+| --- | --- |
+| `tbl_options` | Explicitly passed via `tbl_options` in HTTP/API options |
+| `options` | `Bot.run` data, full API JSON response, or webhook merge |
+
+Use `tbl_options` when you need to pass your own context through a callback. Use `options` for API results or `Bot.run` payloads.
+
+## Important Notes
 
 - `tbl_options` exists only in callback commands
-- It can be any type (object, string, number, etc.)
-- If nothing is passed, it will be `undefined`
+- It can be any type — object, string, number, array, etc.
+- It is read-only during callback execution

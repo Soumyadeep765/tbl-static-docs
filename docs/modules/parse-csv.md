@@ -1,40 +1,89 @@
 # ParseCSV
 
-ParseCSV is used to **parse CSV strings into JSON objects**.
-
-It is useful when working with CSV data in bots or scripts, such as importing lists, reports, or external data sources.
-
-ParseCSV functionality is available through the `modules` object.
-
-## Parsing a CSV String
+`modules.ParseCSV` parses **CSV strings** into arrays of row objects. Returns a **Promise** — use `await`.
 
 ```js
-const result = modules.ParseCSV.parse(
-  "name,age\nAlice,25\nBob,30"
-)
+let rows = await modules.ParseCSV.parse("name,age\nAlice,25\nBob,30")
+// [{ name: "Alice", age: "25" }, { name: "Bob", age: "30" }]
 ```
 
-This converts CSV rows into an array of objects.
+Built on [csv-parse](https://www.npmjs.com/package/csv-parse).
 
-## Example Output
+---
 
+## Basic usage
+
+```js
+let csv = "id,name,score\n1,Alice,95\n2,Bob,87"
+let rows = await modules.ParseCSV.parse(csv)
+
+for (let row of rows) {
+  Bot.inspect(row.id + ": " + row.name + " = " + row.score)
+}
 ```
-result → [
-  { name: "Alice", age: "25" },
-  { name: "Bob", age: "30" }
-]
+
+By default, the first row is treated as column headers and values are **strings**.
+
+---
+
+## With options
+
+Pass any [csv-parse options](https://csv.js.org/parse/options/) as the second argument:
+
+```js
+// Tab-separated, no header row
+let rows = await modules.ParseCSV.parse(tsvData, {
+  delimiter: "\t",
+  columns: ["id", "name", "value"]
+})
+
+// Skip empty lines
+let rows = await modules.ParseCSV.parse(csv, {
+  skip_empty_lines: true
+})
 ```
 
-Values are returned as **strings** by default.
+---
+
+## Limits
+
+| Limit | Value |
+| --- | --- |
+| Total input size | Plan buffer size (512 KB – 10 MB) |
+| Max record size | 256 KB per row |
+| Method | Async — returns Promise |
+
+Exceeding input size throws: `CSV input exceeds plan limit (N bytes)`.
+
+---
+
+## Example — import user list
+
+```js
+let csv = process.env.USER_CSV  // from ENV or HTTP response
+
+let rows = await modules.ParseCSV.parse(csv, {
+  columns: true,
+  skip_empty_lines: true,
+  trim: true
+})
+
+let imported = 0
+for (let row of rows) {
+  if (modules.validator.isEmail(row.email)) {
+    db.bot.set("users/" + row.email, { name: row.name })
+    imported++
+  }
+}
+
+Bot.sendMessage(chat.id, "Imported " + imported + " users.")
+```
+
+---
 
 ## Notes
 
-- The first row is treated as column headers
-- Each row becomes one object
-- Useful for quick CSV imports and transformations
-
-## Official Documentation
-
-[csv-parse Docs]
-
-[csv-parse Docs]: https://www.npmjs.com/package/csv-parse
+- Always `await` — `parse()` returns a Promise
+- Column names come from the header row unless you set `columns` manually
+- For YAML data, use [ParseYML](parse-yml.md)
+- For query strings, use [qs](qs.md)

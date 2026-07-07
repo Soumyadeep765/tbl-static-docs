@@ -52,9 +52,9 @@ Useful for admin alerts in busy groups.
 If your next line needs to edit or delete what you just sent, `await` the call:
 
 ```js
-let msg = await Api.sendMessage({ text: "Working..." })
+let sent = await Api.sendMessage({ text: "Working..." })
 // later
-await msg.editText("Finished.")
+await sent.editText("Finished.")
 ```
 
 See [Method Chaining](method-chaining.md) for everything you can do with that returned object.
@@ -74,3 +74,19 @@ The `afterGetChat` command receives Telegram's response in [`options`](../global
 `Api.sendMessage` accepts any parameter the [Telegram Bot API documents](https://core.telegram.org/bots/api#sendmessage) — reply markup, link previews, protected content, message threading in groups, the lot.
 
 If you need buttons under the message, read [Inline Keyboards](inline-keyboards.md). For files and media, [Media and Files](media-and-files.md).
+
+## Rich messages (Bot API 10.1)
+
+For structured content — tables, headings, nested lists, formulas, collapsible blocks — use `Api.sendRichMessage` instead of plain text:
+
+```js
+Api.sendRichMessage({
+  rich_message: {
+    markdown: "# Order Summary\n\n| Item | Qty |\n| --- | --- |\n| Widget | 2 |"
+  }
+})
+```
+
+Pass content via the `markdown` or `html` field inside `rich_message`, as described in the [Rich Messages docs](https://core.telegram.org/bots/api#rich-messages).
+
+To **stream** partial rich content (e.g. AI-generated replies), use `Api.sendRichMessageDraft` with a `draft_id` and updated `rich_message` on each call. For plain-text streaming, use `Api.sendMessageDraft`.

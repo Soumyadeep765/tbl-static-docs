@@ -29,7 +29,7 @@ Telegram delivers the update. TBL matches `/start`, sends the answer, done. The 
 
 ## Formatting the answer
 
-The answer field accepts [Telegram Markdown](https://core.telegram.org/bots/api#formatting-options). Bold, italic, line breaks — useful for welcome text.
+The answer field accepts [Telegram Markdown](markdown-and-formatting.md) by default. Bold, italic, line breaks — useful for welcome text.
 
 ```
 *Welcome!*
@@ -48,4 +48,4 @@ If nothing comes back, check the bot is launched in the dashboard and you're mes
 
 [Adding a Keyboard](adding-keyboard.md) — give users buttons so they don't have to type commands.
 
-Or read [Command Structure](command-structure.md) if you want the full picture of how triggers and special commands work.
+Or read [Command Flow](index.md) for the full structured guide.

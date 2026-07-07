@@ -3,13 +3,13 @@
 Send a message with Api, get back an object you can act on immediately — edit it, reply to it, pin it, delete it — without hunting for `message_id`.
 
 ```js
-let msg = await Api.sendMessage({ text: "Hello." })
+let sent = await Api.sendMessage({ text: "Hello." })
 
-await msg.pin()
-await msg.react("👍")
-await msg.editText("Updated.")
-await msg.reply("Follow-up.")
-await msg.delete()
+await sent.pin()
+await sent.react("👍")
+await sent.editText("Updated.")
+await sent.reply("Follow-up.")
+await sent.delete()
 ```
 
 Each method maps to the Telegram API call you'd otherwise write by hand with ids and chat references.
@@ -73,9 +73,9 @@ If you're unsure, `await` the send and try — if chaining methods exist on the 
 ## Tiny example
 
 ```js
-let msg = await Api.sendMessage({ text: "Temporary." })
-await msg.editText("This will disappear.")
-await msg.delete()
+let sent = await Api.sendMessage({ text: "Temporary." })
+await sent.editText("This will disappear.")
+await sent.delete()
 ```
 
 ## See also

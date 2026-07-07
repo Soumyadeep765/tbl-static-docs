@@ -1,12 +1,18 @@
-# Basic Global Operations (Deprecated)
+# Basic Global Operations (Removed)
 
-!!! warning "Deprecated"
-    The synchronous `Global` API is deprecated. Please transition to [`db.global`](../db-instance/index.md) instead.
+!!! danger "Removed"
+    `Global.set`, `Global.get`, `Global.del`, `Global.getAll`, and `Global.delAll` have been **removed**. They are not available in any command context.
 
-For legacy support, the basic synchronous operations on the `Global` object are:
+Use [`db.global`](../db-instance/global.md) for all account-level storage.
 
-*   **Set data**: `Global.set(key, value, type)`
-*   **Get data**: `Global.get(key)`
-*   **Delete data**: `Global.del(key)`
-*   **Get all data**: `Global.getAll()`
-*   **Delete all data**: `Global.delAll()`
+## Replacement
+
+See [Unified Methods](../db-instance/unified-methods.md) for the full `db.global` API. Common operations:
+
+- `await db.global.set(key, value)`
+- `await db.global.get(key, defaultValue)`
+- `await db.global.del(key)`
+- `await db.global.getAll()`
+- `await db.global.delAll()`
+
+All `db.global` methods are asynchronous. See [Account-Level Storage](../db-instance/global.md) for examples.

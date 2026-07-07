@@ -1,90 +1,124 @@
 # User-Based Webhooks
 
-User-based webhooks execute commands **in the context of a user**.  
-This means `user` and `chat` are available inside the command.
+Generate signed URLs that execute commands **in the context of a Telegram user**. Inside the command, `user`, `chat`, and the `User` instance are available.
 
-They are useful for triggering bot actions from websites, dashboards, or external APIs **on behalf of a user**.
+---
 
-## Generate Webhook for Current User
+## `getUrl(command, { options, params, expiresIn })`
 
-### getUrl(command, { options, params, redirect })
+Creates a webhook URL for the **current user** — the user whose update triggered the command (e.g. when called from a Telegram message handler).
 
-Generates a **secure webhook URL** for the **current user**.
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `command` | string | Command name or alias to run |
+| `options` | object | Data passed to the command (signed) |
+| `params` | object | Extra query parameters (visible in URL) |
+| `expiresIn` | number | Optional seconds until URL expires |
 
-- `command` → command to execute
-- `options` → custom data passed to the command
-- `params` → extra query parameters
-- `redirect` → optional URL to redirect after execution
+`redirect` is **not** supported on `getUrl()`. Use [`getUrlFor()`](#geturlfor) or [`getGlobalUrl`](global-webhook.md) for redirect prefetch.
 
-Example:
+### Example
 
 ```js
 let syncUrl = Webhook.getUrl("syncGameData", {
   options: { level: 10 },
-  params: { ref: "profile", lang: "en" }
+  params: { ref: "profile", lang: "en" },
+  expiresIn: 3600
 })
 
-Api.sendMessage({
-  text: `Sync your game data: ${syncUrl}`
+await Api.sendMessage({
+  chat_id: chat.id,
+  text: `Sync your data: ${syncUrl}`
 })
 ```
 
-## Generate Webhook for a Specific User
+---
 
-### getUrlFor({ user_id, command, options, params, redirect })
+## `getUrlFor({ user_id, command, redirect, options, params, expiresIn })`
 
-Generates a **personalized webhook URL** for a specific user ID.
+Creates a webhook URL for a **specific user ID**. Use this when generating links from admin commands or backend jobs for a known user.
 
-This is ideal for sending links that should work only for a given user.
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `user_id` | number | Target Telegram user ID |
+| `command` | string | Command to execute |
+| `redirect` | string | Optional HTTPS URL — prefetched into [`content`](../globals/content.md) |
+| `options` | object | Signed options object |
+| `params` | object | Extra query parameters |
+| `expiresIn` | number | Optional expiry in seconds |
 
-Example:
+### Example
 
 ```js
 let upgradeUrl = Webhook.getUrlFor({
-  user_id: 123,
-  command: "syncGameData",
-  redirect: "https://telebothost.com",
+  user_id: 123456789,
+  command: "applyUpgrade",
+  redirect: "https://api.example.com/plan-status",
   options: { plan: "pro" },
-  params: { ref: "upgrade" }
-})
-
-Api.sendMessage({
-  text: `Upgrade your plan here: ${upgradeUrl}`
+  params: { ref: "email" },
+  expiresIn: 600
 })
 ```
 
-## Example Webhook URL
+When the webhook fires, the platform fetches `redirect` (HTTPS only) and exposes the response body as the global `content` variable before your command runs.
 
-A generated webhook URL may look like this:
+---
+
+## Example URL
 
 ```
-https://prod-api.telebothost.com/ownlang/webhook/XXXXXXX
-?command=syncGameData
-&options=%7B%22level%22%3A10%7D
-&sig=SECURE_SIGNATURE
-&user=USER_ID
-&ref=profile
-&lang=en
+https://{domain}/webhook/{bot_id}
+  ?command=syncGameData
+  &options=%7B%22level%22%3A10%7D
+  &sig=a1b2c3...
+  &user=987654321
+  &expires=1710000000
+  &ref=profile
+  &lang=en
 ```
 
-Values are signed and protected.  
-Changing them will invalidate the request.
+- Changing `command`, `options`, `user`, or `expires` invalidates `sig`
+- Expired URLs (when `expires` is set) return **403**
 
-## Execution & Response
+---
 
-- By default, webhook execution returns a **2xx HTTP response**
-- This indicates successful command execution
-- Redirects are handled automatically when `redirect` is provided
+## Inside the command
 
-!!! note
-    You can also use the **[res]** instance to control the HTTP response manually.
+```js
+// user and chat are populated
+let name = user.first_name
+let saved = await db.user.get("progress", 0)
 
-[res]: ../res-instance.md
+// Read HTTP details
+let ref = params.ref || request.query.ref
+let ip = request.ip
 
-## Notes
+// Respond
+res.json({
+  ok: true,
+  user_id: user.id,
+  progress: saved,
+  ref
+})
+```
 
-- User-based webhooks always include user context
-- `user` and `chat` are available in the command
-- Options and params are safely signed
-- URLs cannot be forged or reused for other users
-- Ideal for user-specific actions and flows
+---
+
+## Sending Telegram messages
+
+User webhooks have user context, but there is still no `msg` helper. Use `Api` with explicit IDs or resolve chat from `chat`:
+
+```js
+await Api.sendMessage({
+  chat_id: chat.id,
+  text: "Webhook processed for " + user.first_name
+})
+```
+
+---
+
+## See also
+
+- [Webhook Types](webhook-types.md)
+- [Handling Requests](handle-webhook.md)
+- [HTTP Responses (res)](../res-instance/index.md)

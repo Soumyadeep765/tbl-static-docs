@@ -48,7 +48,7 @@ Reach for **Bot** when you're orchestrating:
 
 - Running another command (`Bot.runCommand`)
 - Sending straightforward messages without touching Telegram's deeper options
-- Reading or writing [bot-level storage](../bot-instance/storing-data.md)
+- Reading or writing [bot-level storage](../bot-instance/bot-properties.md)
 - Listing users who've talked to your bot
 
 Bot methods are shorter because TeleBotHost already knows the context. Less typing, fewer ways to pass a wrong `chat_id`.

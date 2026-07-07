@@ -15,6 +15,18 @@ Api.editMessageText({
 })
 ```
 
+You can also edit a **rich message** (Bot API 10.1) by passing `rich_message` instead of `text`:
+
+```js
+Api.editMessageText({
+  chat_id: chat.id,
+  message_id: request.message.message_id,
+  rich_message: {
+    markdown: "**Status:** Complete"
+  }
+})
+```
+
 You need the `message_id` of the message you're changing. In a callback handler that's usually `update.callback_query.message.message_id`. If you just sent the message yourself, `await Api.sendMessage(...)` and chain `.editText()` instead — see [Method Chaining](method-chaining.md).
 
 ## Edit caption on media
@@ -59,8 +71,8 @@ Api.deleteMessage({
 Or, if you have the chained response object:
 
 ```js
-let msg = await Api.sendMessage({ text: "Temporary notice." })
-await msg.delete()
+let sent = await Api.sendMessage({ text: "Temporary notice." })
+await sent.delete()
 ```
 
 ## What you can't edit

@@ -1,43 +1,80 @@
-# Account-Level Storage (db.global)
+# Account-Level Storage (`db.global`)
 
-The `db.global` collection is used to store data shared across all bots owned by the same user account.
+`db.global` stores data **shared across all bots** under the same owner account — cross-bot bans, shared balances, and account-wide configuration.
 
----
+| Property | Value |
+| --- | --- |
+| Scope | Entire owner account |
+| Isolation | Any bot on the account can read and write |
+| Default context | Current owner's account |
 
-## Isolation and Scope
+## Methods
 
-*   **Scope**: Shared across all bots under the same owner account.
-*   **Isolation**: Scoped to the entire owner account. Any bot belonging to the account can read or modify this data.
+All [unified CRUD methods](unified-methods.md) and [advanced operations](advanced-operations.md). Replaces the removed `Global` instance.
 
----
+!!! note "Syntax difference"
+    `db.global.set` accepts **positional syntax only**: `set(key, value, options)`. Object-form `set({ key, value })` is not supported. `get`, `has`, and `del` support object syntax for the key.
 
-## Common Use Cases
+## Examples
 
-*   **Cross-Bot Balances**: Implementing shared virtual credits across a network of companion bots.
-*   **Unified Blacklists/Bans**: Restricting abusive users from all bots under your account simultaneously.
-*   **Shared Settings**: Distributing global API keys or system-wide configurations to all instances.
+### Network-wide ban
 
----
-
-## Code Examples
-
-### 1. Checking Banned Status Network-Wide
-```javascript
-const isBanned = await db.global.get(`banned:${user.id}`, false);
+```js
+let isBanned = await db.global.get("banned:" + user.id, false)
 
 if (isBanned) {
-  return Bot.sendMessage('Access denied: You have been blocked across this network of bots.');
+  return Bot.sendMessage("Access denied across this network of bots.")
+}
+
+// Ban a user account-wide
+await db.global.set("banned:" + user.id, true)
+```
+
+### Shared maintenance lock
+
+```js
+await db.global.set("global_maintenance", true, { ttl: 3600 })
+
+if (await db.global.get("global_maintenance", false)) {
+  Bot.sendMessage("All bots are in maintenance mode.")
 }
 ```
 
-### 2. Sharing Configuration Across All Bots
-```javascript
-// Retrieve a shared external service configuration token
-const apiToken = await db.global.get('external_api_token', '');
+### Cross-bot counter
+
+```js
+let total = await db.global.incr("network_visits", 1)
 ```
 
-### 3. Setting a Global Lock
-```javascript
-// Enable system-wide lock for maintenance across all bots
-await db.global.set('global_maintenance', true);
+### Batch read
+
+```js
+let flags = await db.global.mget(["maintenance", "max_daily", "version"])
 ```
+
+### List global keys
+
+```js
+let all = await db.global.getAll({ offset: 0, limit: 30 })
+```
+
+### Clear all global data
+
+```js
+await db.global.delAll()
+```
+
+## Common use cases
+
+- Unified ban lists across companion bots
+- Shared virtual currency or referral pools
+- Account-wide feature flags and maintenance mode
+- Cross-bot analytics counters
+
+## Important notes
+
+- Replaces removed `Global.set` / `Global.get` — update old commands to `db.global`
+- Use namespaced keys to avoid collisions: `banned:{user_id}`, `config:api_url`
+- Store **secrets** in dashboard [ENV variables](../globals/process.md), not in `db.global`
+- For data scoped to one bot only, use [`db.bot`](bot.md)
+- For per-user data on one bot, use [`db.user`](user.md)

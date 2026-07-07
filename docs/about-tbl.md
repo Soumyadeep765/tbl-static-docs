@@ -14,6 +14,18 @@ Telegram sends an update. TBL finds the matching **command** and runs it. The co
 
 That makes behavior easier to reason about. One update, one command, one path through the code.
 
+## What a command can do
+
+| Surface | Example |
+| --- | --- |
+| **Telegram reply** | Answer field + Logic → chat message |
+| **Inline buttons** | Logic sends keyboard → [Handling Callbacks](getting-started-with-tbl/handling-callbacks.md) |
+| **Formatted text** | Markdown/HTML answers — [Markdown & Formatting](getting-started-with-tbl/markdown-and-formatting.md) |
+| **Public web page** | `is_web` command → `/public/{bot_id}/index.html` |
+| **HTTP API** | Webhook or webapp command → `res.json()` |
+
+See [Command Flow](getting-started-with-tbl/index.md) for the full structured guide.
+
 ## Short-lived executions
 
 Each run is sandboxed and time-bounded. Your command does its work — send messages, read storage, call HTTP — and exits. Under load, many users can trigger commands at once without one long-running script getting tangled.
@@ -32,7 +44,8 @@ The tradeoff: less flexibility, faster path to a working bot.
 
 ## What to read next
 
-- [Command Structure](getting-started-with-tbl/command-structure.md) — triggers, answers, `@`, `!`, `*`  
+- [Command Flow](getting-started-with-tbl/index.md) — fields, matching, execution, callbacks, public web  
+- [Your First Bot](getting-started-with-tbl/first-hello-bot.md) — hands-on `/start`  
 - [Global Variables](globals/index.md) — `user`, `chat`, `update`, and runtime context  
 - [Bot](bot-instance/index.md) and [Api](api-instance/index.md) — the two main instances  
-- [Bot vs Api](guides/bot-vs-api.md) — two objects, two jobs (after the Bot and Api overviews)
+- [Bot vs Api](guides/bot-vs-api.md) — two objects, two jobs

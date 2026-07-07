@@ -1,194 +1,127 @@
-# Sending Messages and Media with Bot
+# Sending Messages
 
-These Bot methods send messages or media to the **current chat**.
+`Bot` provides shorthand methods for sending text, keyboards, and media to the **current chat**. All methods auto-fill `chat_id` from the command context.
 
-- All messages go to the current chat by default
-- Using `await` is optional
-- If awaited, the Telegram API response is returned
-- Only **some methods** support [chained] actions
+## Text messages
 
-## Sending Text Messages
-
-### Simple Text
+### Simple string
 
 ```js
-Bot.sendMessage("Hello user!")
+Bot.sendMessage("Hello!")
 ```
 
-### Object Format
+Defaults to `parse_mode: "Markdown"`. Keep formatting simple — unclosed markers cause send failures.
+
+### Object format
 
 ```js
-Bot.sendMessage({ text: "Hello user!" })
+Bot.sendMessage({ text: "Hello!" })
 ```
 
-### With Formatting
+### Custom parse mode
 
 ```js
-let res = await Bot.sendMessage(
-  "Hello friend",
-  { parse_mode: "HTML" }
-)
+await Bot.sendMessage("Hello friend", { parse_mode: "HTML" })
 ```
 
-## Sending Keyboards
-
-### String Format
+### Disable formatting
 
 ```js
-Bot.sendKeyboard("Choose an option:", "Yes,No")
+Bot.sendMessage("Price: $5 * 2", { parse_mode: undefined })
 ```
 
-### Object Format
+## Reply keyboards
+
+Send a message with a reply keyboard using comma-separated button labels:
 
 ```js
+// String format
+Bot.sendKeyboard("Choose an option:", "Yes,No,Maybe")
+
+// Object format
 Bot.sendKeyboard({
   text: "Choose an option:",
-  keyboard: "Yes,No"
+  keyboard: "Yes,No,Maybe"
 })
 ```
 
-## Sending Media
+For **inline buttons** (callback buttons under a message), use [`Api.sendMessage`](../api-instance/inline-keyboards.md) with `reply_markup` instead.
 
-All media methods support **string** and **object** formats.
+## Media
 
-### Photo
+All media methods accept a **string** (file URL or path) or an **object** with the media field and options.
 
-```js
-Bot.sendPhoto("photo.jpg")
+| Method | String example | Object example |
+| --- | --- | --- |
+| `Bot.sendPhoto` | `Bot.sendPhoto("photo.jpg")` | `Bot.sendPhoto({ photo: "photo.jpg", caption: "Nice!" })` |
+| `Bot.sendDocument` | `Bot.sendDocument("file.pdf")` | `Bot.sendDocument({ document: "file.pdf", caption: "Your file" })` |
+| `Bot.sendAudio` | `Bot.sendAudio("music.mp3")` | `Bot.sendAudio({ audio: "music.mp3", caption: "Listen" })` |
+| `Bot.sendVideo` | `Bot.sendVideo("video.mp4")` | `Bot.sendVideo({ video: "video.mp4", caption: "Watch" })` |
+| `Bot.sendVoice` | `Bot.sendVoice("voice.ogg")` | `Bot.sendVoice({ voice: "voice.ogg", caption: "Voice note" })` |
 
-Bot.sendPhoto({
-  photo: "photo.jpg",
-  caption: "Nice view!"
-})
-```
+Captions default to Markdown when provided.
 
-### Document
+## Awaiting responses
 
-```js
-Bot.sendDocument("file.pdf", "Here is your pdf")
-
-Bot.sendDocument({
-  document: "file.pdf",
-  caption: "Here is your file"
-})
-```
-
-### Audio
+`await` is optional. When used, you get the Telegram API response — and message-sending methods return a **chainable object**:
 
 ```js
-Bot.sendAudio("music.mp3")
-
-Bot.sendAudio({
-  audio: "music.mp3",
-  caption: "Here is your music"
-})
+let sent = await Bot.sendMessage("Pinned message")
+await sent.pin()
+await sent.editText("Updated.")
+await sent.delete()
 ```
 
-### Video
+See [Api Method Chaining](../api-instance/method-chaining.md) for all chained methods. Not every `Bot` send method returns a chainable object — `sendMessage` and media sends do when awaited.
+
+## Debugging with `Bot.inspect`
+
+Formats values and sends them to the current chat. Useful during development.
 
 ```js
-Bot.sendVideo("video.mp4")
+// Single value
+Bot.inspect(user)
 
-Bot.sendVideo({
-  video: "video.mp4",
-  caption: "Watch this"
-})
+// Multiple values
+Bot.inspect("User data:", user, { step: 2 })
+
+// String + object
+Bot.inspect("Result:", someArray)
 ```
 
-### Voice
+| Behavior | Detail |
+| --- | --- |
+| Input | One or more values (strings sent as-is, objects formatted) |
+| Output | Sent as a plain-text message (no Markdown) |
+| `console.log` | Routes to `Bot.inspect` in TBL commands |
 
-```js
-Bot.sendVoice("voice.ogg")
+!!! warning "Development only"
+    Avoid sending `Bot.inspect` output to end users in production — it may expose internal data.
 
-Bot.sendVoice({
-  voice: "voice.ogg",
-  caption: "Voice note"
-})
-```
+## What's not in Bot
 
-## Using Chained Methods (Limited Support)
+Telegram **read/query** methods are not available on `Bot`:
 
-Only **specific Bot methods** return a response that supports **[chained] methods**  
-(when used with `await`).
+- `getChat`, `getMe`, `getUserProfilePhotos`, etc.
 
-Example:
+Use the [`Api` instance](../api-instance/index.md) for those. `Bot` is for **sending output** and **controlling bot flow**.
 
-```js
-let data = await Bot.sendMessage("Pinned message")
+## Method reference
 
-data.pin()
-```
+| Method | Parameters | Description |
+| --- | --- | --- |
+| `sendMessage(text, options?)` | Text string or `{ text, ...options }` | Send formatted text |
+| `sendKeyboard(text, keyboard?, options?)` | Text + comma-separated buttons | Send with reply keyboard |
+| `sendPhoto(photo, options?)` | URL/path or `{ photo, caption?, ... }` | Send photo |
+| `sendDocument(doc, options?)` | URL/path or `{ document, caption?, ... }` | Send document |
+| `sendAudio(audio, options?)` | URL/path or `{ audio, caption?, ... }` | Send audio |
+| `sendVideo(video, options?)` | URL/path or `{ video, caption?, ... }` | Send video |
+| `sendVoice(voice, options?)` | URL/path or `{ voice, caption?, ... }` | Send voice message |
+| `inspect(...values)` | One or more values | Debug output to chat |
 
-!!! note
-    Not all Bot methods support chaining.
-    Chaining works only when the method returns a Telegram message object.
+## Important notes
 
-## Debugging with Bot.inspect()
-
-`Bot.inspect()` sends **inspect data to the current chat**.
-
-It is mainly used for **debugging** and **checking values quickly**.
-
-### Inspect Any Data
-
-```js
-Bot.inspect({ user: "Alice", id: 123 })
-```
-
-### Inspect Multiple Values
-
-```js
-Bot.inspect(
-  "User data:",
-  user,
-  { id: 123 },
-  someArray
-)
-```
-
-The inspected data is formatted and sent as a message in the chat.
-
-!!! tip
-    Use `Bot.inspect()` only during development.
-    Avoid using it in production bots for users.
-
-## Available Bot Methods
-
-Only the following Bot methods are available for sending output:
-
-- `Bot.sendMessage`
-- `Bot.sendKeyboard`
-- `Bot.sendDocument`
-- `Bot.sendPhoto`
-- `Bot.sendAudio`
-- `Bot.sendVideo`
-- `Bot.sendVoice`
-- `Bot.inspect`
-
-These methods are intentionally limited and focused on output and flow control.
-
-## Not Available in Bot
-
-Methods that **read or query Telegram data**, such as:
-
-- `getChat`
-- `getMe`
-- `getUserProfilePhotos`
-- or similar Telegram API read methods
-
-are **not available** in the Bot instance.
-
-!!! info
-    The Bot instance is designed for sending responses and controlling bot behavior,
-    not for querying Telegram data.
-
-## Important Notes
-
-- All Bot send methods use the current chat
-- `await` is optional
-- Only limited methods support chained actions
-- `Bot.inspect()` sends output to chat
+- All send methods target the **current chat** — no `chat_id` needed
 - Method names are case-sensitive
-- Errors can be handled using the `!` command
-
-[chained]: ../api-instance/method-chaining.md
+- Errors from Telegram are logged; use `await` and check `res.ok` when failures matter
+- For advanced Telegram features (inline keyboards, message edits, rich messages), use [`Api`](../api-instance/index.md)

@@ -64,7 +64,7 @@ Or swap the keyboard while leaving the text alone — `editMessageReplyMarkup`. 
 
 ## callback_data limits
 
-Telegram caps `callback_data` at 64 bytes. Don't stash JSON in there. Store an ID or short token, look up the rest in [User storage](../user-instance/basics.md) or [Bot storage](../bot-instance/storing-data.md).
+Telegram caps `callback_data` at 64 bytes. Don't stash JSON in there. Store an ID or short token, look up the rest in [`db.user`](../db-instance/user.md).
 
 ## URL vs callback
 
@@ -77,6 +77,7 @@ Mix them freely in the same keyboard.
 
 ## Where to go next
 
+- [Handling Callbacks](../getting-started-with-tbl/handling-callbacks.md) — full callback flow tutorial
 - [Editing Messages](editing-messages.md) — change text and keyboards after send
 - [Callbacks](callbacks.md) — route callback handling through `on_run`
 - [Method Chaining](method-chaining.md) — if you sent the message with `await Api.sendMessage`

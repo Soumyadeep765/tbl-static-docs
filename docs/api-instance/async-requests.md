@@ -31,8 +31,8 @@ Without that check, the failure only appears in your platform error logs. The co
 When you `await Api.sendMessage`, the return value is also a chainable object — edit, delete, pin the message you just created. See [Method Chaining](method-chaining.md).
 
 ```js
-let msg = await Api.sendMessage({ text: "Loading..." })
-await msg.editText("Done.")
+let sent = await Api.sendMessage({ text: "Loading..." })
+await sent.editText("Done.")
 ```
 
 ## Don't await everything

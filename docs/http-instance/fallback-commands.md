@@ -1,98 +1,148 @@
-# Using HTTP with Fallback Commands
+# Fallback Commands
 
-TBL allows you to define **success** and **error fallback commands** when making HTTP requests.
+Chain HTTP requests to other commands using `success` and `error`. The HTTP call returns immediately; callback commands run when the response arrives.
 
-These commands are executed automatically based on the result of the request.
+## Basic setup
 
-If the **error command is missing**, the **success command will run instead**.
-
-This makes HTTP workflows simple, safe, and predictable.
-
-## Basic HTTP Request with Fallback Commands
-
-You can attach `success` and `error` commands directly to an HTTP request.
-
-Example:
 ```js
 HTTP.get({
-  url: "https://jsonplaceholder.typicode.com/todos/1",
-  success: "onSuccess",
-  error: "onError",
-  tbl_options: { key: value }
+  url: "https://api.example.com/todos/1",
+  success: "/onSuccess",
+  error: "/onError",
+  tbl_options: { source: "menu" }
 })
 ```
-### tbl_options
 
-- `tbl_options` is optional
-- Used to pass **custom data** to the next command
-- Available directly as `tbl_options` in the success or error command
+| Option | When it runs |
+| --- | --- |
+| `success` | HTTP status is **2xx** (`res.ok === true`) |
+| `error` | HTTP status is **not 2xx** (`res.ok === false`) |
 
-Example access:
+If the request fails and `error` is **not defined**, no callback command runs. Use `await` inline when you need to handle failures in the same command.
 
-tbl_options.key
+## Passing data with `tbl_options`
 
-## How Command Execution Works
-
-- If the HTTP request succeeds:
-  - The `success` command is executed
-  - `options` contains the HTTP response
-- If the HTTP request fails:
-  - The `error` command is executed
-  - `options` contains the HTTP error
-- If the `error` command is **not defined**:
-  - The `success` command will be executed instead
-
-!!! note
-    The error command runs only on **real HTTP failures**  
-    such as invalid URLs, network errors, or server errors (e.g. 500).
-
-## Example Success Command
-
-The success command receives HTTP response data.
-
-Example:
 ```js
-/*command: onSuccess*/
-Bot.sendMessage("Fetched title: " + content)
+HTTP.post({
+  url: "https://api.example.com/order",
+  body: { item: params },
+  success: "/onOrderDone",
+  tbl_options: { item: params, userId: user.id }
+})
 ```
-On success, the following variables are available:
 
-- `http_response`
-- `response`
-- `content` (raw response body string)
-- `headers`
-- `cookies`
+Inside `/onOrderDone`, read `tbl_options.item` and `tbl_options.userId`. See [`tbl_options`](../globals/tbl_options.md).
 
-## Example Error Command
+## Success callback (`/onSuccess`)
 
-The error command receives HTTP error details.
+When the request succeeds, these globals are available:
 
-Example:
+| Global | Description |
+| --- | --- |
+| `http_response` | Full result wrapper |
+| `response` | Parsed HTTP response object |
+| `content` | Raw body (`response.content`) |
+| `headers` | Response headers |
+| `cookies` | Parsed cookies |
+| `tbl_options` | What you passed in the request |
+
 ```js
-/*command: onError*/
-Bot.sendMessage("HTTP request failed: " + error.status)
+// Command: /onSuccess
+if (response.ok && response.isJson) {
+  Bot.sendMessage(chat.id, "Title: " + response.data.title)
+} else {
+  Bot.sendMessage(chat.id, "Response: " + content)
+}
 ```
-On error, the following are available:
 
-- `error`
-- `options` (error-related response data)
-- `tbl_options` (if provided)
+## Error callback (`/onError`)
 
-## Available Response Data
+When the request fails (non-2xx), the `error` global contains the **full HTTP response object**:
 
-On successful requests, detailed response information is available.
+| Field | Example |
+| --- | --- |
+| `error.status` | `404`, `500` |
+| `error.ok` | `false` |
+| `error.content` | Error body string |
+| `error.data` | Parsed error JSON (if applicable) |
+| `error.error.code` | Machine-readable code (e.g. `"TIMEOUT"`) |
+| `error.error.message` | Human-readable message |
 
-See full documentation here: [HTTP Response]
+```js
+// Command: /onError
+if (error.status === 404) {
+  Bot.sendMessage(chat.id, "Resource not found.")
+} else if (error.status === 408 || error.error?.code === "TIMEOUT") {
+  Bot.sendMessage(chat.id, "Request timed out.")
+} else {
+  Bot.sendMessage(chat.id, "Request failed: " + error.status)
+}
+```
 
-[HTTP Response]: ../globals/http_response.md
+`http_response`, `response`, `content`, `headers`, and `cookies` are also set the same way as in success callbacks.
 
-## Important Notes
+## Inline vs callback
 
-!!! tip
-    Use fallback commands to keep HTTP logic separate from message logic.
+| Approach | Best for |
+| --- | --- |
+| `await HTTP.get(...)` | Same command needs the result immediately |
+| `success` / `error` | Fire-and-forget, keep commands short, multi-step pipelines |
 
-!!! warning
-    HTTP fallback commands do not catch TBL runtime errors.
-    Those must be handled using the `!` command.
+```js
+// Inline — handle in same command
+let res = await HTTP.get("https://api.example.com/price")
+if (res.ok) Bot.sendMessage(chat.id, "$" + res.data.price)
 
-This approach makes external API integration clean, modular, and easy to debug.
+// Callback — delegate to another command
+HTTP.get({
+  url: "https://api.example.com/price",
+  success: "/showPrice",
+  error: "/priceUnavailable"
+})
+```
+
+## Command chain limit
+
+Each `success` or `error` callback counts toward the **6-command chain limit** per execution (same as `Bot.run`). Deep HTTP → command → HTTP chains should be kept shallow.
+
+## What fallback commands do not catch
+
+| Not caught by `error` callback | Handle with |
+| --- | --- |
+| TBL script errors in the same command | `!` error handler |
+| Invalid HTTP options (bad URL, etc.) | `!` error handler (throws before request) |
+| Network-level throws in validation | `!` error handler |
+
+## Full pipeline example
+
+```js
+// /fetchWeather command
+HTTP.get({
+  url: "https://api.weather.com/current",
+  query: { city: params },
+  headers: { "X-Key": process.env.WEATHER_API_KEY },
+  success: "/showWeather",
+  error: "/weatherError",
+  tbl_options: { city: params }
+})
+
+Bot.sendMessage(chat.id, "Fetching weather for " + params + "...")
+```
+
+```js
+// /showWeather command
+let temp = response.data.temperature
+Bot.sendMessage(chat.id, tbl_options.city + ": " + temp + "°")
+```
+
+```js
+// /weatherError command
+Bot.sendMessage(chat.id, "Could not fetch weather (" + error.status + ")")
+```
+
+## Important notes
+
+- Callback commands have full access to `Bot`, `Api`, `db`, and globals
+- `HTTP` is **not available** inside broadcast commands
+- Response globals exist only during callback command execution
+- See [Responses](responses.md) for the full response object reference
