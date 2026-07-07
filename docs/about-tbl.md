@@ -1,8 +1,8 @@
 # What is TBL?
 
-**TBL (Tele Bot Language)** is the code you write inside TeleBotHost to make your bot do things — reply to messages, store user data, call APIs, show buttons, gate features behind channel joins.
+**TBL (Tele Bot Language)** is **JavaScript with built-in extras** for Telegram bot development — reply to messages, store user data, call APIs, show buttons, gate features behind channel joins.
 
-It's not for building websites or CLI tools. It's for Telegram bots. TeleBotHost handles hosting; TBL handles behavior. You focus on "what should happen when someone sends `/start`," not "how do I keep a Node process alive at 3 AM."
+You write real JavaScript in command **Logic** fields. TeleBotHost adds `Bot`, `Api`, `user`, `chat`, `db`, `modules`, and more so you skip the boilerplate and ship faster. It's not for building general websites or CLI tools — it's JavaScript tuned for bots. TeleBotHost handles hosting; you focus on "what should happen when someone sends `/start`," not "how do I keep a Node process alive at 3 AM."
 
 New to the platform? [Getting Started](getting-started.md). Ready to write code? [Learning TBL](learning-tbl.md).
 
@@ -67,9 +67,9 @@ Rule of thumb: npm-style utility → `modules`. Telegram-bot glue → `Libs`.
 
 ## Why the limits exist
 
-TBL deliberately isn't Node.js. You can't install arbitrary npm packages or open raw sockets. That frustrates people who want a full server — and protects everyone else from accidental infinite loops, runaway memory, or bots that become impossible to debug.
+TBL is JavaScript, but it's not a full Node.js server. You can't install arbitrary npm packages or open raw sockets. That frustrates people who want a general-purpose backend — and protects everyone else from accidental infinite loops, runaway memory, or bots that become impossible to debug.
 
-The tradeoff: less flexibility, faster path to a working bot. For most Telegram bots, that's a fair swap.
+The tradeoff: less freedom than raw Node, faster path to a working bot. For most Telegram bots, that's a fair swap — you get the language you know, plus the extras you actually need.
 
 ---
 

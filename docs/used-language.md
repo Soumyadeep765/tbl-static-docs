@@ -1,22 +1,32 @@
 # The TBL Language
 
-TeleBotHost bots run on **TBL** — short for Tele Bot Language. If you've written JavaScript, you'll feel at home in about thirty seconds. If you haven't, you'll still feel at home — just start with [Your First Bot](getting-started-with-tbl/first-hello-bot.md) and add Logic when you're ready.
+TeleBotHost bots run on **TBL** — short for Tele Bot Language. **It's JavaScript** with extra built-in tools for Telegram bot development. If you know JS, you're already halfway there. If you don't, start with [Your First Bot](getting-started-with-tbl/first-hello-bot.md) and add Logic when you're ready.
 
 ---
 
 ## What is TBL?
 
-TBL is the language you write inside TeleBotHost commands. Same familiar syntax — variables, objects, `if`, functions, `await` — but a different environment.
+**TBL is JavaScript plus bot-building extras.** You write the same language you'd use in a browser or Node app — variables, objects, `if`, functions, `await` — inside TeleBotHost commands.
 
-`Bot`, `Api`, `user`, and `chat` are already there. You don't bootstrap a server, install a Telegram library, or configure webhooks manually. You write commands in the dashboard, launch the bot, TeleBotHost runs it.
+On top of standard JavaScript, you get globals and instances purpose-built for bots:
 
-That's the deal: smaller runtime, sandboxed, built around **commands** instead of long-running processes.
+| Built-in extra | What it saves you |
+| --- | --- |
+| `Bot`, `Api` | Telegram send/edit/API calls without HTTP boilerplate |
+| `user`, `chat`, `params` | Parsing who sent what and where |
+| `db` | Async storage without setting up a database |
+| `modules`, `Libs` | Curated utilities without `npm install` |
+| `HTTP`, `Webhook`, `Webapp` | Outbound requests and HTTP endpoints |
+
+You don't bootstrap a server, install a Telegram library, or configure webhooks manually. Write commands in the dashboard, launch the bot, TeleBotHost runs your JavaScript.
+
+That's the deal: real JS, sandboxed runtime, built around **commands** instead of long-running processes.
 
 ---
 
-## Not Node, not Python
+## JavaScript — not a full Node server
 
-You can't paste an Express app or a python-telegram-bot script into TeleBotHost and expect it to run. TBL is its own thing — intentionally limited so bots stay stable and debuggable.
+You can't paste an Express app or a python-telegram-bot script into TeleBotHost and expect it to run unchanged. TBL runs **JavaScript in a bot-focused sandbox** — intentionally limited so bots stay stable and debuggable.
 
 | You can't | You can |
 | --- | --- |
@@ -63,7 +73,7 @@ Rule of thumb: general utility you'd npm install → `modules`. Telegram-bot-spe
 Bot.sendMessage(chat.id, "Hi!")
 ```
 
-That's a complete interaction pattern in one call. Or skip Logic entirely and put `"Hi!"` in the **Answer** field for the same result. Your call — Logic is where the fun starts.
+That's real JavaScript calling a built-in extra. One line, no imports, no Telegram library setup. Or skip Logic entirely and put `"Hi!"` in the **Answer** field for the same result. Your call — Logic is where the fun starts.
 
 ---
 
@@ -83,4 +93,4 @@ That's a complete interaction pattern in one call. Or skip Logic entirely and pu
 - [Command Flow](getting-started-with-tbl/index.md) — full structured guide  
 - [Your First Bot](getting-started-with-tbl/first-hello-bot.md) — five-minute tutorial  
 
-If you come from JavaScript, you'll be productive quickly. If you don't, the tutorials walk you through one step at a time — no assumptions about what you already know.
+If you already write JavaScript, you're writing TBL — the extras just save you boilerplate. If you're new to JS, the tutorials walk you through one step at a time — no assumptions about what you already know.

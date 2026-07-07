@@ -17,7 +17,7 @@ Every Telegram bot on TeleBotHost is a collection of **commands**. The platform 
 | Special handlers (`@`, `!`, `@@`) | Custom error middleware |
 
 !!! tip "New to TBL?"
-    Brand new? Start with [Getting Started](../getting-started.md), then [Your First Bot](first-hello-bot.md). The big picture: [What is TBL?](../about-tbl.md). Quick intro: [Learning TBL](../learning-tbl.md).
+    TBL is **JavaScript** with built-in bot extras — not a separate language. Brand new? Start with [Getting Started](../getting-started.md), then [Your First Bot](first-hello-bot.md). The big picture: [What is TBL?](../about-tbl.md). Quick intro: [Learning TBL](../learning-tbl.md).
 
 ---
 

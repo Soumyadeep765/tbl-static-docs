@@ -24,7 +24,7 @@ Think of a command as a small form with a few parts:
 | --- | --- |
 | **Name** | What triggers it (`/start`, `Help`, `*`) |
 | **Answer** | Optional auto-reply before logic |
-| **Logic** | JavaScript for dynamic behavior |
+| **Logic** | Real JavaScript + built-in bot extras for dynamic behavior |
 | **Options** | Keyboard, aliases, need reply, public web, parse mode |
 
 **Answer** is the fast path — static text TBL sends for you. **Logic** is where [`Bot`](../bot-instance/index.md), [`Api`](../api-instance/index.md), `db`, and [globals](../globals/index.md) like [`user`](../globals/user.md) and [`params`](../globals/params.md) come in.

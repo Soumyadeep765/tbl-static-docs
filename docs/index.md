@@ -2,7 +2,7 @@
 
 Build Telegram bots in the cloud without managing servers — write commands, hit save, and TeleBotHost runs the rest.
 
-**TBL (Tele Bot Language)** is the JavaScript-shaped code you write in the command editor. Built-in Telegram tools, curated `modules`, and zero DevOps guilt.
+**TBL (Tele Bot Language)** is **JavaScript** — real `if`, `await`, objects, the works — plus built-in extras for bot development: `Bot`, `Api`, `user`, `chat`, `modules`, `Libs`, and `db`. No boilerplate, no DevOps guilt.
 
 ---
 
@@ -16,7 +16,7 @@ Work through these in order — each step takes about five minutes:
 4. [What is TBL?](about-tbl.md) — the command-driven execution model  
 
 !!! tip "New to TBL?"
-    The fastest on-ramp: [Learning TBL](learning-tbl.md) — globals, instances, and your first Logic field in one page.
+    TBL is **JavaScript** with built-in bot extras — `Bot`, `Api`, `user`, `chat`, and more. The fastest on-ramp: [Learning TBL](learning-tbl.md) — globals, instances, and your first Logic field in one page.
 
 ---
 

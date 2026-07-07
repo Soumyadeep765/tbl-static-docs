@@ -1,8 +1,10 @@
 # Learning TBL
 
-TBL looks like JavaScript because it mostly is — same syntax for variables, `if`, loops, objects. What's different is what's *already there*: `Bot`, `Api`, `user`, `chat`, no `npm install`, no Express server to bootstrap.
+**TBL is JavaScript** — not a lookalike, not a dialect. You write real JavaScript in the **Logic** field: variables, `if`, loops, `await`, objects, all of it.
 
-You write logic inside commands. Telegram sends an update, TBL picks a command, your code runs, execution ends. That's the whole lifecycle. No event loop babysitting required.
+What makes it faster for bot building is what's *already there*: `Bot`, `Api`, `user`, `chat`, `db`, `modules`, and `Libs`. No `npm install`, no Express server, no wiring up a Telegram library before your first `Bot.sendMessage()`.
+
+You write logic inside commands. Telegram sends an update, TBL picks a command, your JavaScript runs, execution ends. That's the whole lifecycle. No event loop babysitting required.
 
 ---
 
@@ -58,9 +60,9 @@ Trigger the command on Telegram — you get a reply. For simple text responses, 
 
 ---
 
-## What's already there
+## JavaScript extras — already there
 
-You never write `import` or `require`. These globals are ready on day one:
+You never write `import` or `require`. On top of standard JavaScript, these bot-building globals are ready on day one:
 
 | Global | What it is |
 | --- | --- |

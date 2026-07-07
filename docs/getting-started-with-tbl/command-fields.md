@@ -12,7 +12,7 @@ No magic — just a form. Fill it in, save, test in Telegram.
 | --- | --- | --- |
 | **Command** | Yes | Trigger name (e.g. `/start`, `Help`, `*`) |
 | **Answer** | No* | Text sent before logic runs |
-| **Logic** | No | JavaScript that runs after the answer |
+| **Logic** | No | Real JavaScript (+ built-in bot extras) that runs after the answer |
 | **Keyboard** | No | Reply keyboard buttons below the input |
 | **Aliases** | No | Alternative trigger names |
 | **Need Reply** | No | Wait for the user's next message |
@@ -59,7 +59,9 @@ If you fill in Answer, TBL sends it for you. You don't need [`Bot.sendMessage()`
 
 ## Logic
 
-JavaScript that runs **after** the Answer (if any). This is where the interesting stuff happens:
+**Real JavaScript** that runs **after** the Answer (if any). Same language you'd write anywhere else — `if`, `await`, loops, objects — plus bot-building extras already in scope (`Bot`, `Api`, `user`, `chat`, `db`, `modules`, `Libs`). No imports needed.
+
+This is where the interesting stuff happens:
 
 - Conditional replies
 - Database reads/writes
