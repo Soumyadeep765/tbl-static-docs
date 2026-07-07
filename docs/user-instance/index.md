@@ -1,9 +1,30 @@
 # User Instance (Deprecated)
 
+The old way to save per-user data — synchronous, current-user-only, and officially retired. New code should use [`db.user`](../db-instance/user.md) instead.
+
+If you're starting fresh, skip this page entirely and go straight to `db.user`. If you're maintaining old commands, here's what you need to migrate.
+
+---
+
+## What was `User`?
+
+The synchronous **`User`** instance stored **per-user key-value data** for the **current user only** — the Telegram user who triggered the command. Data was scoped to one user on one bot and was not shared with others.
+
+| Old (`User`) | New (`db.user`) |
+| --- | --- |
+| Sync reads, fire-and-forget writes | `await` on all operations |
+| Current user only | Current user or `{ user_id }` |
+| No error feedback on writes | Returns `{ ok: true/false }` |
+| Manual counters | `incr`, `decr`, `push`, `pull` |
+
 !!! warning "Use `db.user` instead"
     The synchronous **`User`** instance is **deprecated**. All new code should use [`db.user`](../db-instance/user.md) — async, persistent, with `incr`, `push`, TTL, and proper error handling.
 
-`User` stores **per-user key-value data** for the **current user only** — the Telegram user who triggered the command. Data is scoped to one user on one bot and is not shared with others.
+---
+
+## How to migrate
+
+Replace every `User.*` call with the matching `await db.user.*` call:
 
 ```js
 // ❌ Deprecated
@@ -14,6 +35,24 @@ let level = User.get("level")
 await db.user.set("level", 5)
 let level = await db.user.get("level", 0)
 ```
+
+!!! tip "New to TBL?"
+    `user` is a global variable (read-only profile info), not storage. Quick intro: [Learning TBL](../learning-tbl.md). Full storage guide: [`db.user`](../db-instance/user.md).
+
+---
+
+## Quick migration table
+
+| Deprecated | Replacement |
+| --- | --- |
+| `User.get("key")` | `await db.user.get("key", fallback)` |
+| `User.set("key", val)` | `await db.user.set("key", val)` |
+| `User.del("key")` | `await db.user.del("key")` |
+| `User.getAll()` | `await db.user.getAll()` |
+| `User.delAll()` | `await db.user.delAll({ user_id: user.id })` |
+| `User.has("key")` | `await db.user.has("key")` |
+
+Full guide: [Advanced & Migration](advanced-use.md).
 
 ---
 
@@ -75,21 +114,6 @@ To read or write **another user's** data, use [`db.user`](../db-instance/user.md
 | --- | --- |
 | [Basics](basics.md) | `get`, `set`, `del`, `getAll`, `has` — current user only |
 | [Advanced & Migration](advanced-use.md) | `batchSet`, `refresh`, migration to `db.user` |
-
----
-
-## Quick migration
-
-| Deprecated | Replacement |
-| --- | --- |
-| `User.get("key")` | `await db.user.get("key", fallback)` |
-| `User.set("key", val)` | `await db.user.set("key", val)` |
-| `User.del("key")` | `await db.user.del("key")` |
-| `User.getAll()` | `await db.user.getAll()` |
-| `User.delAll()` | `await db.user.delAll({ user_id: user.id })` |
-| `User.has("key")` | `await db.user.has("key")` |
-
-Full guide: [Advanced & Migration](advanced-use.md).
 
 ---
 

@@ -1,6 +1,6 @@
 # Redirects
 
-Send an HTTP redirect with `res.redirect(url)`.
+Send an HTTP redirect with `res.redirect(url)`. Browsers follow it; API clients get a `302` (or similar) and the `Location` header.
 
 ---
 
@@ -31,6 +31,8 @@ Relative paths like `/another-page` are **not** accepted — use a full `https:/
 
 When generating webhook URLs, you can pass a `redirect` option to **prefetch external content** into the global [`content`](../globals/content.md) variable — this is separate from `res.redirect()`.
 
+Think of it as "fetch this URL before my command runs" vs "send the browser somewhere after."
+
 | Method | `redirect` support |
 | --- | --- |
 | `Webhook.getUrl()` | **No** |
@@ -50,7 +52,7 @@ When the webhook runs, the platform fetches the redirect URL (HTTPS only, size/t
 
 ---
 
-## Examples
+## Try it — copy-paste examples
 
 ### Redirect after processing
 

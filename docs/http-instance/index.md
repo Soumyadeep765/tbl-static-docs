@@ -1,6 +1,28 @@
 # HTTP
 
-The `HTTP` instance lets your bot make **outbound requests** to external APIs, websites, and services — GET, POST, PUT, and more — directly from command scripts.
+Your bot's passport to the outside world — call any REST API, payment gateway, or weather service without leaving your command's **Logic** field.
+
+For Telegram stuff, use [`Api`](../api-instance/index.md). For everything else on the internet, use `HTTP`.
+
+---
+
+## What is HTTP?
+
+The **`HTTP`** instance lets your bot make **outbound requests** to external APIs, websites, and services — GET, POST, PUT, and more — directly from command scripts.
+
+| You get | You skip |
+| --- | --- |
+| Any HTTP verb as a method | Building fetch wrappers |
+| JSON, form, stream responses | Manual parsing boilerplate |
+| Success/error command chaining | Polling for results |
+
+Use `HTTP` when you need data or actions **outside Telegram**. For Telegram API calls, use [`Api`](../api-instance/index.md).
+
+---
+
+## How to use it
+
+Drop this in any command's **Logic** field:
 
 ```js
 let res = await HTTP.get("https://api.example.com/status")
@@ -10,9 +32,18 @@ if (res.ok) {
 }
 ```
 
-Use `HTTP` when you need data or actions **outside Telegram**. For Telegram API calls, use [`Api`](../api-instance/index.md).
+Three things worth knowing upfront:
 
-## When to use HTTP
+1. **All methods return a Promise** — use `await`.
+2. **Requests don't throw on HTTP errors** — check `res.ok` instead.
+3. **Store API tokens in ENV vars** — never hard-code secrets. See [`process.env`](../globals/process.md).
+
+!!! tip "New to TBL?"
+    `user` and `chat` are globals available in every command. Quick intro: [Learning TBL](../learning-tbl.md).
+
+---
+
+## HTTP or Api?
 
 | Use HTTP for | Use Api for |
 | --- | --- |
@@ -20,6 +51,61 @@ Use `HTTP` when you need data or actions **outside Telegram**. For Telegram API 
 | Payment / auth services | Inline keyboards and callbacks |
 | Weather, news, external data | Editing Telegram messages |
 | Webhooks to your server | Bot admin methods (`getMe`, etc.) |
+
+---
+
+## Try it — copy-paste examples
+
+Start simple. Each example only introduces what it needs.
+
+### GET request
+
+```js
+let res = await HTTP.get("https://api.example.com/users", { query: { page: 1 } })
+
+if (res.ok) {
+  Bot.sendMessage(chat.id, "Found " + res.data.length + " users")
+}
+```
+
+### POST with a body
+
+Store your API token in dashboard **ENV** settings:
+
+```js
+let res = await HTTP.post("https://api.example.com/notify", {
+  body: { user_id: user.id, event: "signup" },
+  headers: { Authorization: "Bearer " + process.env.API_TOKEN },
+  timeout: 10000,
+  responseType: "json"
+})
+
+if (!res.ok) {
+  Bot.sendMessage(chat.id, "Could not reach server (" + res.status + ")")
+  return
+}
+
+Bot.sendMessage(chat.id, "Registered! ID: " + res.data.id)
+```
+
+ENV setup: [`process.env`](../globals/process.md)
+
+### Chain to another command
+
+Run `/onSuccess` or `/onError` when the request finishes — no `await` needed:
+
+```js
+HTTP.get({
+  url: "https://api.example.com/data",
+  success: "/onSuccess",
+  error: "/onError",
+  tbl_options: { requestId: "abc" }
+})
+```
+
+Inside callback commands, response data is available via [`http_response`](../globals/http_response.md), `response`, `content`, `headers`, and `cookies`. See [Fallback Commands](fallback-commands.md).
+
+---
 
 ## How it works
 
@@ -51,20 +137,7 @@ await HTTP.post({
 
 All methods return a **Promise** with a response object. Requests do not throw on HTTP errors — check `res.ok` instead.
 
-## Callback workflow
-
-Attach `success` and `error` command names to run another command when the request finishes:
-
-```js
-HTTP.get({
-  url: "https://api.example.com/data",
-  success: "/onSuccess",
-  error: "/onError",
-  tbl_options: { requestId: "abc" }
-})
-```
-
-Inside callback commands, response data is available via [`http_response`](../globals/http_response.md), `response`, `content`, `headers`, and `cookies`. See [Fallback Commands](fallback-commands.md).
+---
 
 ## Routing through proxies
 
@@ -75,6 +148,8 @@ Inside callback commands, response data is available via [`http_response`](../gl
 
 Deploy [cf-http-router](https://github.com/Soumyadeep765/cf-http-router) to get a free `*.workers.dev` cfProxy endpoint.
 
+---
+
 ## Availability
 
 | Context | `HTTP` |
@@ -82,6 +157,8 @@ Deploy [cf-http-router](https://github.com/Soumyadeep765/cf-http-router) to get 
 | Normal Telegram commands | ✓ |
 | Webhook / webapp | ✓ |
 | Broadcast commands | ✗ (`null`) |
+
+---
 
 ## Pages in this section
 
@@ -95,23 +172,3 @@ Deploy [cf-http-router](https://github.com/Soumyadeep765/cf-http-router) to get 
 | [Streaming](streaming.md) | `responseType: "stream"`, SSE, chunk reading, limits |
 | [Fallback Commands](fallback-commands.md) | `success` / `error` chaining, `tbl_options` |
 | [Limits & Timeouts](limits.md) | Plan timeouts, response size, redirects, stream caps |
-
-## Quick example
-
-```js
-let res = await HTTP.post("https://api.example.com/notify", {
-  body: { user_id: user.id, event: "signup" },
-  headers: { Authorization: "Bearer " + process.env.API_TOKEN },
-  timeout: 10000,
-  responseType: "json"
-})
-
-if (!res.ok) {
-  Bot.sendMessage(chat.id, "Could not reach server (" + res.status + ")")
-  return
-}
-
-Bot.sendMessage(chat.id, "Registered! ID: " + res.data.id)
-```
-
-Store API tokens in dashboard [ENV variables](../globals/process.md) — never hard-code secrets.

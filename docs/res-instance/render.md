@@ -1,6 +1,6 @@
 # res.render()
 
-Render another command's source code as the HTTP response. Ideal for separating API logic from HTML/JSON templates.
+Render another command's source code as the HTTP response. Ideal for separating API logic from HTML/JSON templates — keep your handler lean, your templates dumb.
 
 ```js
 res.render("dashboard.html", {
@@ -111,7 +111,7 @@ HTML commands also receive platform HTML injection (`<base>`, meta tag, attribut
 
 ---
 
-## Practical examples
+## Try it — copy-paste examples
 
 ### Separate API logic from HTML
 

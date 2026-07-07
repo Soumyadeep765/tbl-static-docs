@@ -1,6 +1,6 @@
 # Actions
 
-Delete, pin, react, forward, copy, and send chat actions on the **current message** or chat.
+Delete, pin, react, forward, copy, and send chat actions on the **current message** or chat. Side effects without sending a new message.
 
 ```js
 await msg.delete()
@@ -172,7 +172,7 @@ Throws `read is only available for business messages` on normal messages.
 
 ---
 
-## Examples
+## Try it — copy-paste examples
 
 ### Self-destructing command response
 
@@ -215,3 +215,11 @@ await msg.reply("Result: " + result.data.value)
 - `forward` shows "Forwarded from" header; `copy` does not
 - Rate limit: **10 msg method calls per second**
 - For actions on messages sent via `Api`, use [method chaining](../api-instance/method-chaining.md) on the returned object
+
+---
+
+## See also
+
+- [Replying](replying.md)
+- [Editing](editing.md)
+- [Message Data](message-data.md)

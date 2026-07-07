@@ -1,6 +1,22 @@
 # Database Storage (`db`)
 
-The `db` instance is TBL's **modern asynchronous storage API**. Use it to persist bot-wide settings, per-user data, and account-level shared state across commands, webhooks, and webapps.
+Your bot's memory — store scores, settings, feature flags, and flow state that survives between commands. No database server to manage, just `await db.bot.set(...)` and you're done.
+
+The old sync storage APIs are gone or deprecated. `db` is the modern way.
+
+---
+
+## What is `db`?
+
+**`db`** is TeleBotHost's asynchronous storage API. Use it to persist bot-wide settings, per-user data, and account-level shared state across commands, webhooks, and webapps.
+
+| You get | You skip |
+| --- | --- |
+| Three scoped collections (`bot`, `user`, `global`) | Rolling your own database |
+| Counters, lists, TTL | Manual read-modify-write |
+| Works in commands, webhooks, webapps | Separate persistence layer |
+
+`db` is available in every command — just type `db`, no setup. All methods are **async** — use `await`.
 
 It replaces the removed legacy APIs:
 
@@ -10,12 +26,27 @@ It replaces the removed legacy APIs:
 | `Bot.set` / `Bot.get` (1 MB sync cap) | `db.bot` |
 | `User.set` / `User.get` | `db.user` |
 
-`db` is available in every command as `TBL.db`. All methods are **async** — use `await`.
+---
+
+## How to use it
+
+Drop this in any command's **Logic** field:
 
 ```js
 await db.bot.set("maintenance", true)
 let score = await db.user.get("score", 0)
 ```
+
+Three things worth knowing upfront:
+
+1. **All methods are async** — always `await` (or use `.then()`).
+2. **Three collections, three scopes** — pick the right drawer before you store.
+3. **Always check `result.ok`** after `set` and `del` — storage can fill up.
+
+!!! tip "New to TBL?"
+    `user` and `chat` are globals available in every command. Quick intro: [Learning TBL](../learning-tbl.md). For bot-level flow without storage, see [`Bot`](../bot-instance/index.md).
+
+---
 
 ## Collections
 
@@ -24,6 +55,48 @@ let score = await db.user.get("score", 0)
 | [`db.bot`](bot.md) | Current bot (all users) | Feature flags, caches, bot-wide counters |
 | [`db.user`](user.md) | Current bot + user | Profiles, balances, flow state |
 | [`db.global`](global.md) | Owner account (all bots) | Cross-bot bans, shared config |
+
+---
+
+## Try it — copy-paste examples
+
+Start simple. Each example only introduces what it needs.
+
+### Save a user's score
+
+```js
+await db.user.set("score", 100)
+let score = await db.user.get("score", 0)
+Bot.sendMessage(chat.id, "Your score: " + score)
+```
+
+### Bot-wide feature flag
+
+```js
+let maintenance = await db.bot.get("maintenance", false)
+if (maintenance) {
+  return Bot.sendMessage(chat.id, "Bot is under maintenance. Back soon!")
+}
+```
+
+### Counter with TTL
+
+Data expires after the TTL (minimum 60 seconds):
+
+```js
+await db.bot.set("cache", { price: 42.5 }, { ttl: 3600 })  // 1 hour
+```
+
+### Check if storage succeeded
+
+```js
+let res = await db.bot.set("big_payload", data)
+if (!res.ok) {
+  Bot.sendMessage(chat.id, "Storage full: " + res.message)
+}
+```
+
+---
 
 ## Top-level methods
 
@@ -45,6 +118,8 @@ Each collection (`db.bot`, `db.user`, `db.global`) supports:
 
 See [Unified Methods](unified-methods.md) for signatures and [Advanced Operations](advanced-operations.md) for counters and lists.
 
+---
+
 ## Syntax styles
 
 Most methods on `db.bot` and `db.user` accept **positional** or **object** syntax. `db.global` is mostly positional.
@@ -65,7 +140,11 @@ await db.global.get("lock", false)
 
 Not every method supports both forms — see [Unified Methods](unified-methods.md) for the full matrix.
 
-## Key behavior
+---
+
+## How `db` works
+
+The internals — useful when something breaks, skippable when you're vibing:
 
 ### Async and cached
 
@@ -85,15 +164,6 @@ Passing `null`, `undefined`, or `""` to `set` **deletes** the key instead of sto
 | `has` | `boolean` | `false` on error |
 | `mget` | `{ key: value, ... }` | Missing keys omitted |
 
-Always check `result.ok` after `set` and `del`:
-
-```js
-let res = await db.bot.set("big_payload", data)
-if (!res.ok) {
-  Bot.sendMessage("Storage full: " + res.message)
-}
-```
-
 ### TTL
 
 Pass `{ ttl: seconds }` in the options argument:
@@ -104,17 +174,15 @@ Pass `{ ttl: seconds }` in the options argument:
 | Maximum | 31,536,000 seconds (1 year) |
 | Unit | Seconds |
 
-```js
-await db.bot.set("cache", data, { ttl: 3600 })  // expires in 1 hour
-```
-
 ### Type casting
 
 Types are auto-detected. Override with `{ type: "integer" }` (or `"string"`, `"boolean"`, `"array"`, `"object"`, `"number"`, `"date"`, `"binary"`, `"text"`).
 
 Shorthand aliases: `str`, `int`, `num`, `bool`, `arr`, `obj`, `bin`, `txt`.
 
-### Storage limits
+---
+
+## Storage limits
 
 Total async `db` storage per account is capped by your [plan](../globals/plan.md):
 
@@ -142,16 +210,7 @@ let page1 = await db.user.getAll({ offset: 0, limit: 30 })
 let page2 = await db.user.getAll({ offset: 30, limit: 30 })
 ```
 
-## Pages in this section
-
-| Page | Covers |
-| --- | --- |
-| [Bot Storage (`db.bot`)](bot.md) | Bot-wide data, `clearAllData` |
-| [User Storage (`db.user`)](user.md) | Per-user data, scoping |
-| [Global Storage (`db.global`)](global.md) | Account-wide shared data |
-| [Unified Methods](unified-methods.md) | All CRUD signatures and syntax matrix |
-| [Advanced Operations](advanced-operations.md) | `incr`, `decr`, `push`, `pull`, `mget` |
-| [Analytics & Stats](analytics.md) | `getStorageStats`, monitoring usage |
+---
 
 ## Migration from legacy storage
 
@@ -168,3 +227,16 @@ let page2 = await db.user.getAll({ offset: 30, limit: 30 })
 ```
 
 Legacy sync storage and async `db` storage are separate systems. `getStorageStats()` tracks **async `db` only**.
+
+---
+
+## Pages in this section
+
+| Page | Covers |
+| --- | --- |
+| [Bot Storage (`db.bot`)](bot.md) | Bot-wide data, `clearAllData` |
+| [User Storage (`db.user`)](user.md) | Per-user data, scoping |
+| [Global Storage (`db.global`)](global.md) | Account-wide shared data |
+| [Unified Methods](unified-methods.md) | All CRUD signatures and syntax matrix |
+| [Advanced Operations](advanced-operations.md) | `incr`, `decr`, `push`, `pull`, `mget` |
+| [Analytics & Stats](analytics.md) | `getStorageStats`, monitoring usage |

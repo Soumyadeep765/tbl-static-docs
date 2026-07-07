@@ -2,11 +2,11 @@
 
 **Public web** serves static and semi-static bot content directly to browsers — landing pages, CSS, JS, and HTML templates — **without running the TBL sandbox**.
 
-It is the fastest way to host marketing pages, documentation sites, and front-end assets tied to your bot project.
+Fastest path to a marketing page, docs site, or front-end asset bundle tied to your bot project. No `res`, no `db`, no server logic — just files (with optional light EJS).
 
 ---
 
-## How it differs from Webapp
+## Public web vs Webapp
 
 | | Public web | Webapp |
 | --- | --- | --- |
@@ -17,7 +17,7 @@ It is the fastest way to host marketing pages, documentation sites, and front-en
 | **What is served** | Raw command `code` (+ EJS if `<%`) | Script execution output via `res` |
 | **Use case** | Static HTML, CSS, JS, assets | Dynamic APIs, DB-backed pages |
 
-Public web is **not** a replacement for webapps when you need database access or `res.json()`. It is a **static file server** backed by your bot's command files.
+Public web is **not** a replacement for webapps when you need database access or `res.json()`. It's a **static file server** backed by your bot's command files.
 
 ---
 
@@ -52,7 +52,7 @@ A command must be marked **`is_web = 1`** in your bot project. Commands without 
 }
 ```
 
-Only expose files you intend to be world-readable.
+Only expose files you intend to be world-readable. If it wouldn't go on a public CDN, don't mark it `is_web`.
 
 ---
 

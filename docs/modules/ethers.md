@@ -1,17 +1,31 @@
 # ethers
 
-`modules.ethers` is the [ethers.js v6](https://docs.ethers.org/v6/) library with a **sandboxed RPC layer**. Connect to public Ethereum JSON-RPC endpoints, read contracts, and format values — with HTTP-only providers and call limits.
+Read the blockchain without running your own node — or signing a blank cheque.
+
+## What is it?
+
+**ethers** is the [ethers.js v6](https://docs.ethers.org/v6/) library for Ethereum: read balances, call smart contracts, format wei, sign messages locally. In TBL it ships with a **sandboxed RPC layer** — HTTP providers only, with call limits and timeouts so one command can't hammer an endpoint forever.
+
+Access it as `modules.ethers`.
+
+---
+
+## How to use
+
+Connect to a public JSON-RPC endpoint and read the current block — **provider calls are async, use `await`**:
 
 ```js
 let provider = new modules.ethers.JsonRpcProvider("https://eth.llamarpc.com")
 let block = await provider.getBlockNumber()
 ```
 
+Store your RPC URL in dashboard ENV settings and read it via [`process.env`](../globals/process.md) instead of hard-coding URLs.
+
 ---
 
 ## What's available
 
-Most of ethers v6 works as documented — utilities, ABI encoding, wallets (local signing), formatting, etc.
+Most of ethers v6 works as documented — utilities, ABI encoding, wallets (local signing), formatting, and more.
 
 ### Sandboxed providers
 
@@ -53,6 +67,8 @@ let provider = new modules.ethers.JsonRpcProvider(process.env.ETH_RPC)
 let balance = await provider.getBalance("0x...")
 ```
 
+Every async RPC method on wrapped providers counts toward the limit and races against your plan timeout.
+
 ---
 
 ## Common patterns
@@ -84,7 +100,7 @@ let provider = new modules.ethers.FallbackProvider([
 ])
 ```
 
-### Format values
+### Format values (sync — no RPC)
 
 ```js
 modules.ethers.formatEther("1000000000000000000")   // "1.0"
@@ -93,33 +109,40 @@ modules.ethers.getAddress("0x...")                 // checksum address
 modules.ethers.isAddress("0x...")                  // true/false
 ```
 
-### Local wallet (no RPC needed for signing)
+### Local wallet (signing doesn't count as RPC)
 
 ```js
 let wallet = new modules.ethers.Wallet(process.env.PRIVATE_KEY)
-let message = "Hello"
-let signature = await wallet.signMessage(message)
+let signature = await wallet.signMessage("Hello")
 ```
 
 ---
 
-## Provider wrapping
+## Try it
 
-`JsonRpcProvider`, `FallbackProvider`, and `Contract` instances are wrapped:
+### Check an ETH balance
 
-- Every async RPC method counts toward the call limit
-- Every async RPC method has a plan-timeout race
-- Nested `.provider` objects are wrapped recursively
+[Bot](../bot-instance/index.md) replies in the current [chat](../globals/chat.md):
 
-Sync methods (encoding, formatting, address checks) are not limited.
+```js
+let address = params.trim()
 
----
+if (!modules.ethers.isAddress(address)) {
+  return Bot.sendMessage(chat.id, "That doesn't look like a valid address.")
+}
 
-## Error handling
+let provider = new modules.ethers.JsonRpcProvider(process.env.ETH_RPC)
+let balance = await provider.getBalance(address)
+let eth = modules.ethers.formatEther(balance)
+
+Bot.sendMessage(chat.id, "Balance: " + eth + " ETH")
+```
+
+### Handle RPC errors gracefully
 
 ```js
 try {
-  let provider = new modules.ethers.JsonRpcProvider(rpcUrl)
+  let provider = new modules.ethers.JsonRpcProvider(process.env.ETH_RPC)
   let block = await provider.getBlockNumber()
   Bot.sendMessage(chat.id, "Block: " + block)
 } catch (err) {
@@ -127,7 +150,9 @@ try {
 }
 ```
 
-Common errors:
+---
+
+## Error reference
 
 | Error | Cause |
 | --- | --- |
@@ -140,8 +165,8 @@ Common errors:
 
 ## Notes
 
-- Store RPC URLs and private keys in [ENV variables](../globals/process.md)
-- Use a reliable public RPC or your own HTTP endpoint
+- **Provider calls need `await`** — encoding, formatting, and `isAddress()` are sync
+- Store RPC URLs and private keys in [`process.env`](../globals/process.md) — never hard-code
 - Wallet signing is local — does not count as an RPC call
 - For price lookups without RPC, see [marketHub](market-hub.md)
 - Official ethers v6 docs: [docs.ethers.org](https://docs.ethers.org/v6/)

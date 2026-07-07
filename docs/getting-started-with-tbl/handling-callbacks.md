@@ -1,12 +1,14 @@
 # Handling Callbacks
 
-**Callback queries** fire when a user taps an **inline button** — a button attached to a message, not the reply keyboard at the bottom of the chat.
+Reply keyboards send button text as messages. **Inline buttons** are different — they live *inside* the message bubble and fire a **callback query** when tapped. No new message in the chat. Just a tap, a spinner, and your Logic.
 
 This guide covers the full flow: sending inline keyboards, matching callback commands, answering callbacks, and editing messages.
 
 ---
 
 ## Reply keyboard vs inline keyboard
+
+Same word "keyboard," two different animals:
 
 | | Reply keyboard | Inline keyboard |
 | --- | --- | --- |
@@ -15,9 +17,13 @@ This guide covers the full flow: sending inline keyboards, matching callback com
 | Match via | Command name / alias | `callback_data` → command |
 | Docs | [Adding a Keyboard](adding-keyboard.md) | This page |
 
+Pick reply keyboards for menus users type through. Pick inline for "Yes / No" on a specific message.
+
 ---
 
 ## Step 1 — Send inline buttons (Logic)
+
+Inline keyboards are built in **Logic** via [`Api.sendMessage()`](../api-instance/index.md):
 
 ```js
 await Api.sendMessage({
@@ -38,6 +44,8 @@ await Api.sendMessage({
 - `url` buttons open a link — no callback, no command
 - `callback_data` buttons trigger a callback query (max **64 bytes**)
 
+[`chat`](../globals/chat.md) gives you `chat.id` for the send call.
+
 ---
 
 ## Step 2 — Create matching commands
@@ -50,7 +58,9 @@ Each `callback_data` value should match a **command name** or **alias**.
 | `help` | Command `help` (or alias on a shared handler) |
 | `set dark` | Command `set` with param `dark` |
 
-TBL reads `callback_query.data` the same way as message text — command name first, then optional parameters after a space.
+TBL reads `callback_query.data` the same way as message text — command name first, optional [`params`](../globals/params.md) after a space.
+
+Matching rules: [Matching & Priority](matching-order.md).
 
 ### Example `confirm` command
 
@@ -75,7 +85,7 @@ await Api.editMessageText({
 
 ## Step 3 — Always answer the callback
 
-Telegram shows a loading spinner until you respond. Call `Api.answerCallbackQuery()` even if you only acknowledge:
+Telegram shows a loading spinner until you respond. **Always** call [`Api.answerCallbackQuery()`](../api-instance/index.md) — even if you only acknowledge:
 
 ```js
 await Api.answerCallbackQuery({
@@ -93,20 +103,22 @@ await Api.answerCallbackQuery({
 })
 ```
 
-In callback commands, `update.callback_query.id` is also available via the [`request`](../globals/request.md) global (`request` equals `update.callback_query` when `update_type === 'callback_query'`).
+In callback commands, [`request`](../globals/request.md) equals `update.callback_query` when `update_type === 'callback_query'`.
 
 ---
 
 ## What globals are available
+
+Callbacks aren't normal messages — some globals behave differently:
 
 | Global | In callback commands |
 | --- | --- |
 | `update.callback_query` | Full callback object |
 | `update.callback_query.data` | The `callback_data` string |
 | `update.callback_query.message` | Message the button is on |
-| `user`, `chat` | Available |
-| `msg` | **`null`** — use `Api` with explicit IDs |
-| `message` | **`null`** — use `update.callback_query.message` |
+| [`user`](../globals/user.md), [`chat`](../globals/chat.md) | Available |
+| [`msg`](../globals/msg.md) | **`null`** — use `Api` with explicit IDs |
+| [`message`](../globals/message.md) | **`null`** — use `update.callback_query.message` |
 
 ```js
 let data = update.callback_query.data
@@ -114,9 +126,13 @@ let msgId = update.callback_query.message.message_id
 let userId = user.id
 ```
 
+Full object shape: [`update`](../globals/update.md).
+
 ---
 
 ## Edit the message instead of sending new
+
+Cleaner UX — update the same bubble:
 
 ```js
 await Api.editMessageText({
@@ -137,7 +153,7 @@ Swap only the keyboard with `Api.editMessageReplyMarkup()`. See [Editing Message
 
 ## Shared handler pattern
 
-One command can handle multiple callbacks using Logic:
+One command, many buttons — branch in Logic:
 
 **Command:** `action`
 
@@ -165,19 +181,19 @@ if (action === "yes") {
 }
 ```
 
-Set all buttons' `callback_data` to `action yes`, `action no`, etc. — or use separate commands per button for simpler bots.
+Set buttons' `callback_data` to `action yes`, `action no`, etc. — or use separate commands per button for simpler bots.
 
 ---
 
 ## Dynamic handler (advanced)
 
-Alternatively, route all callbacks through one handler command:
+Route **all** callbacks through one command when nothing more specific matches:
 
 **Command:** `/handle_callback_query`
 
 **Logic:** inspect `update.callback_query.data` and branch.
 
-This runs for every callback if no more specific command matches first. See [Dynamic Handlers](dynamic-commands.md).
+See [Dynamic Handlers](dynamic-commands.md).
 
 ---
 
@@ -236,4 +252,3 @@ await Api.answerCallbackQuery({
 - [Inline Keyboards](../api-instance/inline-keyboards.md) — Api reference
 - [Execution Flow](execution-flow.md) — callback in the pipeline
 - [Adding a Keyboard](adding-keyboard.md) — reply keyboards (different feature)
-- [`update`](../globals/update.md) — `callback_query` object

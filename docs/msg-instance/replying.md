@@ -1,6 +1,6 @@
 # Replying
 
-All `reply*` methods send a **new message** as a reply to the current one. `chat_id` and `reply_to_message_id` are set automatically.
+All `reply*` methods send a **new message** as a reply to the current one. `chat_id` and `reply_to_message_id` are set automatically — you just write the content.
 
 ```js
 await msg.reply("Hello!")
@@ -168,7 +168,7 @@ await msg.replyPoll({
 
 ---
 
-## Examples
+## Try it — copy-paste examples
 
 ### Reply with inline keyboard
 
@@ -208,3 +208,11 @@ await msg.reply("Here's your answer: " + params)
 - Returned message objects support [Api method chaining](../api-instance/method-chaining.md) (`sent.pin()`, `sent.editText()`, etc.)
 - Business messages automatically include `business_connection_id` when needed
 - Media shorthand defaults to `parse_mode: "Markdown"` for captions
+
+---
+
+## See also
+
+- [Editing](editing.md) — change the current message in place
+- [Actions](actions.md) — delete, pin, react, forward
+- [Message Data](message-data.md) — read fields from the current message

@@ -1,20 +1,21 @@
 # Listing Users
 
-`Bot.getUsers()` queries the database for users and chats that have interacted with your bot. Returns a **Promise** — always use `await`.
+"How many people use my bot?" **`Bot.getUsers()`** answers that — and a lot more. Query user IDs, full profiles, counts, and filters without writing SQL or staring at spreadsheets.
 
-## Basic usage
+Always returns a **Promise**. Always use `await`. Forgetting `await` gives you a Promise object instead of users. JavaScript's favorite prank.
+
+---
+
+## What does it return?
+
+By default: an **array of user/chat IDs** (numbers). Channels excluded unless you ask for them.
 
 ```js
-// All user IDs (channels excluded by default)
 let ids = await Bot.getUsers()
 // [5723455420, 1234567890, ...]
 
-Bot.sendMessage(`Total users: ${ids.length}`)
+Bot.sendMessage("Total users: " + ids.length)
 ```
-
-By default, returns an **array of user/chat IDs** (numbers). Channels are excluded unless you explicitly filter for them.
-
-## Return modes
 
 | Mode | How to request | Returns |
 | --- | --- | --- |
@@ -23,14 +24,33 @@ By default, returns an **array of user/chat IDs** (numbers). Channels are exclud
 | Count only | `{ countOnly: true }` | `number` |
 | With metadata | `{ meta: true }` | `{ users, count, limit, skip, total? }` |
 
-```js
-// Count without fetching all IDs
-let total = await Bot.getUsers({ countOnly: true })
+!!! tip "New to TBL?"
+    `Bot`, `chat`, and `user` are globals available in every command. Quick intro: [Learning TBL](../learning-tbl.md).
 
-// Full user objects
+---
+
+## How to use it
+
+### Count without fetching every ID
+
+```js
+let total = await Bot.getUsers({ countOnly: true })
+Bot.sendMessage("You have " + total + " users.")
+```
+
+### Full user objects (paginated)
+
+```js
 let users = await Bot.getUsers({ full: true, limit: 50 })
 
-// Paginated with total count
+for (let u of users) {
+  // u.first_name, u.username, u.last_interaction, etc.
+}
+```
+
+### Page with total count
+
+```js
 let page = await Bot.getUsers({
   full: true,
   page: 1,
@@ -41,9 +61,52 @@ let page = await Bot.getUsers({
 // { users: [...], count: 100, limit: 100, skip: 0, total: 4523 }
 ```
 
+---
+
+## Try it — copy-paste examples
+
+### Premium private users (VIP list)
+
+```js
+let vip = await Bot.getUsers({
+  chatType: "private",
+  premiumOnly: true,
+  excludeBlocked: true
+})
+
+Bot.sendMessage("VIP count: " + vip.length)
+```
+
+### Search by name
+
+```js
+let found = await Bot.getUsers({
+  search: "alice",
+  full: true,
+  limit: 20
+})
+```
+
+### Groups only
+
+```js
+let groups = await Bot.getUsers({ chatType: "group" })
+```
+
+### Recently active users
+
+```js
+let recent = await Bot.getUsers({
+  activeAfter: "2025-07-01",
+  chatType: "private"
+})
+```
+
+---
+
 ## Filters
 
-All filters are optional and passed as a single object.
+All filters are optional — pass them as a single object.
 
 ### Chat type
 
@@ -57,11 +120,6 @@ All filters are optional and passed as a single object.
 
 Default: private + groups (channels excluded).
 
-```js
-let groups = await Bot.getUsers({ chatType: "group" })
-let channels = await Bot.getUsers({ chatType: "channel" })
-```
-
 ### Premium and blocked
 
 | Filter | Value | Description |
@@ -70,11 +128,6 @@ let channels = await Bot.getUsers({ chatType: "channel" })
 | `premiumOnly` | `false` | Non-premium users only |
 | `blockedOnly` | `true` | Blocked users only |
 | `excludeBlocked` | `true` | Exclude blocked users |
-
-```js
-let premium = await Bot.getUsers({ premiumOnly: true })
-let active = await Bot.getUsers({ excludeBlocked: true })
-```
 
 ### User targeting
 
@@ -86,11 +139,6 @@ let active = await Bot.getUsers({ excludeBlocked: true })
 | `hasUsername` | `boolean` | `true` = has username, `false` = no username |
 | `search` | `string` | Search `first_name`, `last_name`, `username`, `chat_title` |
 
-```js
-let admins = await Bot.getUsers({ userIds: [111, 222, 333] })
-let found = await Bot.getUsers({ search: "alice" })
-```
-
 ### Date ranges
 
 | Filter | Description |
@@ -99,13 +147,6 @@ let found = await Bot.getUsers({ search: "alice" })
 | `createdBefore` | Users created before this date |
 | `activeAfter` / `lastInteractionAfter` | Last interaction after this date |
 | `activeBefore` / `lastInteractionBefore` | Last interaction before this date |
-
-```js
-let recent = await Bot.getUsers({
-  activeAfter: "2025-07-01",
-  chatType: "private"
-})
-```
 
 ### Pagination and sorting
 
@@ -118,15 +159,7 @@ let recent = await Bot.getUsers({
 | `sortOrder` / `order` | `"asc"` / `"desc"` | Sort direction |
 | `fields` | `string[]` | Project specific fields (with `full: true`) |
 
-```js
-let page2 = await Bot.getUsers({
-  full: true,
-  page: 2,
-  pageSize: 50,
-  sortBy: "last_interaction",
-  sortOrder: "desc"
-})
-```
+---
 
 ## Full object fields
 
@@ -145,34 +178,11 @@ When `full: true`, each object may include:
 | `last_interaction` | Last interaction date |
 | `chat_title` | Group/channel title |
 
-## Examples
-
-```js
-// Premium private users
-let vip = await Bot.getUsers({
-  chatType: "private",
-  premiumOnly: true,
-  excludeBlocked: true
-})
-
-// Search and paginate
-let results = await Bot.getUsers({
-  search: "john",
-  full: true,
-  limit: 20,
-  meta: true
-})
-
-// Use IDs in a loop
-let ids = await Bot.getUsers({ chatType: "private", limit: 1000 })
-for (let id of ids) {
-  // process each user
-}
-```
+---
 
 ## Important notes
 
 - Always `await` — `Bot.getUsers()` returns a Promise
 - Default return is an **array of IDs**, not full objects
 - Channels are **excluded by default** — use `chatType: "channel"` to include them
-- For broadcast targeting, see [Broadcasting](broadcasting.md) which uses similar filters internally
+- To actually *message* everyone matching filters, see [Broadcasting](broadcasting.md)

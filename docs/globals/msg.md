@@ -1,12 +1,51 @@
-# The `msg` Variable
+# msg
 
-In TBL, `msg` is the **current Telegram message** enriched with built-in helper methods for replying, editing, and managing that message. It is available for normal messages and business messages.
+The current message — with built-in reply, edit, and react superpowers.
 
-!!! note "Global `msg` vs msg instance docs"
-    This page documents the **global `msg` variable** available in every message-based command.  
-    The [msg instance](../msg-instance/index.md) page covers the same API in more detail with additional examples.
+## What is it?
 
-## When `msg` Is Available
+**`msg`** is the current Telegram message, enriched with **helper methods** for replying, editing, deleting, reacting, and more. Instead of passing `chat.id` and `message_id` everywhere, you just call `msg.reply("Got it!")`.
+
+It's [`update`](update.md)`.message` after a gym membership — same data, but it can do more.
+
+## When would you use it?
+
+- Reply to the message that triggered your command
+- Edit the message in place
+- React with an emoji
+- Read text, captions, or message IDs without digging through `update`
+- Delete, pin, or forward the current message
+
+For a plain text string only, [`message`](message.md) is simpler. For raw Telegram fields with no helpers, use `update.message`. For actually *doing things* to the message, use `msg`.
+
+!!! note "Two docs, same API"
+    This page covers the **global `msg` variable**. The [msg instance](../msg-instance/index.md) page has the full method list with more examples.
+
+---
+
+## Try it
+
+```js
+// Read fields directly
+let text = msg.text
+let messageId = msg.message_id
+
+// Reply without passing chat/message IDs
+await msg.reply("Got it!")
+
+// Short alias
+await msg.r("Got it!")
+
+// Edit the message that triggered this command
+await msg.editText("Updated text")
+
+// React with an emoji
+await msg.react("👍")
+```
+
+---
+
+## When is `msg` available?
 
 | Update type | `msg` value |
 | --- | --- |
@@ -14,34 +53,11 @@ In TBL, `msg` is the **current Telegram message** enriched with built-in helper 
 | `business_message` | Message helper object |
 | Callback query, webhook, webapp, broadcast | `null` |
 
-## What `msg` Contains
+Always check before calling methods. `msg.reply()` on `null` is not a fun debugging session.
 
-`msg` includes **all native Telegram message fields** (such as `message_id`, `text`, `photo`, `entities`, `reply_markup`) **plus helper methods** bound to that message.
+---
 
-You can read fields directly:
-
-```javascript
-let text = msg.text
-let messageId = msg.message_id
-```
-
-Or call helper methods without passing chat/message IDs:
-
-```javascript
-// Reply to the current message
-await msg.reply('Got it!')
-
-// Short alias
-await msg.r('Got it!')
-
-// Edit the current message
-await msg.editText('Updated text')
-
-// React with an emoji
-await msg.react('👍')
-```
-
-## Common Methods
+## Common methods
 
 | Method | Aliases | Description |
 | --- | --- | --- |
@@ -58,20 +74,22 @@ await msg.react('👍')
 | `getChatId()` | `chatId` | Get current chat ID |
 | `isBusiness()` | `isBusinessMessage` | Whether this is a business message |
 
-See the [msg instance](../msg-instance/index.md) for the full method list including media, polls, locations, and business message support.
+Full method list: [msg instance](../msg-instance/index.md).
+
+---
 
 ## `msg` vs `message` vs `update.message`
 
 | Variable | What it is |
 | --- | --- |
-| `msg` | Message object **with helper methods** — use this for replying and editing |
-| `message` | Plain **string** of `update.message.text` only (or `null`) |
-| `update.message` | Raw Telegram message object — no helper methods |
+| `msg` | Message object **with helper methods** |
+| [`message`](message.md) | Plain **string** of text only (or `null`) |
+| [`update`](update.md)`.message` | Raw Telegram object — no helpers |
 
-For simple text reading, `message` or `msg.text` both work. For sending replies or edits, use `msg`.
+---
 
-## Important Notes
+## Good to know
 
-- `msg` is `null` outside message and business-message updates — check before calling methods
-- Methods return Promises — use `await` or `.then()` inside async flows
+- Methods return Promises — use `await` when you need the result
 - `msg` exists only during command execution
+- For reply flows that wait for user input, see [Handle Need Reply](../getting-started-with-tbl/handle-need-reply.md)

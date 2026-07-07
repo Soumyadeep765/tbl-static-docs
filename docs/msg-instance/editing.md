@@ -127,7 +127,7 @@ Returns the stopped poll object.
 
 ---
 
-## Examples
+## Try it — copy-paste examples
 
 ### Edit bot's last reply in a loop
 
@@ -175,3 +175,11 @@ if (msg.photo) {
 - Default `parse_mode: "Markdown"` on shorthand calls
 - Editing another message in the same chat requires that message's `message_id` via `Api.editMessageText`
 - All methods return Promises — failed edits (e.g. message too old) return `ok: false` from Telegram
+
+---
+
+## See also
+
+- [Replying](replying.md) — send new messages
+- [Actions](actions.md) — delete, pin, react
+- [Api method chaining](../api-instance/method-chaining.md) — edit messages returned from `reply()`

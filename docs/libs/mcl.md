@@ -1,12 +1,82 @@
 # MCL (Membership Checker)
 
-`Libs.mcl` checks whether a user has joined required Telegram channels or groups. All methods are **async** — always use `await`.
+"Join our channel to unlock this feature" — classic bot move. **`Libs.mcl`** checks whether a user actually joined, builds join buttons, and writes the nag message for you.
+
+**Every check method is async.** You must use `await`. No exceptions. Well, one exception: `getBtn()` is sync.
+
+---
+
+## What is it?
+
+`Libs.mcl` checks whether a user has joined required Telegram channels or groups. It calls Telegram's `getChatMember` API live — not cached, not guessed.
+
+Access: `Libs.mcl.<method>()`
+
+**Requirements:**
+
+- Your bot must be a member of every channel/group you check
+- The bot needs permission to call `getChatMember`
+- Max **10 channels** per call
+
+If the bot isn't in the channel, that channel lands in `invalid` — and your gate silently fails in confusing ways. Add the bot first. Future you will thank present you.
+
+---
+
+## How to use it — and why `await` matters
+
+MCL talks to Telegram's servers. That takes time. Async methods return **Promises** — you need `await` to get the actual result:
 
 ```js
-let ok = await Libs.mcl.quick(user.id, ["@MyChannel", "@MyGroup"])
+// Wrong — ok is a Promise, not true/false. Gate broken. Everyone gets in.
+let ok = Libs.mcl.quick(user.id, ["@MyChannel"])
+
+// Correct
+let ok = await Libs.mcl.quick(user.id, ["@MyChannel"])
+
+if (ok) {
+  Bot.sendMessage(chat.id, "Thanks for joining! Here's your reward.")
+} else {
+  Bot.sendMessage(chat.id, "Join @MyChannel first, then try again.")
+}
 ```
 
-The bot must be a member of every channel/group you check (with permission to call `getChatMember`).
+**Rule of thumb:** if the method checks membership, `await` it. If it builds buttons (`getBtn`), don't.
+
+TBL doesn't support `.then()` chains — always use `await`.
+
+!!! tip "Globals"
+    `user.id` is the Telegram user ID. `Api.sendMessage` sends with inline keyboards. See [Global Variables](../globals/index.md) and [Api](../api-instance/index.md).
+
+---
+
+## Try it — beginner examples
+
+### Simple gate
+
+```js
+if (await Libs.mcl.quick(user.id, ["@Chan1", "@Chan2"])) {
+  Bot.run("/premiumFeature")
+} else {
+  Bot.sendMessage(chat.id, "Join our channels first.")
+}
+```
+
+### Gate with join buttons
+
+```js
+let channels = ["@MyChannel", "@MyGroup"]
+let ok = await Libs.mcl.quick(user.id, channels)
+
+if (!ok) {
+  let text = await Libs.mcl.summaryText(user.id, channels)
+  let buttons = Libs.mcl.getBtn(channels)  // sync — no await
+  Api.sendMessage({
+    chat_id: chat.id,
+    text,
+    reply_markup: { inline_keyboard: buttons }
+  })
+}
+```
 
 ---
 

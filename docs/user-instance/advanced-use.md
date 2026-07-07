@@ -1,6 +1,6 @@
 # Advanced User Operations & Migration
 
-Legacy **`User`** helpers and migration to [`db.user`](../db-instance/user.md).
+Legacy **`User`** helpers and how to migrate to [`db.user`](../db-instance/user.md). If you're starting fresh, you can skip this page entirely.
 
 !!! warning "Deprecated — current user only"
     `User` does **not** support cross-user operations. Use `db.user` with `{ user_id }` for admin or multi-user logic.
@@ -173,6 +173,8 @@ let visits = await db.user.incr("visits", 1)
 let name = await db.user.get("display_name", user.first_name)
 Bot.sendMessage("Visit #" + visits + ", " + name)
 ```
+
+Cleaner, atomic, and you know the write actually landed.
 
 ---
 

@@ -1,6 +1,32 @@
 # ResourcesLib
 
-`Libs.ResourcesLib` manages **persistent numeric resources** — coins, XP, health, points — scoped to a user, chat, or the whole bot. Supports passive growth over time. All methods are **synchronous**.
+Coins, XP, health bars, leaderboard points — if it's a number that should stick around between command runs, **`Libs.ResourcesLib`** is your economy engine.
+
+Persistent numeric resources scoped to a user, chat, or your whole bot. Passive growth included. All methods are **synchronous** — no `await`.
+
+---
+
+## What is it?
+
+`Libs.ResourcesLib` manages **persistent numeric resources** — coins, XP, health, points — scoped to a user, chat, or the whole bot. Supports passive growth over time.
+
+Access: `Libs.ResourcesLib.<method>()`
+
+Values persist via bot properties (`ResourcesLib_*` keys). Growth state is stored as JSON.
+
+| Scope | Who shares it |
+| --- | --- |
+| User | Just that one player |
+| Chat | Everyone in that group |
+| Global | Everyone who uses your bot |
+
+Uses `user.telegramid` and `chat.chatid` for the current user/chat scope.
+
+---
+
+## How to use it
+
+The classic pattern — give coins, show balance:
 
 ```js
 let coins = Libs.ResourcesLib.userRes("coins")
@@ -8,7 +34,56 @@ coins.add(50)
 Bot.sendMessage(chat.id, "Balance: " + coins.value())
 ```
 
-Values persist via bot properties (`ResourcesLib_*` keys). Growth state is stored as JSON.
+Every resource object gives you `.value()`, `.add()`, `.set()`, `.have()`, and `.remove()`. Growth is optional — add it when you want passive income, not when you're just counting visits.
+
+!!! tip "Globals"
+    `user` and `chat` define the default scope for `userRes()` and `chatRes()`. See [Global Variables](../globals/index.md).
+
+---
+
+## Try it — beginner examples
+
+### New player setup
+
+```js
+let gold = Libs.ResourcesLib.userRes("gold")
+
+if (gold.value() === 0) {
+  gold.set(100)
+  Bot.sendMessage(chat.id, "Welcome! Starting gold: 100")
+}
+
+gold.add(25)
+Bot.sendMessage(chat.id, "Gold: " + gold.value())
+```
+
+### Spend if they can afford it
+
+```js
+let gold = Libs.ResourcesLib.userRes("gold")
+
+if (gold.have(30)) {
+  gold.remove(30)
+  Bot.sendMessage(chat.id, "Purchased! Remaining: " + gold.value())
+} else {
+  Bot.sendMessage(chat.id, "Not enough gold. You have: " + gold.value())
+}
+```
+
+### Passive gold growth
+
+```js
+let gold = Libs.ResourcesLib.userRes("gold")
+Libs.ResourcesLib.growthFor(gold).add({
+  value: 1,       // +1 per interval
+  interval: 60,   // every 60 seconds
+  max: 1000       // cap at 1000
+})
+
+Bot.sendMessage(chat.id, "Gold: " + gold.value() + " (grows over time!)")
+```
+
+Growth is calculated when `.value()` is called — not on a background timer. No sneaky midnight cron jobs.
 
 ---
 
@@ -30,8 +105,6 @@ let totalVisits = Libs.ResourcesLib.globalRes("visits")
 let friendGold = Libs.ResourcesLib.anotherUserRes("gold", 123456789)
 ```
 
-Uses `user.telegramid` and `chat.chatid` for the current user/chat scope.
-
 ---
 
 ## Basic operations
@@ -46,23 +119,6 @@ Every resource object supports:
 | `.have(amount)` | `true` if value ≥ amount | — |
 | `.remove(amount)` | Subtract if enough available | if insufficient |
 | `.removeAnyway(amount)` | Subtract regardless of balance | if not a number |
-
-```js
-let gold = Libs.ResourcesLib.userRes("gold")
-
-// Initialize new player
-if (gold.value() === 0) {
-  gold.set(100)
-}
-
-gold.add(25)
-Bot.sendMessage(chat.id, "Gold: " + gold.value())
-
-if (gold.have(30)) {
-  gold.remove(30)
-  Bot.sendMessage(chat.id, "Purchased! Remaining: " + gold.value())
-}
-```
 
 String values passed to `.set()` / `.add()` are auto-converted to numbers. Non-numeric values throw `ResLib: value must be number only`.
 
@@ -155,8 +211,6 @@ if (g.isEnabled()) {
 
 g.stop()  // pause passive income
 ```
-
-Growth is calculated when `.value()` is called — not on a background timer.
 
 ---
 

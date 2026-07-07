@@ -3,9 +3,13 @@
 !!! warning "Deprecated — current user only"
     Use [`db.user`](../db-instance/user.md) for all new code. **`User` only supports the current user** who triggered the command. No cross-user reads or writes.
 
+This page documents the legacy `User` API for existing bots. New projects should skip straight to `db.user`.
+
 ---
 
 ## How `User` works
+
+Four steps, one caveat:
 
 1. At command start, the **current user's** props are preloaded into `botState.user_props`
 2. **`User.get`** reads from that in-memory cache — instant, synchronous
@@ -155,9 +159,9 @@ await db.user.delAll({ user_id: user.id })
 
 ---
 
-## Examples (legacy)
+## Try it — legacy vs modern
 
-### Save language preference
+### Save language preference (legacy)
 
 ```js
 User.set("language", user.language_code || "en")

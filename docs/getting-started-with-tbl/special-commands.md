@@ -1,48 +1,102 @@
 # Special Commands
 
-TBL defines several special reserved commands that have unique behaviors and trigger points in the lifecycle of an update.
+Most commands wait for a user to type something. A few **reserved names** run on their own — before, after, or instead of normal matching. Think of them as hooks wired into every update.
+
+You still create them like any other command in the editor. The difference is *when* they fire.
 
 ---
 
-## 1. `/start` (Entry Command)
-The primary entry point when a user starts a conversation with the bot.
+## `/start` — the front door
 
-*   **Trigger**: Sent when a user clicks the "Start" button or sends `/start`.
-*   **Purpose**: Welcoming users, showing main menus, or initializing state.
+The first thing most users do: tap **Start** or send `/start`.
 
----
+| | |
+| --- | --- |
+| **Trigger** | User clicks Start or sends `/start` |
+| **Typical use** | Welcome message, main menu, first-run setup |
 
-## 2. `@` (Initialization Command)
-Runs automatically **before** any other matched command for every single update.
+It's not magic — just a normal command name that Telegram and users expect. Your welcome text goes in **Answer**; menus and logic go in **Keyboard** and **Logic**.
 
-*   **Purpose**:
-    *   Initialize global variables or helper state.
-    *   Run authorization checks or rate limiter checks.
-    *   Load common configurations.
+Tutorial: [Your First Bot](first-hello-bot.md).
 
 ---
 
-## 3. `!` (Error Handler Command)
-Executed automatically if any runtime error or exception occurs during the execution of another command.
+## `@` — runs before everything
 
-*   **Purpose**:
-    *   Catch errors cleanly without causing silent failures.
-    *   Alert developers or send a fallback error message to the user.
+The **`@`** command runs automatically **before** any other matched command on **every** update.
 
----
+| | |
+| --- | --- |
+| **Answer sent?** | No |
+| **Logic runs?** | Yes |
+| **Typical use** | Auth checks, rate limits, loading shared config |
 
-## 4. `@@` (Post-Processor Command)
-Runs automatically **after** any command execution finishes, regardless of whether it succeeded or failed.
-
-*   **Purpose**:
-    *   Run analytics or log metrics.
-    *   Perform cleanup operations.
+It skips Answer and keyboard side effects — pure setup logic. If `@` throws, the matched command may not run. Use it for lightweight checks, not heavy API calls that slow every message.
 
 ---
 
-## 5. `*` (Fallback Command)
-Triggered when no other command matches the incoming text or update trigger.
+## `!` — the error catcher
 
-*   **Purpose**:
-    *   Acts as a catch-all safety net.
-    *   Provides user guidance or menu prompts for unrecognized inputs.
+When **any** command's Logic throws a runtime error, the **`!`** command runs.
+
+| | |
+| --- | --- |
+| **Answer sent?** | Yes (if configured) |
+| **Logic runs?** | Yes |
+| **Typical use** | Friendly fallback message, error logging, alerting you |
+
+Without `!`, users might see a generic platform error. With it, you control the apology:
+
+```js
+// ! command Logic
+Bot.sendMessage(chat.id, "Oops — something broke. Try /start to reset.")
+```
+
+---
+
+## `@@` — runs after everything
+
+The **`@@`** command runs **after** every command finishes — success or failure.
+
+| | |
+| --- | --- |
+| **Answer sent?** | No |
+| **Logic runs?** | Yes |
+| **Typical use** | Analytics, metrics, cleanup |
+
+Like `@`, it skips automatic Answer sends. Good for "increment message counter" or "log command name" without spamming the user.
+
+---
+
+## `*` — the catch-all
+
+When **no other command** matches the incoming text, **`*`** runs.
+
+| | |
+| --- | --- |
+| **Answer sent?** | Yes (if configured) |
+| **Logic runs?** | Yes |
+| **Typical use** | "I didn't understand that", help hints, default reply |
+
+It's a safety net, not a primary feature. Put real logic in named commands; use `*` for graceful "huh?" responses.
+
+Guide: [Using the Wildcard](using-wildcard.md).
+
+---
+
+## How they fit together
+
+One update, one matched command — but the wrappers always run:
+
+```
+@  →  matched command (or *)  →  ! (on error)  →  @@
+```
+
+Full pipeline diagram: [Execution Flow](execution-flow.md).
+
+---
+
+## See also
+
+- [Matching & Priority](matching-order.md) — when `*` wins
+- [Dynamic Handlers](dynamic-commands.md) — `/handle_{update_type}` is a different kind of special

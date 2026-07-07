@@ -1,6 +1,6 @@
 # HTML & EJS
 
-Send HTML pages with automatic EJS rendering and platform HTML injection.
+Send HTML pages with automatic EJS rendering and platform HTML injection. Your webhook or webapp can return full browser pages — not just JSON.
 
 ---
 

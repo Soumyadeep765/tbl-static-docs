@@ -1,19 +1,35 @@
-# The `error` Variable
+# error
 
-In TBL, `error` contains **information about a failure** that triggered an error-handling command. The shape depends on which error handler ran.
+Something went wrong — here's what happened.
 
-## When `error` Is Available
+## What is it?
 
-| Trigger | Handler command | `error` shape |
-| --- | --- | --- |
-| Script exception or runtime error | `!` (error handler) | Error details object |
-| HTTP request returned a non-2xx status | HTTP error callback command | Full HTTP response object |
+**`error`** contains **information about a failure** that triggered an error-handling command. It's your bot's "incident report" — what broke, when, and (sometimes) why.
 
-In normal commands, `error` is `null`.
+In normal commands, `error` is `null`. Everything is fine. Nothing to see here.
 
-## Shape A: `!` Error Handler
+It only shows up in two special places: the **`!` error handler** (when a script throws) and **HTTP error callback commands** (when a request returns a non-2xx status).
 
-When a command throws an error, TBL runs the `!` command with:
+## When would you use it?
+
+- Log failures to the owner in your `!` handler
+- Send user-friendly fallback messages after a crash
+- Handle API errors gracefully in HTTP error callbacks (404, 500, rate limits)
+- Inspect stack traces for debugging (sanitized — internal paths are redacted)
+
+Pair with [`owner`](owner.md) for alerting and [`http_response`](http_response.md) for successful HTTP flows.
+
+---
+
+## Try it — script errors (`!` handler)
+
+When any command throws, the `!` command runs with:
+
+```js
+// Inside the ! command
+Bot.sendMessage(owner.mail, "Error: " + error.message)
+Bot.inspect(error.stack)
+```
 
 | Field | Type | Description |
 | --- | --- | --- |
@@ -22,15 +38,22 @@ When a command throws an error, TBL runs the `!` command with:
 | `stack` | `string` | Sanitized stack trace (file paths redacted) |
 | `timestamp` | `string` | ISO 8601 timestamp of when the error occurred |
 
-```javascript
-// Inside the ! command
-Bot.sendMessage(owner.mail, `Error in ${filename}: ${error.message}`)
-Bot.inspect(error.stack)
+---
+
+## Try it — HTTP error callbacks
+
+When an [HTTP](../http-instance/index.md) request fails and routes to an error callback, `error` is the **full HTTP response object** (same structure as `response` in [`http_response`](http_response.md)):
+
+```js
+// Inside an HTTP error callback command
+if (error.status === 404) {
+  Bot.sendMessage(user.id, "Resource not found.")
+} else if (error.status === 429) {
+  Bot.sendMessage(user.id, "Too many requests. Slow down!")
+} else {
+  Bot.sendMessage(user.id, "API error: " + error.status)
+}
 ```
-
-## Shape B: HTTP Error Callback
-
-When an [HTTP](../http-instance/index.md) request fails and routes to an error callback command, `error` is the **full HTTP response object** (same structure as `response` in [http_response](http_response.md)):
 
 | Field | Type | Description |
 | --- | --- | --- |
@@ -42,17 +65,20 @@ When an [HTTP](../http-instance/index.md) request fails and routes to an error c
 | `error` | `Object` | Error details (`code`, `message`) when the request was blocked |
 | `headers` | `Object` | Response headers |
 
-```javascript
-// Inside an HTTP error callback command
-if (error.status === 404) {
-  Bot.sendMessage(user.id, 'Resource not found.')
-} else {
-  Bot.sendMessage(user.id, `API error: ${error.status}`)
-}
-```
+---
 
-## Important Notes
+## Which handler ran?
+
+| Trigger | Handler command | `error` shape |
+| --- | --- | --- |
+| Script exception or runtime error | `!` (error handler) | Error details object |
+| HTTP request returned non-2xx | HTTP error callback command | Full HTTP response object |
+| Normal command | — | `null` |
+
+---
+
+## Good to know
 
 - `error` is read-only and exists only during error-handling command execution
-- The `!` handler is the right place for logging and user-friendly fallback messages
-- Stack traces in the `!` handler are sanitized — internal paths are redacted
+- The `!` handler is the right place for logging and graceful fallbacks — don't let users see raw stack traces
+- Stack traces in the `!` handler are sanitized for safety

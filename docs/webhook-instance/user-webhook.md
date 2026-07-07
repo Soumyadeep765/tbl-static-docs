@@ -1,12 +1,30 @@
 # User-Based Webhooks
 
-Generate signed URLs that execute commands **in the context of a Telegram user**. Inside the command, `user`, `chat`, and the `User` instance are available.
+Signed URLs that run a command **as a specific Telegram user**. Inside the command, `user`, `chat`, and the `User` instance are all there — just like a normal message handler, except the caller is an HTTP client instead of Telegram.
+
+---
+
+## What you get
+
+| In the command | Available? |
+| --- | --- |
+| `user`, `chat` | ✓ |
+| `User.get()` / `User.set()` | ✓ (deprecated — prefer `db.user`) |
+| `db.user` | ✓ — scoped to the webhook user |
+| `request`, `params`, `options` | ✓ |
+| `res` | ✓ |
+
+Three things worth knowing upfront:
+
+1. **`getUrl()` is for the current user** — the one whose update triggered the command you're running now.
+2. **`getUrlFor()` targets any user ID** — use this from admin commands or backend jobs.
+3. **`redirect` only works on `getUrlFor()` and `getGlobalUrl()`** — not on plain `getUrl()`.
 
 ---
 
 ## `getUrl(command, { options, params, expiresIn })`
 
-Creates a webhook URL for the **current user** — the user whose update triggered the command (e.g. when called from a Telegram message handler).
+Creates a webhook URL for the **current user** — whoever triggered the command you're writing (e.g. a `/share` command in Telegram).
 
 | Parameter | Type | Description |
 | --- | --- | --- |
@@ -15,9 +33,9 @@ Creates a webhook URL for the **current user** — the user whose update trigger
 | `params` | object | Extra query parameters (visible in URL) |
 | `expiresIn` | number | Optional seconds until URL expires |
 
-`redirect` is **not** supported on `getUrl()`. Use [`getUrlFor()`](#geturlfor) or [`getGlobalUrl`](global-webhook.md) for redirect prefetch.
+`redirect` is **not** supported here. Use [`getUrlFor()`](#geturlfor-user_id-command-redirect-options-params-expiresin) or [`getGlobalUrl`](global-webhook.md) if you need redirect prefetch.
 
-### Example
+### Example — share a sync link
 
 ```js
 let syncUrl = Webhook.getUrl("syncGameData", {
@@ -28,7 +46,7 @@ let syncUrl = Webhook.getUrl("syncGameData", {
 
 await Api.sendMessage({
   chat_id: chat.id,
-  text: `Sync your data: ${syncUrl}`
+  text: "Sync your data: " + syncUrl
 })
 ```
 
@@ -36,7 +54,7 @@ await Api.sendMessage({
 
 ## `getUrlFor({ user_id, command, redirect, options, params, expiresIn })`
 
-Creates a webhook URL for a **specific user ID**. Use this when generating links from admin commands or backend jobs for a known user.
+Creates a webhook URL for a **specific user ID**. Use when you know the target user but they didn't trigger the current command — admin panels, email links, backend jobs.
 
 | Parameter | Type | Description |
 | --- | --- | --- |
@@ -47,7 +65,7 @@ Creates a webhook URL for a **specific user ID**. Use this when generating links
 | `params` | object | Extra query parameters |
 | `expiresIn` | number | Optional expiry in seconds |
 
-### Example
+### Example — admin-generated upgrade link
 
 ```js
 let upgradeUrl = Webhook.getUrlFor({
@@ -64,7 +82,7 @@ When the webhook fires, the platform fetches `redirect` (HTTPS only) and exposes
 
 ---
 
-## Example URL
+## What the URL looks like
 
 ```
 https://{domain}/webhook/{bot_id}
@@ -85,7 +103,7 @@ https://{domain}/webhook/{bot_id}
 ## Inside the command
 
 ```js
-// user and chat are populated
+// user and chat are populated — use them freely
 let name = user.first_name
 let saved = await db.user.get("progress", 0)
 
@@ -93,7 +111,7 @@ let saved = await db.user.get("progress", 0)
 let ref = params.ref || request.query.ref
 let ip = request.ip
 
-// Respond
+// Respond to the HTTP caller
 res.json({
   ok: true,
   user_id: user.id,

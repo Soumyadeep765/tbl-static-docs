@@ -1,51 +1,57 @@
-# Command Execution
+# Running Commands
 
-The `Bot` instance lets you **run another command programmatically** — useful for multi-step flows, reusing logic, and navigation without duplicating code.
+Your bot doesn't have to be a one-command wonder. **`Bot.runCommand`** and **`Bot.run`** let you jump to another command mid-flow — like a choose-your-own-adventure, but with less dragons and more `/menu` buttons.
 
-## Quick start
+Multi-step wizards, reusable logic, "go to checkout" navigation — all without copy-pasting the same code into five commands.
+
+---
+
+## What is command execution?
+
+When a user triggers `/start`, one command runs. Sometimes you want that command to **hand off** to another — programmatically, from inside your Logic field.
+
+| You get | You skip |
+| --- | --- |
+| Multi-step flows without duplication | Giant if/else trees in one command |
+| Shared logic across commands | Pasting the same block everywhere |
+| Optional routing (`ignoreMissingCommand`) | Hard-coded command existence checks |
+
+The target command receives any data you pass via the [`options`](../globals/options.md) global. Think of it as a note slipped to the next command: "here's where we left off."
+
+!!! tip "New to TBL?"
+    `Bot`, `chat`, and `user` are globals available in every command. Quick intro: [Learning TBL](../learning-tbl.md).
+
+---
+
+## How to use it
+
+### Quick start — `Bot.runCommand`
+
+The friendly shorthand. Runs a command in the **current chat** for the **current user**:
 
 ```js
-// Run another command
+// Jump to another command
 Bot.runCommand("/menu")
 
-// Pass data to the target command
+// Pass data along for the ride
 Bot.runCommand("/checkout", { step: 2, item: "Widget" })
 ```
 
-Inside the target command, passed data is available as the [`options`](../globals/options.md) global.
+Inside `/checkout`, read `options.step` and `options.item`. Simple.
 
-## `Bot.runCommand(command, options?)`
-
-Shorthand for running a command in the **current chat** for the **current user**.
-
-| Parameter | Type | Description |
-| --- | --- | --- |
-| `command` | `string` | Command name (e.g. `"/start"`, `"/help"`) |
-| `options` | `object` | Optional data passed to the target command as `options` |
+Returns a **Promise** — add `await` when the next line depends on the target command finishing:
 
 ```js
-Bot.runCommand("/survey", { question: 1 })
+await Bot.runCommand("/validate")
+Bot.sendMessage("Validation passed. Moving on!")
 ```
 
-Returns a **Promise** resolving to `{ success: true }` on completion.
+### Full control — `Bot.run`
 
-## `Bot.run(params)`
-
-Full control over command execution. Accepts a single params object:
-
-| Parameter | Type | Default | Description |
-| --- | --- | --- | --- |
-| `command` | `string` | — | **Required.** Command to execute. Can include params: `"/greet Alice"` |
-| `options` | `object` | — | Data passed to the target command as `options` |
-| `user_id` | `number` | `user.id` | Override the user context |
-| `chat_id` | `number` | `chat.id` | Override the chat context |
-| `user_telegramid` | `number` | — | Override `user.telegramid` in the cloned update |
-| `ignoreMissingCommand` | `boolean` | `false` | Skip silently if the command doesn't exist |
-
-### Examples
+When you need to override chat/user, embed params in the command string, or skip missing commands gracefully:
 
 ```js
-// Basic
+// Basic handoff
 Bot.run({ command: "/contact" })
 
 // With options
@@ -54,7 +60,7 @@ Bot.run({
   options: { step: 2 }
 })
 
-// Run for a different user/chat
+// Different user or chat (admin notifications, cross-user flows)
 Bot.run({
   command: "/notify",
   options: { alert: "New order" },
@@ -62,66 +68,124 @@ Bot.run({
   chat_id: 987654321
 })
 
-// Optional command — no error if missing
+// Params baked into the command string
+Bot.run({ command: "/greet Alice" })
+
+// Command might not exist — don't crash if it doesn't
 Bot.run({
   command: "/optional_hook",
   ignoreMissingCommand: true
 })
 ```
 
-### Return values
+---
 
-| Result | Meaning |
-| --- | --- |
-| `{ success: true }` | Command executed successfully |
-| `{ success: true, waitingForReply: true }` | Command is waiting for user reply (`need_reply`) |
-| `{ success: true, skipped: true }` | Command not found, skipped (`ignoreMissingCommand: true`) |
+## Try it — copy-paste examples
 
-Use `await` when you need to wait for the target command to finish before continuing:
+### Simple menu navigation
+
+User tapped "Settings" in your flow? Send them to the settings command:
 
 ```js
-await Bot.runCommand("/validate")
-Bot.sendMessage("Validation passed.")
+Bot.runCommand("/settings")
 ```
 
-## Command chain limit
+### Wizard with state
 
-Each `Bot.run` / `Bot.runCommand` call increments an internal chain counter. **Maximum 6 chained commands** per execution — exceeding this throws an error.
+Step 1 collects a name, step 2 asks for email:
 
 ```js
-// This is fine — 3 levels
-Bot.runCommand("/step2")  // step2 runs step3, step3 runs step4
+// In /wizard_step1 — user just typed their name
+Bot.runCommand("/wizard_step2", { name: params })
 ```
 
-Avoid deep recursive chains. For complex flows, use [`options`](../globals/options.md) to pass state instead of chaining many commands.
+```js
+// In /wizard_step2 — options.name is waiting for you
+Bot.sendMessage("Nice to meet you, " + options.name + "! What's your email?")
+```
 
-## Error handling
+### Safe optional routing
 
-If the target command **does not exist** and `ignoreMissingCommand` is `false`:
-
-- A runtime error is thrown
-- The `!` error handler runs if defined
-- Execution stops unless caught
+Try a premium hook; fall back gracefully if it's not configured:
 
 ```js
-// Safe optional routing
 let result = await Bot.run({
-  command: "/fallback",
+  command: "/premium_hook",
   ignoreMissingCommand: true
 })
 
 if (result.skipped) {
-  Bot.sendMessage("Fallback command not configured.")
+  Bot.sendMessage("Premium hook not set up yet — using default flow.")
+  Bot.runCommand("/default_flow")
 }
 ```
 
-## `Bot.runCommand` vs `Bot.run`
+---
+
+## Return values
+
+| Result | Meaning |
+| --- | --- |
+| `{ success: true }` | Command ran successfully |
+| `{ success: true, waitingForReply: true }` | Target command is waiting for user reply (`need_reply`) |
+| `{ success: true, skipped: true }` | Command not found, skipped (`ignoreMissingCommand: true`) |
+
+---
+
+## Command chain limit
+
+Each `Bot.run` / `Bot.runCommand` call increments an internal chain counter. **Maximum 6 chained commands** per execution — go deeper and you'll get an error.
+
+```js
+// Fine — a few levels deep
+Bot.runCommand("/step2")  // step2 runs step3, step3 runs step4
+```
+
+For complex flows, pass state through [`options`](../globals/options.md) instead of chaining command after command. Your future self will thank you.
+
+---
+
+## Error handling
+
+If the target command **doesn't exist** and `ignoreMissingCommand` is `false`:
+
+- A runtime error is thrown
+- Your `!` error handler runs if you've defined one
+- Execution stops unless you catch it
+
+Define a `!` command — users see a message instead of silence when something breaks.
+
+---
+
+## `runCommand` vs `run`
 
 | | `runCommand` | `run` |
 | --- | --- | --- |
 | Syntax | `Bot.runCommand("/cmd", opts)` | `Bot.run({ command: "/cmd", options: opts })` |
 | Override chat/user | No | Yes |
 | Skip missing commands | No | Yes (`ignoreMissingCommand`) |
-| Include params in command string | No | Yes (`command: "/greet Bob"`) |
+| Params in command string | No | Yes (`command: "/greet Bob"`) |
 
-Use `runCommand` for simple navigation. Use `run` when you need chat/user overrides or optional commands.
+**Rule of thumb:** `runCommand` for simple navigation. `run` when you need overrides or optional routing.
+
+---
+
+## Method reference
+
+### `Bot.runCommand(command, options?)`
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `command` | `string` | Command name (e.g. `"/start"`, `"/help"`) |
+| `options` | `object` | Optional data passed to the target as [`options`](../globals/options.md) |
+
+### `Bot.run(params)`
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `command` | `string` | — | **Required.** Command to execute. Can include params: `"/greet Alice"` |
+| `options` | `object` | — | Data passed to the target as `options` |
+| `user_id` | `number` | `user.id` | Override the user context |
+| `chat_id` | `number` | `chat.id` | Override the chat context |
+| `user_telegramid` | `number` | — | Override `user.telegramid` in the cloned update |
+| `ignoreMissingCommand` | `boolean` | `false` | Skip silently if the command doesn't exist |

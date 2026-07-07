@@ -1,6 +1,12 @@
 # Streaming Responses
 
-Use `responseType: "stream"` to read an HTTP response body **chunk by chunk** instead of loading it all at once. Streaming is only enabled when you set this explicitly — it is never auto-detected.
+Most APIs return a small JSON blob you can read in one gulp. Some don't — live feeds, Server-Sent Events, newline-delimited logs. For those, load the body **chunk by chunk** with `responseType: "stream"`.
+
+Streaming is opt-in only. It is never auto-detected. If you didn't ask for it, you get the whole body at once.
+
+---
+
+## How to stream
 
 ```js
 let res = await HTTP.get("https://api.example.com/events", {
@@ -8,14 +14,10 @@ let res = await HTTP.get("https://api.example.com/events", {
 })
 ```
 
----
+When `responseType` is `"stream"`:
 
-## How it works
-
-When `responseType` is `"stream"`, TBL:
-
-1. Receives response **headers** (status, `Content-Type`, cookies, etc.)
-2. Returns immediately with a `stream` object — body is **not** pre-loaded
+1. Response **headers** arrive first (status, `Content-Type`, cookies, etc.)
+2. The call returns immediately with a `stream` object — body is **not** pre-loaded
 3. You read chunks via `stream.read()`, `for await`, or `stream.collect()`
 4. Two internal timers guard the connection (lifetime + idle)
 5. Cumulative bytes read are capped at the response size limit (2 MB default)
@@ -28,7 +30,7 @@ HTTP.get({ responseType: "stream" })
     → stream ends (done), cancel(), or timer/limit hit
 ```
 
-For non-stream requests, TBL reads the full body first, checks `Content-Length`, then returns `data` and `content`. Streams **skip** the upfront `Content-Length` check — the size limit is enforced as you read.
+For non-stream requests, the full body is read first, `Content-Length` is checked, then `data` and `content` are returned. Streams **skip** the upfront `Content-Length` check — the size limit is enforced as you read.
 
 ---
 
@@ -41,7 +43,7 @@ For non-stream requests, TBL reads the full body first, checks `Content-Length`,
 | **Responses near the 2 MB cap** | Start processing before the full body is buffered |
 | **Early exit** | Read until you have enough, then `stream.cancel()` |
 
-For typical small JSON APIs, use `responseType: "auto"` — simpler and returns `res.data` directly.
+For typical small JSON APIs, use `responseType: "auto"` — simpler and returns `res.data` directly. Don't stream what you can swallow whole.
 
 ---
 
@@ -172,7 +174,7 @@ Two independent timers start the moment the response is parsed (when `await HTTP
 | Premium | **60 seconds** |
 | Elite | **120 seconds** |
 
-Counts from response parse time — **not** from your first `read()`. If you do other work after `await` before reading, that time counts.
+Counts from response parse time — **not** from your first `read()`. If you do other work after `await` before reading, that time counts. Procrastination has consequences.
 
 Error message: `Stream lifetime limit of Xs exceeded`
 
@@ -215,7 +217,7 @@ So for long-lived SSE feeds, a **direct** request gives you up to the plan lifet
 
 ---
 
-## Examples
+## Try it — copy-paste examples
 
 ### SSE (text event stream)
 

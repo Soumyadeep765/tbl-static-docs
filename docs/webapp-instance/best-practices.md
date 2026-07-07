@@ -1,6 +1,6 @@
 # Webapp Best Practices
 
-Guidelines for choosing between webapp, public web, and webhooks — and building safe public endpoints.
+Guidelines for picking the right surface — webapp, public web, or webhook — and building endpoints that won't embarrass you in production.
 
 ---
 
@@ -13,9 +13,11 @@ Guidelines for choosing between webapp, public web, and webhooks — and buildin
 | Per-user signed action | [User webhook](../webhook-instance/user-webhook.md) |
 | Cron / system signed job | [Global webhook](../webhook-instance/global-webhook.md) |
 
-Do not use a webapp when public web is enough — public web is faster and cheaper (no sandbox).
+Three rules of thumb:
 
-Do not use a webapp when you need `user` — use a webhook.
+1. **Public web when static is enough** — faster, no sandbox overhead.
+2. **Webapp when you need `db` or `res`** — but remember URLs are unsigned.
+3. **Webhook when you need `user` or signing** — per-user actions and tamper-proof links.
 
 ---
 
@@ -25,6 +27,8 @@ Do not use a webapp when you need `user` — use a webhook.
 - Put structured config in `options` (single JSON blob)
 - Never put API keys, tokens, or passwords in URLs
 - Use `expiresIn` on webhooks for one-time sensitive links
+
+URLs end up in browser history, server logs, and referrer headers. Treat them as public.
 
 ---
 
@@ -71,7 +75,7 @@ See [Limits & Security](../webhook-instance/limits-and-security.md).
 
 ---
 
-## Related
+## See also
 
 - [Webapp Methods](webapp-methods.md)
 - [Public Web](public-web.md)

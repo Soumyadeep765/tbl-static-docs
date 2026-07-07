@@ -1,78 +1,200 @@
 # Modules
 
-`modules` exposes **curated npm-style utilities** inside TBL — JWT, crypto, parsing, validation, Web3, and more. No `require()` or install step needed.
+Imagine npm packages that already live inside your bot — no `require()`, no `package.json`, no "works on my machine" excuses. That's `modules`.
 
-```js
-let token = modules.JWT.sign({ userId: user.id }, process.env.JWT_SECRET)
-let html = modules.md2html("**Hello** *world*")
-let price = modules.marketHub.getPrice("BTC")
-```
-
-Access as `modules.<name>` (case-sensitive). The object is frozen per command execution.
+Hash a password, sign a JWT, parse a CSV, check if an email looks real, grab the BTC price — all from your command's **Logic** field. Type `modules.` and autocomplete your way to happiness.
 
 ---
 
-## Available modules
+## What are modules?
+
+**Modules** are curated third-party utilities (JWT, bcrypt, lodash, zod, ethers, and friends) that TeleBotHost loads and sandboxes for you.
+
+| You get | You skip |
+| --- | --- |
+| Battle-tested libraries | `npm install` |
+| One global object: `modules` | Import statements |
+| Works in commands, webhooks, webapps | Server setup |
+
+Every module is accessed as `modules.<name>` — **case-sensitive**. `modules.JWT` works. `modules.jwt` does not. The universe is cruel but consistent.
+
+---
+
+## How to use them
+
+Drop this in any command's **Logic** field:
+
+```js
+let id = modules.UUID.uuidv4()
+Bot.sendMessage(chat.id, "Your order ID: " + id)
+```
+
+Three things worth knowing upfront:
+
+1. **`modules` is already there** — you never import or initialize it.
+2. **The object is frozen** — you can't add your own properties to `modules`. Nice try though.
+3. **Some methods need `await`** — parsing and crypto hashing often return Promises. More on that [below](#sync-vs-async).
+
+!!! tip "New to TBL?"
+    `Bot`, `chat`, and `user` are globals available in every command. Quick intro: [Learning TBL](../learning-tbl.md). Secrets like API keys go in dashboard ENV vars — see [`process.env`](../globals/process.md).
+
+---
+
+## Modules or Libs?
+
+TBL has two toolboxes. Pick the right drawer before you rummage:
+
+| | `modules` | `Libs` |
+| --- | --- | --- |
+| What | npm-style packages (crypto, parsing, Web3) | TBL-built bot helpers (referrals, dice rolls, channel checks) |
+| Access | `modules.validator.isEmail(email)` | `Libs.random.randomInt(1, 6)` |
+| Best for | JWT, bcrypt, CSV, YAML, Ethereum | MCL, referral links, resource balances |
+
+Full Libs docs: [TBL Libraries](../libs/index.md).
+
+Still not sure? Rule of thumb: if you'd normally `npm install` it, check `modules` first. If it's Telegram-bot-specific glue, check `Libs`.
+
+---
+
+## Pick a module
 
 ### Security and crypto
 
-| Module | Access | Description |
+| Module | Access | What it does |
 | --- | --- | --- |
 | [JWT](jwt.md) | `modules.JWT` | Sign, verify, decode JSON Web Tokens |
-| [bcrypt](bcrypt.md) | `modules.bcrypt` | Password hashing |
-| [crypto](crypto.md) | `modules.crypto` | Node.js crypto — hashes, HMAC, random bytes |
-| [UUID](uuid.md) | `modules.UUID` | `uuidv4()` and `uuidv6()` |
+| [bcrypt](bcrypt.md) | `modules.bcrypt` | Password hashing (the slow kind — on purpose) |
+| [crypto](crypto.md) | `modules.crypto` | Hashes, HMAC, random bytes |
+| [UUID](uuid.md) | `modules.UUID` | `uuidv4()` and `uuidv6()` — IDs that won't collide |
 
 ### Parsing and data
 
-| Module | Access | Description |
+| Module | Access | What it does |
 | --- | --- | --- |
-| [ParseCSV](parse-csv.md) | `modules.ParseCSV` | Parse CSV strings (async) |
+| [ParseCSV](parse-csv.md) | `modules.ParseCSV` | Turn CSV text into row objects |
 | [ParseYML](parse-yml.md) | `modules.ParseYML` | Parse/stringify YAML (safe schema) |
 | [qs](qs.md) | `modules.qs` | Query string parse and stringify |
-| [cheerio](cheerio.md) | `modules.cheerio` | HTML parsing and DOM traversal |
+| [cheerio](cheerio.md) | `modules.cheerio` | HTML parsing — jQuery vibes, no browser |
 | [lodash](lodash.md) | `modules.lodash` | Array/object utilities |
-| [deepmerge](deepmerge.md) | `modules.deepmerge` | Deep-merge objects |
-| [zod](zod.md) | `modules.zod` | Schema validation |
+| [deepmerge](deepmerge.md) | `modules.deepmerge` | Deep-merge objects without crying |
+| [zod](zod.md) | `modules.zod` | Schema validation with nice error messages |
 
 ### Dates and text
 
-| Module | Access | Description |
+| Module | Access | What it does |
 | --- | --- | --- |
 | [dayjs](dayjs.md) | `modules.dayjs` | Lightweight date formatting |
-| [humanizeDuration](humanize-duration.md) | `modules.humanizeDuration` | Human-readable durations |
+| [humanizeDuration](humanize-duration.md) | `modules.humanizeDuration` | `"3 hours"` instead of `10800000` |
 | [md2html](md2html.md) | `modules.md2html` | Telegram Markdown → HTML |
 | [validator](validator.md) | `modules.validator` | Email, URL, and input validation |
-| [uaParser](uaparser.md) | `modules.uaParser` | Parse User-Agent strings |
+| [uaParser](uaparser.md) | `modules.uaParser` | Decode User-Agent strings |
 
 ### Random and IDs
 
-| Module | Access | Description |
+| Module | Access | What it does |
 | --- | --- | --- |
 | [randomstring](randomstring.md) | `modules.randomstring` | Configurable random strings |
 
 ### Web3 and markets
 
-| Module | Access | Description |
+| Module | Access | What it does |
 | --- | --- | --- |
 | [ethers](ethers.md) | `modules.ethers` | Ethereum library (sandboxed RPC) |
 | [marketHub](market-hub.md) | `modules.marketHub` | Live crypto and fiat prices |
 
 ---
 
+## Try it — copy-paste examples
+
+Start simple. Each example only introduces what it needs.
+
+### Generate a unique ID
+
+No setup, no secrets — just an ID:
+
+```js
+let ref = modules.UUID.uuidv4().slice(0, 8).toUpperCase()
+Bot.sendMessage(chat.id, "Your reference: #" + ref)
+```
+
+### Validate an email
+
+`params` is whatever the user typed after your command:
+
+```js
+if (!modules.validator.isEmail(params)) {
+  return Bot.sendMessage(chat.id, "That doesn't look like an email. Try again.")
+}
+Bot.sendMessage(chat.id, "Email accepted. Welcome aboard!")
+```
+
+### Markdown → HTML for Telegram
+
+Telegram's HTML mode is picky. `md2html` translates your Markdown:
+
+```js
+let html = modules.md2html("**Sale!** Visit [our site](https://example.com)")
+Bot.sendMessage(chat.id, html, { parse_mode: "HTML" })
+```
+
+### Sign a session token
+
+Store your secret in dashboard **ENV** settings, then read it via `process.env`:
+
+```js
+let token = modules.JWT.sign(
+  { uid: user.id },
+  process.env.JWT_SECRET,
+  { expiresIn: "7d" }
+)
+Bot.sendMessage(chat.id, "Logged in. Token saved.")
+```
+
+ENV setup: [`process.env`](../globals/process.md) · JWT details: [JWT module](jwt.md)
+
+### Check BTC price
+
+```js
+let btc = modules.marketHub.getCrypto("BTC")
+if (btc) {
+  Bot.sendMessage(chat.id, "BTC: $" + modules.marketHub.formatPrice("BTC"))
+} else {
+  Bot.sendMessage(chat.id, "Price feed is taking a coffee break. Try again soon.")
+}
+```
+
+### Parse CSV (async)
+
+`ParseCSV` returns a Promise — add `await`:
+
+```js
+let csvText = "name,score\nAlice,9001\nBob,42"
+let rows = await modules.ParseCSV.parse(csvText)
+
+for (let row of rows) {
+  Bot.sendMessage(chat.id, row.name + " scored " + row.score)
+}
+```
+
+---
+
 ## How modules work
+
+The internals — useful when something breaks, skippable when you're vibing:
 
 | Behaviour | Detail |
 | --- | --- |
-| Injection | `TBL.modules` created per command with plan limits |
-| Caching | Modules loaded once and cached in memory |
+| Injection | `modules` is created fresh for each command run, with your plan's limits applied |
+| Caching | Each module loads once and stays in memory for the rest of that run |
 | Frozen | The `modules` object cannot be modified |
-| Input limits | Parse-heavy modules enforce plan `buffer_size` |
-| Abort | Operations check execution abort signal |
+| Input limits | Parse-heavy modules enforce your plan's `buffer_size` |
+| Abort | Long operations respect the command's abort signal |
 
-### Input size limits
+---
 
-Parsing modules (`ParseCSV`, `ParseYML`, `cheerio`, `md2html`, `qs.parse`, `JWT`) enforce your plan buffer size:
+## Size limits
+
+Parsing modules (`ParseCSV`, `ParseYML`, `cheerio`, `md2html`, `qs.parse`, `JWT`) enforce your plan's max input size:
 
 | Plan | Max input |
 | --- | --- |
@@ -80,7 +202,7 @@ Parsing modules (`ParseCSV`, `ParseYML`, `cheerio`, `md2html`, `qs.parse`, `JWT`
 | Premium | 5 MB |
 | Elite | 10 MB |
 
-Exceeding the limit throws: `Input exceeds plan limit (N bytes)`.
+Go over the limit and you'll see: `Input exceeds plan limit (N bytes)`. The docs didn't write themselves — they had to draw a line somewhere.
 
 ### Module-specific caps
 
@@ -96,6 +218,8 @@ Exceeding the limit throws: `Input exceeds plan limit (N bytes)`.
 
 ## Sync vs async
 
+Most modules are synchronous — call them like any function. A few need `await`:
+
 | Module | Async methods |
 | --- | --- |
 | `ParseCSV.parse()` | Yes — returns Promise |
@@ -104,85 +228,35 @@ Exceeding the limit throws: `Input exceeds plan limit (N bytes)`.
 | Most others | Sync |
 
 ```js
-// Async
+// Async — don't forget await
 let rows = await modules.ParseCSV.parse(csvText)
 let hash = await modules.bcrypt.hash(password, 10)
 
-// Sync
+// Sync — just call it
 let id = modules.UUID.uuidv4()
 let valid = modules.validator.isEmail(email)
 ```
 
----
-
-## Quick examples
-
-### JWT session token
-
-```js
-let token = modules.JWT.sign(
-  { uid: user.id },
-  process.env.JWT_SECRET,
-  { expiresIn: "7d" }
-)
-```
-
-### Markdown to HTML message
-
-```js
-let html = modules.md2html("**Sale!** Visit [our site](https://example.com)")
-Bot.sendMessage(chat.id, html, { parse_mode: "HTML" })
-```
-
-### BTC price
-
-```js
-let btc = modules.marketHub.getCrypto("BTC")
-if (btc) {
-  Bot.sendMessage(chat.id, "BTC: $" + modules.marketHub.formatPrice("BTC"))
-}
-```
-
-### Validate and parse
-
-```js
-if (!modules.validator.isEmail(params)) {
-  return Bot.sendMessage(chat.id, "Invalid email.")
-}
-
-let data = modules.zod.object({ email: modules.zod.string().email() }).parse({ email: params })
-```
+Forget `await` on an async method and you'll get a Promise object instead of the result. JavaScript's favorite prank.
 
 ---
 
-## Removed modules
+## Retired modules
 
-These are **no longer available** in TBL:
+These used to exist. They don't anymore. We're sorry for the inconvenience:
 
-| Module | Replacement |
+| Module | Use instead |
 | --- | --- |
-| `moment` | Use [dayjs](dayjs.md) |
-| `chance` | Use [Libs.random](../libs/random.md) |
-| `math` | Use native JavaScript `Math` |
-| `shortid` | Use [UUID](uuid.md) or [randomstring](randomstring.md) |
+| `moment` | [dayjs](dayjs.md) |
+| `chance` | [Libs.random](../libs/random.md) |
+| `math` | Native JavaScript `Math` |
+| `shortid` | [UUID](uuid.md) or [randomstring](randomstring.md) |
 
 ---
 
-## Modules vs Libs
+## Where modules work
 
-| | `modules` | `Libs` |
-| --- | --- | --- |
-| Source | npm packages (sandboxed) | TBL built-in libraries |
-| Access | `modules.lodash.map()` | `Libs.random.randomInt()` |
-| Best for | Crypto, parsing, validation, Web3 | Bot helpers (MCL, referrals, resources) |
-
-See [TBL Libraries](../libs/index.md) for Libs documentation.
-
----
-
-## Availability
-
-| Context | `modules` |
+| Context | `modules` available? |
 | --- | --- |
 | Normal Telegram commands | ✓ |
 | Webhook / webapp | ✓ |
@@ -193,4 +267,4 @@ See [TBL Libraries](../libs/index.md) for Libs documentation.
 
 ## Pages in this section
 
-All module pages are listed in the tables above. New modules: [ethers](ethers.md), [marketHub](market-hub.md), [md2html](md2html.md).
+Every module has its own page — linked in the tables above. Recently added: [ethers](ethers.md), [marketHub](market-hub.md), [md2html](md2html.md).

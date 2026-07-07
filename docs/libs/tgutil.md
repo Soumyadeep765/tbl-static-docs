@@ -1,11 +1,75 @@
 # tgutil
 
-`Libs.tgutil` provides Telegram-specific helpers for user names, mentions, chat links, message links, and text escaping. All methods are **synchronous**.
+Telegram has opinions about how names, mentions, and links should look — and those opinions change depending on whether you're using Markdown or HTML. **`Libs.tgutil`** handles the formatting so you don't accidentally send a broken mention or escape character soup.
+
+All methods are **synchronous**. No `await`.
+
+---
+
+## What is it?
+
+`Libs.tgutil` provides Telegram-specific helpers for user names, clickable mentions, chat links, message links, and text escaping. It's the "make my bot sound human on Telegram" library.
+
+Access: `Libs.tgutil.<method>()`
+
+| You pass in | You get back |
+| --- | --- |
+| `user` / `chat` objects | Properly formatted names and links |
+| Raw user text | Safely escaped strings for Markdown or HTML |
+
+!!! tip "Globals"
+    `user` and `chat` are always available in command Logic. Quick intro: [Global Variables](../globals/index.md).
+
+---
+
+## How to use it
+
+The most common pattern — greet someone with a clickable mention:
+
+```js
+let mention = Libs.tgutil.getUserMention(user, { parseMode: "html" })
+Bot.sendMessage(chat.id, "Hello " + mention + "!", { parse_mode: "HTML" })
+```
+
+Need a display name without the link fuss?
 
 ```js
 let name = Libs.tgutil.getFullName(user)
+Bot.sendMessage(chat.id, "Welcome, " + name)
+```
+
+**Important:** match `parseMode` in tgutil to `parse_mode` on `Bot.sendMessage`. HTML mention + Markdown parse mode = sad bot.
+
+---
+
+## Try it — beginner examples
+
+### Welcome message with mention
+
+```js
 let mention = Libs.tgutil.getUserMention(user, { parseMode: "html" })
-let safe = Libs.tgutil.escapeText("*bold*", "markdown")
+Bot.sendMessage(chat.id, "Welcome " + mention + "!", { parse_mode: "HTML" })
+```
+
+### Safe user input in bold
+
+`params` is whatever the user typed after your command — escape it before embedding in formatted text:
+
+```js
+let safe = Libs.tgutil.escapeText(params, "html")
+Bot.sendMessage(chat.id, "<b>You said:</b> " + safe, { parse_mode: "HTML" })
+```
+
+### User info card
+
+```js
+let info = [
+  "Name: " + Libs.tgutil.getFullName(user),
+  "Username: " + (user.username ? "@" + user.username : "none"),
+  "Bot: " + (Libs.tgutil.isBot(user) ? "yes" : "no")
+].join("\n")
+
+Bot.sendMessage(chat.id, info)
 ```
 
 ---
@@ -154,36 +218,6 @@ Supported entity types: `bold`, `italic`, `code`, `pre`, `text_link`, `mention`.
 | `formatMessageLink(chatId, messageId, parseMode?)` | `string` | No |
 | `escapeText(text, parseMode?)` | `string` | No |
 | `parseEntities(text, entities, parseMode?)` | `string` | No |
-
----
-
-## Examples
-
-### Welcome message with mention
-
-```js
-let mention = Libs.tgutil.getUserMention(user, { parseMode: "html" })
-Bot.sendMessage(chat.id, "Welcome " + mention + "!", { parse_mode: "HTML" })
-```
-
-### Safe user input in bold
-
-```js
-let safe = Libs.tgutil.escapeText(params, "html")
-Bot.sendMessage(chat.id, "<b>You said:</b> " + safe, { parse_mode: "HTML" })
-```
-
-### User info card
-
-```js
-let info = [
-  "Name: " + Libs.tgutil.getFullName(user),
-  "Username: " + (user.username ? "@" + user.username : "none"),
-  "Bot: " + (Libs.tgutil.isBot(user) ? "yes" : "no")
-].join("\n")
-
-Bot.sendMessage(chat.id, info)
-```
 
 ---
 

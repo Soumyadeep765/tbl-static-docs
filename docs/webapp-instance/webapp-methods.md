@@ -1,6 +1,18 @@
 # Webapp Methods
 
-Generate webapp and public web URLs with `Webapp.getUrl()` (alias: `Webapp.get()`).
+Generate webapp and public web URLs with `Webapp.getUrl()` (alias: `Webapp.get()`). One method, two URL flavors — sandboxed webapp or static public web.
+
+---
+
+## What is `getUrl()`?
+
+`Webapp.getUrl()` builds a browser-ready URL that hits your bot's webapp route (`/webapp/{bot_id}/{command}`) or, with `public: true`, the public web route (`/public/{bot_id}/{path}`).
+
+| You get | You skip |
+| --- | --- |
+| Correct per-bot URL paths | Hand-building domain + bot_id strings |
+| `options` and `params` encoding | Manual URL encoding |
+| Command validation (when handlers are loaded) | Typos in command names |
 
 ---
 
@@ -22,7 +34,7 @@ let url = Webapp.getUrl("dashboard", {
 | `options` | object | JSON config passed to the command |
 | `params` | object | Visible query parameters |
 | `public` | boolean | If `true`, generate a [public web](public-web.md) URL |
-| `publi` | boolean | Typo-tolerant alias for `public` |
+| `publi` | boolean | Typo-tolerant alias for `public` (yes, really) |
 
 ### Object form
 
@@ -39,12 +51,14 @@ Webapp.getUrl({
 
 ## `options` vs `params`
 
+Two ways to pass data in the URL — pick based on who needs to read it:
+
 | | `options` | `params` |
 | --- | --- | --- |
 | **Encoding** | Single `options={urlEncodedJson}` query key | Standard `key=value` pairs |
 | **Visibility** | One JSON blob in URL | Individual readable parameters |
 | **Use for** | App config, structured settings | Shareable filters, `ref`, `lang` |
-| **In command** | Available on global [`options`](../globals/options.md) | Available on global [`params`](../globals/params.md) |
+| **In command** | Global [`options`](../globals/options.md) | Global [`params`](../globals/params.md) |
 
 ```js
 // URL: .../dashboard?options=%7B%22theme%22%3A%22dark%22%7D&ref=home&lang=en
@@ -52,6 +66,8 @@ Webapp.getUrl({
 let theme = options.theme   // "dark"
 let ref = params.ref        // "home"
 ```
+
+Never put secrets in either — use [webhooks](../webhook-instance/index.md) for signed flows.
 
 ---
 
@@ -90,6 +106,8 @@ When `commandHandlers` are available at URL generation time, `getUrl` validates 
 Error: Unknown command: {name}
 ```
 
+Catch this in development — it saves you from sending broken links to users.
+
 ---
 
 ## Array params
@@ -105,7 +123,7 @@ Webapp.getUrl("search", {
 
 ---
 
-## Examples
+## Try it — copy-paste examples
 
 ### Send dashboard link in Telegram
 
@@ -141,7 +159,6 @@ let apiUrl = Webapp.getUrl("api/status", {
 - Use short, predictable command names (`dashboard`, `api/users`)
 - Put marketing/tracking params in `params` (`ref`, `utm_source`)
 - Put structured config in `options`
-- Never put secrets in URLs — use [webhooks](../webhook-instance/index.md) for signed flows
 - Use `public: true` only for static `is_web` commands
 
 ---

@@ -1,10 +1,64 @@
 # random
 
-`Libs.random` generates random values — numbers, strings, colors, dates, UUIDs, and more. All methods are **synchronous** (no `await` needed).
+Need a dice roll, promo code, or lottery pick without rolling actual dice on your keyboard? **`Libs.random`** has you covered.
+
+Numbers, strings, colors, dates, UUIDs, weighted picks, statistical distributions — all **synchronous**. No `await`, no drama.
+
+---
+
+## What is it?
+
+`Libs.random` generates random values for games, giveaways, test data, and "pick a winner" moments. It's the built-in replacement for the retired `modules.chance` module.
+
+Access: `Libs.random.<method>()`
+
+| Good for | Not for |
+| --- | --- |
+| Dice, loot tables, promo codes | Passwords, auth tokens, crypto keys |
+| Giveaway winners, shuffled lists | Cryptographically secure randomness |
+
+For security-sensitive tokens, use [`modules.crypto`](../modules/crypto.md) instead. `Libs.random` uses `Math.random()` — fine for games, not for vault keys.
+
+---
+
+## How to use it
+
+Drop this in your command's **Logic** field:
 
 ```js
 let roll = Libs.random.randomInt(1, 6)
-let code = Libs.random.randomString(8, { charset: "numeric" })
+Bot.sendMessage(chat.id, "You rolled: " + roll)
+```
+
+All methods return immediately — **no `await` needed**.
+
+!!! tip "Globals"
+    `chat` is the current Telegram chat. See [Global Variables](../globals/index.md) if you're new to TBL.
+
+---
+
+## Try it — beginner examples
+
+### Coin flip
+
+```js
+let flip = Libs.random.randomBoolean()
+Bot.sendMessage(chat.id, flip ? "Heads!" : "Tails!")
+```
+
+### Promo code
+
+```js
+let code = Libs.random.randomString(8, { charset: "alphanumeric" })
+Bot.sendMessage(chat.id, "Your code: " + code.toUpperCase())
+```
+
+### Giveaway winner
+
+```js
+let entrants = [111, 222, 333, 444]
+let winner = Libs.random.randomChoice(entrants)
+Bot.sendMessage(chat.id, "Winner: " + winner)
 ```
 
 ---
@@ -148,34 +202,8 @@ let digits = Libs.random.randomSequence(6, Libs.random.randomInt, [0, 9])
 
 ---
 
-## Practical examples
-
-### Coin flip
-
-```js
-let flip = Libs.random.randomBoolean()
-Bot.sendMessage(chat.id, flip ? "Heads!" : "Tails!")
-```
-
-### Giveaway winner
-
-```js
-let entrants = [111, 222, 333, 444]
-let winner = Libs.random.randomChoice(entrants)
-Bot.sendMessage(chat.id, "Winner: " + winner)
-```
-
-### Promo code
-
-```js
-let code = Libs.random.randomString(8, { charset: "alphanumeric" })
-Bot.sendMessage(chat.id, "Your code: " + code.toUpperCase())
-```
-
----
-
 ## Notes
 
 - All methods are **sync** — no `await`
-- Uses `Math.random()` — not cryptographically secure; use `Modules.crypto` for security-sensitive tokens
+- Uses `Math.random()` — not cryptographically secure; use `modules.crypto` for security-sensitive tokens
 - Methods are capped at the Libs **2-second timeout** (only relevant for very heavy custom generators passed to `randomMatrix` / `randomSequence`)

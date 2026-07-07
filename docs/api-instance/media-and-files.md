@@ -1,8 +1,33 @@
 # Media and Files
 
-Text gets you far. Eventually you'll send photos, PDFs, voice notes, or stickers. Api mirrors Telegram's media methods — same object style as `sendMessage`.
+Text gets you far. Eventually you'll send photos, PDFs, voice notes, or stickers. **`Api`** mirrors Telegram's media methods — same object style as `sendMessage`, same "just works in the current chat" defaults.
 
-## Photos
+URLs for testing. `file_id` for production — so Telegram doesn't re-fetch the same image every time like an overeager intern.
+
+---
+
+## What can you send?
+
+| Method | Best for |
+| --- | --- |
+| `Api.sendPhoto` | Images (inline preview) |
+| `Api.sendDocument` | PDFs, archives, downloads |
+| `Api.sendAudio` | Music tracks with metadata |
+| `Api.sendVoice` | Round voice-message player |
+| `Api.sendVideo` | Video files |
+| `Api.sendSticker` | Stickers |
+| `Api.sendAnimation` | GIF-style clips |
+
+All accept a URL, a `file_id` from a previous upload, or a file reference already on Telegram's servers.
+
+!!! tip "New to TBL?"
+    `Bot`, `chat`, and `user` are globals available in every command. Quick intro: [Learning TBL](../learning-tbl.md).
+
+---
+
+## How to use it
+
+### Photos
 
 ```js
 Api.sendPhoto({
@@ -11,9 +36,7 @@ Api.sendPhoto({
 })
 ```
 
-`photo` accepts a URL, a `file_id` from a previous upload, or a file reference your bot already has on Telegram's servers. URLs are the quickest way to test; `file_id` is what you want in production so Telegram doesn't re-fetch the same image every time.
-
-## Documents
+### Documents
 
 For PDFs, archives, anything that isn't treated as an inline photo:
 
@@ -26,7 +49,7 @@ Api.sendDocument({
 
 Users get a download-style attachment.
 
-## Audio and voice
+### Audio and voice
 
 ```js
 Api.sendAudio({
@@ -41,7 +64,7 @@ Api.sendVoice({
 
 Voice messages show the round player UI. Audio files show as music tracks with metadata.
 
-## Video
+### Video
 
 ```js
 Api.sendVideo({
@@ -51,36 +74,65 @@ Api.sendVideo({
 })
 ```
 
-## Stickers and animations
+---
 
-Stickers use `sendSticker`. GIF-style clips use `sendAnimation`. Both take a `file_id` or upload source the same way as photos.
+## Try it — copy-paste examples
 
-Check the [Telegram Bot API media methods](https://core.telegram.org/bots/api#available-methods) for the full parameter list — dimensions, thumbnails, spoiler flags, and so on all pass through unchanged.
+### Photo with caption
+
+```js
+Api.sendPhoto({
+  photo: "https://example.com/welcome.png",
+  caption: "*Welcome!* Tap /help to get started.",
+  parse_mode: "Markdown"
+})
+```
+
+### Document as a reply
+
+Thread under a specific message:
+
+```js
+Api.sendDocument({
+  document: fileUrl,
+  caption: "Here's your receipt.",
+  reply_to_message_id: message.message_id
+})
+```
+
+### Send, edit caption, delete
+
+```js
+let photo = await Api.sendPhoto({ photo: url, caption: "Draft" })
+await photo.editCaption("Final version")
+await photo.delete()
+```
+
+See [Method Chaining](method-chaining.md) for edit and delete helpers on the returned object.
+
+---
 
 ## Captions and formatting
 
 Most media methods accept `caption` and `parse_mode` just like messages. Same Markdown rules apply — don't get clever with nested formatting on day one.
 
-## Sending media as a reply
+Check the [Telegram Bot API media methods](https://core.telegram.org/bots/api#available-methods) for the full parameter list — dimensions, thumbnails, spoiler flags, and so on all pass through unchanged.
 
-Add `reply_to_message_id` if the file should thread under a specific message:
-
-```js
-Api.sendDocument({
-  document: fileUrl,
-  reply_to_message_id: message.message_id
-})
-```
+---
 
 ## Bot.sendPhoto vs Api.sendPhoto
 
-`Bot.sendPhoto("url", "caption")` works for quick sends inside bot flows. When you need keyboard markup, spoiler mode, or precise Telegram options, use Api.
+| | `Bot.sendPhoto` | `Api.sendPhoto` |
+| --- | --- | --- |
+| Syntax | `Bot.sendPhoto("url", "caption")` | `Api.sendPhoto({ photo, caption, ... })` |
+| Best for | Quick sends inside bot flows | Keyboards, spoiler mode, precise Telegram options |
 
-## Chaining after send
+When you need keyboard markup, spoiler mode, or full Telegram control, use `Api`.
 
-```js
-let photo = await Api.sendPhoto({ photo: url, caption: "Draft" })
-await photo.editCaption("Final version")
-```
+---
 
-See [Method Chaining](method-chaining.md) for edit and delete helpers on the returned object.
+## Important notes
+
+- `photo` / `document` / etc. accept URL, `file_id`, or existing Telegram file reference
+- Use `await` when you need to edit or delete what you just sent
+- Case-sensitive method names — `Api.sendPhoto`, not `Api.sendphoto`

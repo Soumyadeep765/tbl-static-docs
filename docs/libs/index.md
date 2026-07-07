@@ -1,18 +1,62 @@
 # TBL Libraries (Libs)
 
-`Libs` provides **built-in helper libraries** for common bot tasks — random values, dates, resources, referrals, Telegram formatting, and channel membership checks.
+Imagine a Swiss Army knife that only opens Telegram-bot-shaped problems — dice rolls, referral links, coin balances, "did they join the channel?" gates. That's **`Libs`**.
 
-```js
-let roll = Libs.random.randomInt(1, 6)
-let now = Libs.dateTimeFormat.getCurrentDate("isoDateTime")
-let joined = await Libs.mcl.quick(user.id, ["@MyChannel"])
-```
-
-No imports or setup required. Access any library as `Libs.<libraryName>.<method>()`.
+No imports, no setup, no "where do I put this file?" Type `Libs.` and pick your tool. Roll a die, format a date, check channel membership — all from your command's **Logic** field.
 
 ---
 
-## Available libraries
+## What are Libs?
+
+**Libs** are TBL-built helper libraries for bot-specific tasks: random values, dates, Telegram formatting, persistent resources, referrals, and channel membership checks.
+
+| You get | You skip |
+| --- | --- |
+| Bot-focused helpers (MCL, refLib, ResourcesLib) | Writing glue code from scratch |
+| One global object: `Libs` | Import statements |
+| Works in commands, webhooks, webapps | External services for simple stuff |
+
+Every library is accessed as `Libs.<libraryName>.<method>()` — **case-sensitive**. `Libs.random` works. `Libs.Random` does not. Consistency is a lifestyle choice.
+
+---
+
+## How to use them
+
+Drop this in any command's **Logic** field:
+
+```js
+let roll = Libs.random.randomInt(1, 6)
+Bot.sendMessage(chat.id, "You rolled: " + roll)
+```
+
+Three things worth knowing upfront:
+
+1. **`Libs` is already there** — you never import or initialize it.
+2. **The object is frozen** — you can't add your own properties to `Libs`. Nice try though.
+3. **Some methods need `await`** — MCL talks to Telegram's API and returns Promises. More on that [below](#sync-vs-async).
+
+!!! tip "New to TBL?"
+    `Bot`, `chat`, and `user` are globals available in every command. Quick intro: [Learning TBL](../learning-tbl.md). For general npm-style utilities (JWT, bcrypt, CSV), see [Modules](../modules/index.md).
+
+---
+
+## Libs or Modules?
+
+TBL has two toolboxes. Pick the right drawer before you rummage:
+
+| | `Libs` | `modules` |
+| --- | --- | --- |
+| What | TBL-built bot helpers (referrals, dice rolls, channel checks) | npm-style packages (crypto, parsing, Web3) |
+| Access | `Libs.random.randomInt(1, 6)` | `modules.validator.isEmail(email)` |
+| Best for | MCL, referral links, resource balances, Telegram names | JWT, bcrypt, CSV, YAML, Ethereum |
+
+Full Modules docs: [Modules](../modules/index.md).
+
+Still not sure? Rule of thumb: if it's Telegram-bot glue or game economy stuff, check `Libs` first. If you'd normally `npm install` it, check `modules`.
+
+---
+
+## Pick a library
 
 | Library | Access | Sync / Async | Page |
 | --- | --- | --- | --- |
@@ -27,49 +71,13 @@ Source code: [telebothost/tbl-libs](https://github.com/telebothost/tbl-libs) on 
 
 ---
 
-## How Libs works
+## Try it — copy-paste examples
 
-Libraries are loaded from TBL's global lib registry and run inside a **sandboxed VM**:
+Start simple. Each example only introduces what it needs.
 
-| Behaviour | Detail |
-| --- | --- |
-| Lazy loading | Each library loads on first access (`Libs.random`, `Libs.mcl`, etc.) |
-| Immutable | `Libs` cannot be modified — assignments throw `[LibsError] Immutable` |
-| Method timeout | Each method call is capped at **2 seconds** (max), minimum **500 ms** |
-| Init timeout | Library initialization also capped at **2 seconds** |
-| Async methods | Return Promises — always use `await` (`.then` is not supported in TBL) |
-| Sync methods | Return values directly — no `await` needed |
-| Circular deps | Detected and throw `[LibsError] Circular dependency` |
-| TBL access | Libraries can use `Bot`, `Api`, `user`, `chat`, and other TBL globals during execution |
+### Roll a dice
 
-### Sync vs async
-
-```js
-// Sync — immediate return
-let n = Libs.random.randomInt(1, 100)
-let name = Libs.tgutil.getFullName(user)
-
-// Async — must await
-let result = await Libs.mcl.check(user.id, ["@Channel1"])
-let ok = await Libs.mcl.quick(user.id, ["@Channel1"])
-```
-
-### Error format
-
-Lib errors are prefixed with `[LibsError]`:
-
-| Error | Cause |
-| --- | --- |
-| `[LibsError] Timeout: mcl.check` | Method exceeded 2-second limit |
-| `[LibsError] InitFail: mcl -> ...` | Library failed to initialize |
-| `[LibsError] Immutable: Cannot modify libraries` | Attempted to assign to `Libs` |
-| `[LibsError] Circular dependency: X` | Lib A imports Lib B which imports Lib A |
-
----
-
-## Quick examples by task
-
-### Random dice roll
+No setup — just randomness:
 
 ```js
 let roll = Libs.random.randomInt(1, 6)
@@ -85,12 +93,16 @@ Bot.sendMessage(chat.id, "Today: " + today)
 
 ### Mention a user safely
 
+Telegram HTML is picky. `tgutil` builds the mention for you:
+
 ```js
 let mention = Libs.tgutil.getUserMention(user, { parseMode: "html" })
-Bot.sendMessage(chat.id, "Hello " + mention, { parse_mode: "HTML" })
+Bot.sendMessage(chat.id, "Hello " + mention + "!", { parse_mode: "HTML" })
 ```
 
 ### User coin balance
+
+Resources persist between command runs — perfect for game economies:
 
 ```js
 let coins = Libs.ResourcesLib.userRes("coins")
@@ -99,6 +111,8 @@ Bot.sendMessage(chat.id, "Balance: " + coins.value())
 ```
 
 ### Referral link
+
+Call `track()` once (usually in `/start`) so deep links get detected:
 
 ```js
 Libs.refLib.track({ onAttracted: (referrer) => {
@@ -109,7 +123,9 @@ let link = Libs.refLib.getLink()
 Bot.sendMessage(chat.id, "Share: " + link)
 ```
 
-### Force channel join
+### Force channel join (async)
+
+MCL checks live membership via Telegram — **always `await`**:
 
 ```js
 let ok = await Libs.mcl.quick(user.id, ["@MyChannel", "@MyGroup"])
@@ -121,29 +137,73 @@ if (!ok) {
 }
 ```
 
+MCL details: [MCL](mcl.md)
+
 ---
 
-## Availability
+## How Libs works
 
-| Context | `Libs` |
+The internals — useful when something breaks, skippable when you're vibing:
+
+| Behaviour | Detail |
+| --- | --- |
+| Lazy loading | Each library loads on first access (`Libs.random`, `Libs.mcl`, etc.) |
+| Immutable | `Libs` cannot be modified — assignments throw `[LibsError] Immutable` |
+| Method timeout | Each method call is capped at **2 seconds** (max), minimum **500 ms** |
+| Init timeout | Library initialization also capped at **2 seconds** |
+| Async methods | Return Promises — always use `await` (`.then` is not supported in TBL) |
+| Sync methods | Return values directly — no `await` needed |
+| Circular deps | Detected and throw `[LibsError] Circular dependency` |
+| Globals access | Libraries can use `Bot`, `Api`, `user`, `chat`, and other globals during execution |
+
+---
+
+## Sync vs async
+
+Most Libs methods are synchronous — call them like any function. **MCL is the exception** — it asks Telegram whether someone joined a channel, so every check method returns a Promise:
+
+| Library | Async methods |
+| --- | --- |
+| `mcl.check()`, `quick()`, `getLeftChannels()`, etc. | Yes — returns Promise |
+| `mcl.getBtn()` | No — sync |
+| `random`, `dateTimeFormat`, `tgutil`, `ResourcesLib`, `refLib` | Sync |
+
+```js
+// Async — don't forget await
+let ok = await Libs.mcl.quick(user.id, ["@Channel1"])
+let result = await Libs.mcl.check(user.id, ["@Channel1"])
+
+// Sync — just call it
+let roll = Libs.random.randomInt(1, 6)
+let name = Libs.tgutil.getFullName(user)
+let buttons = Libs.mcl.getBtn(["@Channel1"])  // no await here
+```
+
+Forget `await` on an async MCL method and you'll get a Promise object instead of `true`/`false`. JavaScript's favorite prank — and your gate will let everyone through.
+
+---
+
+## Error format
+
+Lib errors are prefixed with `[LibsError]`:
+
+| Error | Cause |
+| --- | --- |
+| `[LibsError] Timeout: mcl.check` | Method exceeded 2-second limit |
+| `[LibsError] InitFail: mcl -> ...` | Library failed to initialize |
+| `[LibsError] Immutable: Cannot modify libraries` | Attempted to assign to `Libs` |
+| `[LibsError] Circular dependency: X` | Lib A imports Lib B which imports Lib A |
+
+---
+
+## Where Libs works
+
+| Context | `Libs` available? |
 | --- | --- |
 | Normal Telegram commands | ✓ |
 | Webhook / webapp | ✓ |
 | HTTP callback commands | ✓ |
 | Broadcast commands | ✓ |
-
----
-
-## Libs vs Modules
-
-| | `Libs` | `Modules` |
-| --- | --- | --- |
-| What | Built-in TBL helper libraries | Curated npm-style packages |
-| Access | `Libs.random.randomInt()` | `Modules.crypto`, etc. |
-| Setup | None | None |
-| Best for | Bot-specific helpers (referrals, MCL, resources) | General utilities (crypto, encoding) |
-
-See [Modules](../modules/index.md) for the modules reference.
 
 ---
 

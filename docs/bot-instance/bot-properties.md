@@ -1,12 +1,14 @@
 # Bot Properties (Deprecated)
 
-!!! warning "Deprecated API"
-    `Bot.set`, `Bot.get`, `Bot.del`, and all other `Bot.*` property methods are **deprecated**.  
-    Use [`db.bot`](../db-instance/bot.md) for all new bot-wide storage.
+Once upon a time, `Bot.set` and `Bot.get` were how you stored bot-wide data. They still work — but they're the flip phone of storage APIs. **`db.bot`** is the smartphone: bigger limits, confirmed writes, works in webhooks.
 
-The legacy **Bot properties** API stores key-value data shared across all users of the same bot. It still works for existing commands, but has important limits and is not recommended for new development.
+If you're starting fresh, skip this page and go straight to [Bot-Level Storage (`db.bot`)](../db-instance/bot.md). If you're maintaining legacy commands, read on — then migrate when you can.
 
-## Use `db.bot` instead
+---
+
+## What's deprecated?
+
+`Bot.set`, `Bot.get`, `Bot.del`, and all other `Bot.*` property methods are **deprecated**. They store key-value data shared across all users of the same bot.
 
 | | `Bot.set` / `Bot.get` (deprecated) | `db.bot` (recommended) |
 | --- | --- | --- |
@@ -20,7 +22,14 @@ The legacy **Bot properties** API stores key-value data shared across all users 
 | Webhook / webapp | **Not available** | Available |
 | Reliability | Fire-and-forget writes | Confirmed persistence |
 
-### Quick migration
+!!! tip "New to TBL?"
+    `Bot`, `chat`, and `user` are globals available in every command. Quick intro: [Learning TBL](../learning-tbl.md).
+
+---
+
+## How to migrate
+
+Three lines changed, one world of difference:
 
 ```js
 // Deprecated
@@ -32,48 +41,54 @@ await db.bot.set("maintenance", true)
 if (await db.bot.get("maintenance", false)) { ... }
 ```
 
+Counters got easier too:
+
 ```js
-// Deprecated counter
+// Deprecated — race conditions waiting to happen
 Bot.set("visits", (Bot.get("visits") || 0) + 1)
 
-// Recommended
+// Recommended — atomic increment
 await db.bot.incr("visits", 1)
 ```
 
-See [Bot-Level Storage (`db.bot`)](../db-instance/bot.md) for full examples, TTL, and advanced operations.
+Full examples, TTL, and advanced ops: [Bot-Level Storage (`db.bot`)](../db-instance/bot.md).
 
-## 1 MB storage limit
+---
 
-Bot properties use the legacy sync storage backend, which enforces a **1 MB total cap per bot** (combined bot + user sync data). If a write would exceed this limit, it fails with a storage limit error.
+## The 1 MB trap
 
-This limit applies to the **serialized size** of all stored properties — not the number of keys. Large objects, cached API responses, or user lists will hit the cap quickly.
+Bot properties use a legacy sync backend with a **1 MB total cap per bot** (combined bot + user sync data). Hit the limit and writes fail with a storage error.
+
+The cap applies to **serialized size** of all stored properties — not key count. Large objects, cached API responses, or user lists will fill it fast.
 
 !!! danger "Do not use for large data"
-    Never store big payloads, user lists, or API caches with `Bot.set`. Use [`db.bot`](../db-instance/bot.md) which supports much larger limits based on your [plan](../globals/plan.md).
+    Never store big payloads, user lists, or API caches with `Bot.set`. Use [`db.bot`](../db-instance/bot.md) — limits scale with your [plan](../globals/plan.md).
 
-## Recommendations
+---
 
-**Do use `db.bot` for:**
+## What to use where
+
+**Use `db.bot` for:**
 
 - Feature flags and maintenance modes
 - Counters and analytics (`db.bot.incr`)
 - Cached API responses with TTL
-- Any data you need to rely on in webhooks or webapps
-- Anything that may grow over time
+- Data you need in webhooks or webapps
+- Anything that might grow over time
 
 **Only keep `Bot.set` / `Bot.get` if:**
 
-- You have existing commands that already use them
-- You need a quick sync read during a one-off migration
+- Existing commands already use them
+- You're doing a one-off sync read during migration
 
 **Never use bot properties for:**
 
-- Secrets or API keys — use dashboard [ENV variables](../globals/process.md)
-- Per-user data — use [`db.user`](../db-instance/user.md) (not deprecated `User`)
-- Account-wide data across multiple bots — use [`db.global`](../db-instance/global.md)
-- Large or unbounded data — you will hit the 1 MB cap
+- Secrets or API keys — dashboard [ENV variables](../globals/process.md)
+- Per-user data — [`db.user`](../db-instance/user.md)
+- Account-wide data across bots — [`db.global`](../db-instance/global.md)
+- Large or unbounded data — you'll hit 1 MB and cry
 
-**Migration path:** Replace `Bot.set`/`get`/`del` calls with `await db.bot.set`/`get`/`del` one command at a time. Both can coexist during migration.
+**Migration path:** Replace `Bot.set`/`get`/`del` with `await db.bot.set`/`get`/`del` one command at a time. Both can coexist during migration.
 
 ---
 
@@ -113,7 +128,9 @@ let flag = Bot.get("flag")   // true
 Bot.del("flag")
 ```
 
-Writes return `{ success, key, bot_id, cached: true }` immediately — persistence to the database happens asynchronously and may fail silently if the 1 MB limit is exceeded.
+Writes return `{ success, key, bot_id, cached: true }` immediately — persistence happens asynchronously and may fail silently if the 1 MB limit is exceeded.
+
+---
 
 ## Availability
 

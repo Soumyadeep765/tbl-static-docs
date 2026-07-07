@@ -1,8 +1,12 @@
 # Responses
 
-Every `HTTP` call resolves to a **response object**. Failed HTTP status codes do not throw — inspect `res.ok` and `res.status` instead.
+Every `HTTP` call resolves to a **response object** — status, headers, parsed body, cookies, the works. HTTP errors don't throw. A 404 is just `res.ok === false`, not a crash.
 
-## Response object
+Always check `res.ok` before reaching for `res.data`. Future-you will thank present-you.
+
+---
+
+## What do you get back?
 
 ```js
 let res = await HTTP.get("https://api.example.com/data")
@@ -51,7 +55,9 @@ let res = await HTTP.get("https://api.example.com/data")
 }
 ```
 
-## Reading the body
+---
+
+## How to read the body
 
 | Field | When to use |
 | --- | --- |
@@ -68,6 +74,8 @@ if (res.ok && res.isJson) {
   Bot.sendMessage(chat.id, res.content)
 }
 ```
+
+---
 
 ## Response types
 
@@ -90,9 +98,11 @@ await HTTP.get(url, { responseType: "buffer" })
 await HTTP.get(url, { responseType: "arrayBuffer" })
 ```
 
-If `responseType: "json"` is set but the body is not valid JSON, `res.ok` is `false` and `res.error.code` is `"INVALID_JSON"`.
+If `responseType: "json"` is set but the body is not valid JSON, `res.ok` is `false` and `res.error.code` is `"INVALID_JSON"`. The server sent something. It just wasn't JSON.
 
 For large or live responses, use `responseType: "stream"` — see [Streaming](streaming.md).
+
+---
 
 ## Cookies
 
@@ -111,6 +121,8 @@ let profile = await HTTP.get("https://api.example.com/profile", {
 ```
 
 In callback commands, cookies are also available as the `cookies` global alias. See [`http_response`](../globals/http_response.md).
+
+---
 
 ## Error inspection
 
@@ -137,6 +149,8 @@ if (!res.ok) {
 | `WORKER_PROXY_ERROR` | 502 | Cloudflare Worker proxy error |
 | `HTTP_REQUEST_ERROR` | 500 | Unexpected request failure |
 
+---
+
 ## In callback commands
 
 When using `success` / `error` fallback commands, the same response shape is available through globals:
@@ -151,6 +165,8 @@ When using `success` / `error` fallback commands, the same response shape is ava
 | `error` | Full response object (in `error` callback only) |
 
 See [Fallback Commands](fallback-commands.md) and [`http_response`](../globals/http_response.md).
+
+---
 
 ## Important notes
 

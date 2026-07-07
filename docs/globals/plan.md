@@ -1,12 +1,49 @@
-# The `plan` Variable
+# plan
 
-In TBL, `plan` contains the **resolved subscription limits and features** for the bot owner. TBL uses these values internally to enforce timeouts, buffer sizes, and rate limits — you can also read them to gate features in your bot logic.
+Your bot's subscription limits — timeouts, storage, and rate caps in one object.
 
-## Properties
+## What is it?
+
+**`plan`** is an object with the **resolved limits and features** for your bot's subscription tier. TeleBotHost uses these values internally to enforce timeouts, buffer sizes, and rate limits. You can read them too — handy for gating premium features or showing owners what they're working with.
+
+It's the fine print, but readable. No lawyers required.
+
+## When would you use it?
+
+- Gate features behind premium (`plan.premium`)
+- Show owners their current limits in an admin command
+- Adjust bot behavior based on timeout or buffer size
+- Warn users when they're on a plan with ads (`plan.ads`)
+
+For raw subscription dates and tier strings, check [`owner.plan`](owner.md). For module input size limits that reference `buffer_size`, see [Modules](../modules/index.md#size-limits).
+
+---
+
+## Try it
+
+```js
+// Premium-only feature
+if (!plan.premium) {
+  return Bot.sendMessage(user.id, "This feature requires a Premium plan.")
+}
+
+// Show plan info to the owner
+Bot.sendMessage(user.id,
+  "Your plan: " + plan.name +
+  " (" + (plan.timeout / 1000) + "s script timeout)"
+)
+
+// Respect buffer limits when parsing big files
+Bot.inspect("Max input size: " + (plan.buffer_size / 1024) + " KB")
+```
+
+---
+
+## Fields
 
 | Field | Type | Description |
 | --- | --- | --- |
-| `name` | `string` | Plan name: `"Free"`, `"Freemium"`, `"Premium"`, or `"Elite"` |
+| `name` | `string` | `"Free"`, `"Freemium"`, `"Premium"`, or `"Elite"` |
 | `premium` | `boolean` | Whether the plan is a premium tier |
 | `ads` | `boolean` | Whether ads are shown |
 | `prop_limit.per_account` | `number` | Max storage properties per account |
@@ -18,7 +55,7 @@ In TBL, `plan` contains the **resolved subscription limits and features** for th
 | `rate_limit.perMinute` | `number` | Web/webapp requests per minute |
 | `rate_limit.perDay` | `number` | Web/webapp requests per day |
 
-## Tier Comparison
+### Tier comparison
 
 | Tier | Premium | Timeout | Buffer | Parallel | Max Sleep | Rate (min / day) |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -27,7 +64,7 @@ In TBL, `plan` contains the **resolved subscription limits and features** for th
 | **Premium** | Yes | 30s | 5 MB | 20 | 20s | 60 / 10,000 |
 | **Elite** | Yes | 60s | 10 MB | 40 | 50s | 120 / 20,000 |
 
-## Example Object
+### Example object
 
 ```json
 {
@@ -44,22 +81,10 @@ In TBL, `plan` contains the **resolved subscription limits and features** for th
 }
 ```
 
-## Usage
+---
 
-```javascript
-// Gate a premium feature
-if (!plan.premium) {
-  return Bot.sendMessage(user.id, 'This feature requires a Premium plan.')
-}
-
-// Show plan info to the owner
-if (user.id === owner.id) {
-  Bot.sendMessage(user.id, `Your plan: ${plan.name} (${plan.timeout / 1000}s timeout)`)
-}
-```
-
-## Important Notes
+## Good to know
 
 - `plan` is read-only and frozen during command execution
-- `timeout` and `buffer_size` are in milliseconds and bytes respectively; `sleep` is in seconds
-- Raw subscription dates are on [owner.plan](owner.md); resolved limits are on `plan`
+- `timeout` and `buffer_size` are in milliseconds and bytes; `sleep` is in seconds
+- Raw subscription dates live on [`owner.plan`](owner.md)

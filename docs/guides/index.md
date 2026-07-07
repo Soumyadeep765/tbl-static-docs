@@ -1,8 +1,25 @@
 # Guides
 
-These pages answer questions that come up once you've got a bot running but aren't sure which tool to reach for.
+You've got a bot running. Now you're staring at `Bot`, `Api`, `HTTP`, webhooks, and webapps wondering which one actually does what you need. These pages are your decision tree.
 
 They sit between the [Command Flow](../getting-started-with-tbl/index.md) guides (how commands work) and the reference sections (method lists and variable docs).
+
+---
+
+## What are these guides?
+
+These pages answer questions that come up once you've got a bot running but aren't sure which tool to reach for — command interactions, instance comparisons, and choosing the right web surface.
+
+| You get | You skip |
+| --- | --- |
+| "When to use X" decision tables | Reading every reference page |
+| Side-by-side comparisons | Trial-and-error tool picking |
+| Links to the right deep dive | Getting lost in method lists |
+
+!!! tip "New to TBL?"
+    Haven't built a bot yet? Start with [Getting Started](../getting-started.md) → [Your First Bot](../getting-started-with-tbl/first-hello-bot.md). Quick intro: [Learning TBL](../learning-tbl.md).
+
+---
 
 ## Command & interaction guides
 
@@ -14,11 +31,17 @@ They sit between the [Command Flow](../getting-started-with-tbl/index.md) guides
 | [Public Web Commands](../getting-started-with-tbl/public-web-commands.md) | Static `is_web` pages per bot |
 | [Handling User Input](../getting-started-with-tbl/handle-need-reply.md) | Multi-step input flows |
 
+---
+
 ## Instance comparison
 
 **[Bot vs Api](bot-vs-api.md)** — lives in the sidebar after the [Bot](../bot-instance/index.md) and [Api](../api-instance/index.md) sections. Read those overviews first, then use the comparison when both objects start to blur together.
 
+---
+
 ## Choosing a web surface
+
+Not sure whether you need a webhook, webapp, or static page? Start here:
 
 | Need | Use |
 | --- | --- |
@@ -26,6 +49,8 @@ They sit between the [Command Flow](../getting-started-with-tbl/index.md) guides
 | Dynamic API with `db` | [Webapp](../webapp-instance/index.md) |
 | Signed per-user action | [User webhook](../webhook-instance/user-webhook.md) |
 | Cron / system trigger | [Global webhook](../webhook-instance/global-webhook.md) |
+
+---
 
 ## Where to go next
 

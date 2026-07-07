@@ -1,27 +1,27 @@
 # md2html
 
-`modules.md2html` converts **Telegram-style Markdown** to **Telegram-compatible HTML**. Use it when you have Markdown text and need to send with `parse_mode: "HTML"`.
+Write Markdown, send HTML — Telegram's picky parser will thank you.
+
+## What is it?
+
+**md2html** converts **Telegram-style Markdown** into **Telegram-compatible HTML**. When you want bold, links, and spoilers in a message but `parse_mode: "HTML"` is easier to debug than MarkdownV2 escaping, this module does the translation for you.
+
+Access it as `modules.md2html` — a single sync function.
+
+Powered by [telegram-md2html](https://www.npmjs.com/package/telegram-md2html).
+
+---
+
+## How to use
+
+Pass Markdown, get HTML:
 
 ```js
 let html = modules.md2html("**Bold** and *italic* text")
 Bot.sendMessage(chat.id, html, { parse_mode: "HTML" })
 ```
 
-Powered by [telegram-md2html](https://www.npmjs.com/package/telegram-md2html).
-
----
-
-## Basic usage
-
-```js
-modules.md2html("**Hello** *world*!")
-// "<b>Hello</b> <i>world</i>!"
-
-modules.md2html("Visit [Google](https://google.com)")
-// 'Visit <a href="https://google.com">Google</a>'
-```
-
-Pass the result directly to `Bot.sendMessage` or `Api.sendMessage` with `parse_mode: "HTML"`.
+Send the result to [Bot](../bot-instance/index.md) with `parse_mode: "HTML"`. That's the whole pipeline.
 
 ---
 
@@ -58,7 +58,22 @@ modules.md2html("This is *italic* text")
 
 ---
 
-## Full message example
+## md2html vs manual HTML
+
+| Approach | When to use |
+| --- | --- |
+| `modules.md2html(text)` | You have Markdown and want HTML parse mode |
+| `parse_mode: "Markdown"` | Simple Telegram Markdown — no conversion needed |
+| `parse_mode: "MarkdownV2"` | Full MarkdownV2 — escape with [tgutil](../libs/tgutil.md) |
+| Manual HTML | Full control over tags |
+
+---
+
+## Try it
+
+### Format a daily update
+
+[Bot](../bot-instance/index.md) sends to [chat](../globals/chat.md):
 
 ```js
 let markdown = [
@@ -78,48 +93,23 @@ let html = modules.md2html(markdown)
 Bot.sendMessage(chat.id, html, { parse_mode: "HTML" })
 ```
 
----
+### Mix Markdown with user input
 
-## With user content
-
-Escape is handled automatically when `escapeHtml` is enabled (default). For mixed user input, still validate content before converting:
+When [user](../globals/user.md) content is involved, escape it first with [Libs.tgutil](../libs/tgutil.md):
 
 ```js
-let userText = modules.tgutil.escapeText(params, "html")
+let userText = Libs.tgutil.escapeText(params, "html")
 let html = modules.md2html("**You wrote:**\n" + userText)
 Bot.sendMessage(chat.id, html, { parse_mode: "HTML" })
 ```
-
-Or use [tgutil](../libs/tgutil.md) for Telegram-specific escaping.
-
----
-
-## Limits
-
-| Limit | Value |
-| --- | --- |
-| Input size | Plan buffer size (512 KB – 10 MB) |
-| Method | Sync function call |
-
-Input exceeding the plan buffer throws: `Markdown input exceeds plan limit (N bytes)`.
-
----
-
-## md2html vs manual HTML
-
-| Approach | When to use |
-| --- | --- |
-| `modules.md2html(text)` | You have Markdown and want HTML parse mode |
-| `parse_mode: "Markdown"` | Simple Telegram Markdown — no conversion needed |
-| `parse_mode: "MarkdownV2"` | Full MarkdownV2 — escape with [tgutil](../libs/tgutil.md) |
-| Manual HTML | Full control over tags |
 
 ---
 
 ## Notes
 
-- Returns a **string** — sync, no `await`
+- **Sync** — returns a string, no `await`
+- Input size is limited by your plan's buffer size (512 KB – 10 MB). Exceeding it throws: `Markdown input exceeds plan limit (N bytes)`
+- HTML special characters in plain text are escaped by default (`escapeHtml` enabled)
 - Output is safe for Telegram `parse_mode: "HTML"`
-- HTML special characters in plain text are escaped by default
-- For date formatting in messages, see [dayjs](dayjs.md) or [Libs.dateTimeFormat](../libs/date-time-format.md)
+- For date formatting in messages, see [dayjs](dayjs.md)
 - Package docs: [telegram-md2html on npm](https://www.npmjs.com/package/telegram-md2html)

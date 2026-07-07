@@ -1,6 +1,6 @@
 # Webapp Examples
 
-Practical patterns for webapp commands and URL generation.
+Practical patterns for webapp commands and URL generation. Copy, adapt, ship.
 
 ---
 
@@ -20,9 +20,14 @@ res
   .json({ ok: true, record: record || null })
 ```
 
+!!! tip "Browsers calling your API"
+    Set CORS headers when a front-end on another origin fetches your webapp. See [Headers & Status](../res-instance/headers-and-status.md).
+
 ---
 
 ## HTML dashboard via `res.render()`
+
+Separate logic from layout — handler command fetches data, template command displays it.
 
 **Handler command (`showDashboard`):**
 
@@ -98,6 +103,8 @@ let progress = await db.user.get("level", 0)
 res.json({ ok: true, user_id: user.id, level: progress })
 ```
 
+Webapps are unsigned — anyone with the URL can call them. Per-user mutations belong on signed webhooks.
+
 ---
 
 ## Health check endpoint
@@ -112,7 +119,7 @@ res.json({
 
 ---
 
-## Related
+## See also
 
 - [Webapp Methods](webapp-methods.md)
 - [Public Web](public-web.md)

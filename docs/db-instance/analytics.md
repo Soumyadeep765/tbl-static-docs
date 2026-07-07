@@ -1,6 +1,19 @@
 # Analytics & Stats
 
-The `db` instance provides top-level methods to inspect storage usage and list available collections.
+Your bot is storing data. Great. But how full is the tank? `db.getStorageStats()` tells you — bytes used, keys per collection, which bots eat the most space.
+
+Handy for admin commands and panic prevention. Less handy if you're still on deprecated sync storage — this only tracks async `db` data.
+
+---
+
+## What can you inspect?
+
+The `db` instance has two top-level introspection methods:
+
+| Method | What it returns |
+| --- | --- |
+| `db.getStorageStats()` | Usage report — bytes, counts, top bots |
+| `db.getCollections()` | `["user", "bot", "global"]` |
 
 !!! note "Async storage only"
     `getStorageStats()` tracks **async `db` storage** only. It does not include legacy sync data from deprecated `Bot.set` / `User.set` / removed `Global` APIs.
@@ -50,7 +63,7 @@ Compare `total_mb` against your [plan](../globals/plan.md) limit:
 | Premium | 50 MB |
 | Elite | 100 MB |
 
-When approaching the limit, `set` operations return `{ ok: false, message: "Storage limit exceeded" }`.
+When approaching the limit, `set` operations return `{ ok: false, message: "Storage limit exceeded" }`. The tank is full. Time to clean up or upgrade.
 
 ### Example: usage warning
 
@@ -60,7 +73,7 @@ let usedMB = parseFloat(stats.total_mb)
 let limitMB = plan.prop_limit.per_account
 
 if (usedMB > limitMB * 0.9) {
-  Bot.sendMessage(owner.mail, `Storage at ${usedMB}/${limitMB} MB`)
+  Bot.sendMessage(owner.mail, "Storage at " + usedMB + "/" + limitMB + " MB")
 }
 ```
 
@@ -75,7 +88,7 @@ let collections = await db.getCollections()
 // ["user", "bot", "global"]
 ```
 
-Useful for dynamic admin tools or debugging.
+Useful for dynamic admin tools or debugging. Not thrilling, but reliable.
 
 ---
 
@@ -86,6 +99,8 @@ Useful for dynamic admin tools or debugging.
 - Use `db.bot.getAll({ limit: 30 })` to audit large key sets page by page
 - Migrate off deprecated `Bot.set` (1 MB cap) to `db.bot` for accurate tracking here
 - Delete stale data with `del`, `delAll`, or `db.bot.clearAllData()` for full bot resets
+
+---
 
 ## Important notes
 

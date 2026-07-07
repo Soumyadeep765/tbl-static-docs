@@ -1,10 +1,14 @@
 # Handling Webhook Requests
 
-When a webhook URL is hit, your command runs in a web context with an HTTP **`request`** object instead of a Telegram `update` payload.
+When someone hits a webhook URL, your command runs in a **web context** — with an HTTP `request` object instead of a Telegram `update` payload.
+
+Same sandbox, different front door.
 
 ---
 
 ## The `request` object
+
+Your command gets a snapshot of the incoming HTTP call:
 
 | Field | Type | Description |
 | --- | --- | --- |
@@ -15,7 +19,7 @@ When a webhook URL is hit, your command runs in a web context with an HTTP **`re
 | `query` | object | Query string parameters |
 | `body` | object \| null | POST body (when method is POST) |
 
-### Example
+### Example — guard by method
 
 ```js
 let method = request.method
@@ -46,6 +50,8 @@ Parsed `options` are also available on the global [`options`](../globals/options
 
 ## `options` and `params`
 
+Two globals, two jobs:
+
 | Global | Source |
 | --- | --- |
 | `options` | Decoded `options` query/body field + request metadata |
@@ -56,9 +62,11 @@ let level = options.level        // from signed options JSON
 let lang = params.lang           // from ?lang=en
 ```
 
+Put secrets and tamper-sensitive data in `options` (signed). Put marketing tags and filters in `params` (visible in the URL).
+
 ---
 
-## Globals available in webhooks
+## What's available in webhooks
 
 | Global / Instance | User webhook | Global webhook |
 | --- | --- | --- |
@@ -71,7 +79,10 @@ let lang = params.lang           // from ?lang=en
 | `Webhook`, `Webapp` | ✓ | ✓ |
 | `request`, `params`, `options` | ✓ | ✓ |
 | `content` | ✓ (if `redirect` prefetch) | ✓ |
-| `msg`, `TBL` | `null` | `null` |
+| `msg` | `null` | `null` |
+| Platform utilities | `null` | `null` |
+
+`msg` only exists when Telegram sends a message update — webhooks don't have one. **Platform utilities** (internal helpers tied to Telegram message context) are likewise unavailable here.
 
 ---
 
@@ -82,13 +93,13 @@ let lang = params.lang           // from ?lang=en
 | Telegram message | `update`, `message`, `user`, `msg` |
 | Webhook / webapp | `request`, `params`, `options` |
 
-Do not expect `message` or `msg` in webhook commands.
+Do not expect `message` or `msg` in webhook commands. If your logic branches on update type, check `request` instead.
 
 ---
 
 ## Sending Telegram messages
 
-**User webhooks** — use `chat.id` or `user.id`:
+**User webhooks** — `chat.id` is right there:
 
 ```js
 await Api.sendMessage({
@@ -97,7 +108,7 @@ await Api.sendMessage({
 })
 ```
 
-**Global webhooks** — pass `chat_id` explicitly:
+**Global webhooks** — you're on your own for `chat_id`:
 
 ```js
 await Api.sendMessage({
@@ -114,19 +125,18 @@ Webhooks resolve command names through the same alias system as Telegram command
 
 ---
 
-## Error responses from the platform
+## Errors before your command runs
 
-Before your command runs, the platform may return:
+The platform may reject a request before your Logic field executes:
 
 | Status | Reason |
 | --- | --- |
 | 400 | Missing `command` |
 | 401 | Missing `sig` |
-| 403 | Invalid signature or expired URL |
+| 403 | Invalid signature, expired URL, or bot blocked |
 | 404 | Bot not found / inactive |
 | 413 | `options` or `params` payload too large |
 | 429 | Rate limit exceeded |
-| 403 | Bot blocked |
 
 Your command can return its own errors via [`res`](../res-instance/index.md).
 

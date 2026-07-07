@@ -1,8 +1,20 @@
 # Advanced Operations
 
-Beyond basic CRUD, each collection supports **counters**, **lists**, and **batch reads**. All methods are `async` and accept an optional `options` object for scoping (`bot_id`, `user_id`, `ttl`, `type`).
+Basic CRUD gets you storage. Counters, lists, and batch reads get you *useful* storage — without hand-rolling read-modify-write loops that race under load.
 
-Available on: `db.bot`, `db.user`, `db.global`.
+All three collections (`db.bot`, `db.user`, `db.global`) support these operations. They're all `async` and accept an optional `options` object for scoping (`bot_id`, `user_id`, `ttl`, `type`).
+
+---
+
+## What can you do beyond CRUD?
+
+| Category | Methods | Best for |
+| --- | --- | --- |
+| Counters | `incr`, `decr` | Credits, lives, visit counts |
+| Lists | `push`, `pull` | History logs, tag lists, achievements |
+| Batch read | `mget` | Loading a profile in one call |
+
+For plain get/set/has/del, see [Unified Methods](unified-methods.md).
 
 ---
 
@@ -32,7 +44,7 @@ let pool = await db.bot.decr("credits_pool", 5)
 ```
 
 !!! note "Concurrency"
-    `incr` and `decr` use read-modify-write (get → add → set) with a pending-write flush. They are safe for typical bot workloads but not Redis-atomic under extreme concurrent writes to the same key.
+    `incr` and `decr` use read-modify-write (get → add → set) with a pending-write flush. They're safe for typical bot workloads but not Redis-atomic under extreme concurrent writes to the same key. If two users hammer the same key at the exact same millisecond, one might win. For most bots, that's fine.
 
 ---
 
@@ -85,7 +97,7 @@ let level = data.level ?? 1
 let props = await db.bot.mget({ keys: ["a", "b", "c"] })
 ```
 
-There is no `mset` — write keys individually with `set`.
+There is no `mset` — write keys individually with `set`. One day, maybe. Today, loop.
 
 ---
 
@@ -100,7 +112,7 @@ There is no `mset` — write keys individually with `set`.
 
 ---
 
-## Examples
+## Try it — copy-paste examples
 
 ### Reward system
 
@@ -109,12 +121,12 @@ let cost = 50
 let balance = await db.user.get("credits", 0)
 
 if (balance < cost) {
-  return Bot.sendMessage("Not enough credits.")
+  return Bot.sendMessage(chat.id, "Not enough credits.")
 }
 
 await db.user.decr("credits", cost)
 await db.user.push("purchases", "item_sword")
-Bot.sendMessage("Purchased!")
+Bot.sendMessage(chat.id, "Purchased!")
 ```
 
 ### Tag management
@@ -137,9 +149,22 @@ let highScore = await db.bot.get("high_score", 0)
 
 if (score > highScore) {
   await db.bot.set("high_score", score)
-  Bot.sendMessage("New high score!")
+  Bot.sendMessage(chat.id, "New high score!")
 }
 ```
+
+---
+
+## Error handling — two personalities
+
+| Operation | On failure |
+| --- | --- |
+| `set`, `del`, `delAll` | Returns `{ ok: false, message }` — no throw |
+| `incr`, `decr`, `push`, `pull` | **Throws** `Error` |
+
+Wrap advanced ops in try/catch, or use the `!` error handler. Don't mix up the patterns.
+
+---
 
 ## Important notes
 

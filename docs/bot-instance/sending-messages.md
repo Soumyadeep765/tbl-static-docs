@@ -1,38 +1,57 @@
 # Sending Messages
 
-`Bot` provides shorthand methods for sending text, keyboards, and media to the **current chat**. All methods auto-fill `chat_id` from the command context.
+The bread and butter of every bot: **sending stuff to the chat**. `Bot` gives you shorthand methods for text, keyboards, and media — all auto-targeted to the **current chat**. No `chat_id` required. Less typing, more chatting.
 
-## Text messages
+For inline buttons, message edits, and other Telegram power moves, see [`Api`](../api-instance/index.md). `Bot` is your fast lane for everyday output.
 
-### Simple string
+---
+
+## What can Bot send?
+
+| Method | What it sends |
+| --- | --- |
+| `Bot.sendMessage` | Formatted text |
+| `Bot.sendKeyboard` | Text + reply keyboard (bottom of screen) |
+| `Bot.sendPhoto` / `sendDocument` / etc. | Media files |
+| `Bot.inspect` | Debug output (dev only) |
+
+All send methods use the **current chat** from command context. Method names are case-sensitive — `Bot.sendMessage` works, `Bot.sendmessage` does not. The universe is cruel but consistent.
+
+!!! tip "New to TBL?"
+    `Bot`, `chat`, and `user` are globals available in every command. Quick intro: [Learning TBL](../learning-tbl.md).
+
+---
+
+## How to use it
+
+### Text messages
+
+Simplest possible send:
 
 ```js
 Bot.sendMessage("Hello!")
 ```
 
-Defaults to `parse_mode: "Markdown"`. Keep formatting simple — unclosed markers cause send failures.
+Defaults to `parse_mode: "Markdown"`. Keep formatting simple — unclosed `*` or `_` markers are the #1 reason messages fail to send.
 
-### Object format
+Object format works too:
 
 ```js
 Bot.sendMessage({ text: "Hello!" })
 ```
 
-### Custom parse mode
+Custom parse mode or no formatting at all:
 
 ```js
 await Bot.sendMessage("Hello friend", { parse_mode: "HTML" })
-```
 
-### Disable formatting
-
-```js
+// Literal asterisks — no Markdown interpretation
 Bot.sendMessage("Price: $5 * 2", { parse_mode: undefined })
 ```
 
-## Reply keyboards
+### Reply keyboards
 
-Send a message with a reply keyboard using comma-separated button labels:
+Comma-separated button labels at the bottom of the screen:
 
 ```js
 // String format
@@ -45,11 +64,19 @@ Bot.sendKeyboard({
 })
 ```
 
-For **inline buttons** (callback buttons under a message), use [`Api.sendMessage`](../api-instance/inline-keyboards.md) with `reply_markup` instead.
+For **inline buttons** (tappable buttons *inside* the message bubble), use [`Api.sendMessage`](../api-instance/inline-keyboards.md) with `reply_markup` instead.
 
-## Media
+### Media
 
-All media methods accept a **string** (file URL or path) or an **object** with the media field and options.
+String (URL or path) or object with options:
+
+```js
+Bot.sendPhoto("photo.jpg")
+Bot.sendPhoto({ photo: "photo.jpg", caption: "Nice shot!" })
+
+Bot.sendDocument("file.pdf")
+Bot.sendVideo({ video: "video.mp4", caption: "Watch this" })
+```
 
 | Method | String example | Object example |
 | --- | --- | --- |
@@ -61,50 +88,62 @@ All media methods accept a **string** (file URL or path) or an **object** with t
 
 Captions default to Markdown when provided.
 
-## Awaiting responses
+---
 
-`await` is optional. When used, you get the Telegram API response — and message-sending methods return a **chainable object**:
+## Try it — copy-paste examples
+
+### Welcome message
 
 ```js
-let sent = await Bot.sendMessage("Pinned message")
-await sent.pin()
-await sent.editText("Updated.")
+Bot.sendMessage("*Welcome!* Type /help for commands.")
+```
+
+### Quick menu with reply keyboard
+
+```js
+Bot.sendKeyboard("What would you like?", "Shop,Support,About")
+```
+
+### Send then edit (with await)
+
+`await` is optional — but when you use it, send methods return a **chainable object**:
+
+```js
+let sent = await Bot.sendMessage("Working on it...")
+await sent.editText("Done!")
 await sent.delete()
 ```
 
-See [Api Method Chaining](../api-instance/method-chaining.md) for all chained methods. Not every `Bot` send method returns a chainable object — `sendMessage` and media sends do when awaited.
+See [Method Chaining](../api-instance/method-chaining.md) for all chained methods.
 
-## Debugging with `Bot.inspect`
+### Debug with `Bot.inspect`
 
-Formats values and sends them to the current chat. Useful during development.
+Formats values and sends them to the current chat. `console.log` routes here in command Logic fields:
 
 ```js
-// Single value
 Bot.inspect(user)
-
-// Multiple values
-Bot.inspect("User data:", user, { step: 2 })
-
-// String + object
-Bot.inspect("Result:", someArray)
+Bot.inspect("Step:", 2, "Result:", someArray)
 ```
 
 | Behavior | Detail |
 | --- | --- |
-| Input | One or more values (strings sent as-is, objects formatted) |
-| Output | Sent as a plain-text message (no Markdown) |
-| `console.log` | Routes to `Bot.inspect` in TBL commands |
+| Input | One or more values (strings as-is, objects formatted) |
+| Output | Plain-text message (no Markdown) |
 
 !!! warning "Development only"
-    Avoid sending `Bot.inspect` output to end users in production — it may expose internal data.
+    Don't send `Bot.inspect` output to end users in production — it may expose internal data.
 
-## What's not in Bot
+---
 
-Telegram **read/query** methods are not available on `Bot`:
+## What's not on Bot?
+
+Telegram **read/query** methods aren't on `Bot`:
 
 - `getChat`, `getMe`, `getUserProfilePhotos`, etc.
 
 Use the [`Api` instance](../api-instance/index.md) for those. `Bot` is for **sending output** and **controlling bot flow**.
+
+---
 
 ## Method reference
 
@@ -119,9 +158,10 @@ Use the [`Api` instance](../api-instance/index.md) for those. `Bot` is for **sen
 | `sendVoice(voice, options?)` | URL/path or `{ voice, caption?, ... }` | Send voice message |
 | `inspect(...values)` | One or more values | Debug output to chat |
 
+---
+
 ## Important notes
 
 - All send methods target the **current chat** — no `chat_id` needed
-- Method names are case-sensitive
 - Errors from Telegram are logged; use `await` and check `res.ok` when failures matter
-- For advanced Telegram features (inline keyboards, message edits, rich messages), use [`Api`](../api-instance/index.md)
+- For inline keyboards, message edits, and rich messages, use [`Api`](../api-instance/index.md)

@@ -1,126 +1,127 @@
 # Handling User Input with Need Reply
 
-Now that your bot can respond to commands and keyboards, the next step is handling **user input**.
+Commands that fire and forget are great until you need to *ask* something — a name, a number, a yes/no. **Need Reply** pauses the command, waits for the user's next message, then runs Logic with that input.
 
-This is done using **Need Reply**, which allows a command to wait for the user’s next message before continuing.
+It's a mini conversation in two steps. No wizard framework required.
+
+---
 
 ## What is Need Reply?
 
-`Need Reply` tells the bot to **pause and wait for the user’s next message**.
+**Need Reply** tells the bot: send the Answer, then **wait** for the user's next message before running Logic.
 
-Instead of finishing immediately, the command stays active until the user replies.
+| Step | What happens |
+| --- | --- |
+| 1 | User triggers the command |
+| 2 | Bot sends Answer (and keyboard if set) |
+| 3 | Bot **waits** — Logic does **not** run yet |
+| 4 | User sends their next message |
+| 5 | Logic runs with that message as input |
 
-This is useful when you need input like:
+Useful for names, values, choices — any single piece of user text.
 
-- A name
-- A value
-- A choice
-- Any simple user response
+Full pipeline: [Execution Flow](execution-flow.md#need-reply-flow).
 
-## Simple Input Example
+---
 
-We will create a command that asks for the user’s name and replies using that input.
+## Simple example — ask for a name
 
-Command : `/input`
+**Command:** `/input`
 
-Answer : `Tell me your name 🙂`
+**Answer:** `Tell me your name 🙂`
 
-Need Reply : true
+**Need Reply:** enabled
 
-Logic (TBL Code)
-```js 
-Bot.sendMessage("Your name is " + message)
+**Logic:**
+
+```js
+Bot.sendMessage(chat.id, "Your name is " + message)
 ```
 
-## How This Works
+[`Bot`](../bot-instance/index.md) sends the reply. [`message`](../globals/message.md) holds the text the user just sent — plain string, not the full Telegram object.
 
-Step by step:
+---
 
-- User sends `/input`
-- The bot replies: “Tell me your name”
-- Because `Need Reply` is enabled, the bot waits
-- User sends their next message
-- That message is captured
-- The logic runs and replies using the input
+## How this works (step by step)
 
-The important rule is this:
+1. User sends `/input`
+2. Bot replies: "Tell me your name"
+3. Need Reply is on → bot **waits**
+4. User sends `Alice`
+5. Logic runs: "Your name is Alice"
 
-**The next message is treated as input, not as a new command.**
+**Important:** that next message is treated as **input**, not a new command — unless it matches another valid command name.
 
-## What `message` Means Here
+---
 
-For this beginner example:
+## What `message` means here
 
-- `message` refers only to the **text** sent by the user
-- It does not handle media or other message types
-- This keeps the bot simple and easy to understand
+For this beginner flow:
 
-!!! note
-    Advanced bots can handle all update types, but for learning purposes, `message` is treated as plain text here.
+- [`message`](../globals/message.md) is the **text** the user sent
+- Photos, stickers, voice → `message` is `null` (handle that in advanced bots)
+- Keeps things simple while you're learning
 
-## How to Cancel Need Reply
+Text after the command name lives in [`params`](../globals/params.md) — different variable, different job.
 
-Sometimes a user may change their mind or want to stop the input process.
+---
 
-To cancel `Need Reply`, the user can simply send **any valid existing command**.
+## How to cancel Need Reply
 
-For example:
+Users change their mind. Let them escape by sending **any valid existing command**:
 
 - `/start`
 - `Help`
 - `About`
 
-When a valid command is received:
-
-- The waiting state is cleared
-- `Need Reply` is cancelled
-- Normal command matching resumes
+The waiting state clears. Need Reply cancels. Normal matching resumes.
 
 !!! info
-    Sending a valid command automatically cancels the active Need Reply state.
+    You don't need special "cancel" Logic — valid commands cancel automatically. Consider mentioning `/start` in your Answer so users know the escape hatch.
 
-This makes it easy for users to escape input mode without getting stuck.
+---
 
-## Why This Is Important
+## Why the cancel matters
 
-Without a cancel option:
+Without it:
 
-- Users can feel trapped
-- Other commands stop working temporarily
-- The bot feels broken
+- Users feel **stuck** in input mode
+- Other commands **stop working** until they reply or cancel
+- The bot feels **broken**
 
-Allowing users to send a valid command keeps the bot safe and user-friendly.
+One line in your Answer — *"Send /start anytime to cancel"* — saves support headaches.
 
-## Good Practices for Need Reply
+---
 
-Follow these rules:
+## Good practices
 
-- Always explain what input you expect
-- Keep reply flows short
-- Allow users to cancel using `/start` or menu buttons
-- Respond immediately after receiving input
-- Avoid chaining many reply-based steps
+- **Explain** what input you expect in the Answer
+- Keep flows **short** — one question at a time
+- Mention **/start** or menu buttons as cancel options
+- **Reply immediately** after receiving input
+- Avoid chaining many Need Reply steps in a row (use Logic + `db.user` for wizards)
 
 !!! warning
-    Leaving users in a reply-waiting state without clear instructions can block normal bot usage.
+    Leaving users in a reply-waiting state without clear instructions blocks normal bot usage. Always tell them what to send — and how to bail out.
 
-## Test the Cancel Behavior
+More detail: [handle-need-reply matching](matching-order.md#need-reply-override).
 
-To test cancellation:
+---
 
-- Send `/input`
-- Instead of replying with text, send `/start`
-- The bot should cancel the input flow and restart normally
+## Test cancel behavior
 
-If this works, your Need Reply handling is correct.
+1. Send `/input`
+2. Instead of a name, send `/start`
+3. Bot should cancel input mode and run `/start` normally
 
-## What You Learned
+Works? Your Need Reply setup is solid.
 
-With `Need Reply`, you now understand how to:
+---
 
-- Pause a command and wait for input
-- Read simple text input using `message`
-- Cancel input mode safely
-- Build basic interactive flows
+## What's next
 
-This is the foundation for setup wizards, forms, and guided user interactions.
+- Store answers in `db.user` for multi-step flows
+- Combine with [keyboards](adding-keyboard.md) for guided choices
+- [Handling Callbacks](handling-callbacks.md) when buttons live inside messages
+
+Foundation for wizards, forms, and anything that asks before it acts.

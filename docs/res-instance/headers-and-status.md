@@ -1,12 +1,12 @@
 # Headers & Status
 
-Control HTTP status codes and response headers before sending the body.
+Control HTTP status codes and response headers before sending the body. Chain `set()` and `status()` — then finish with `json()`, `text()`, or another send method.
 
 ---
 
 ## `set(key, value)`
 
-Sets a response header. Headers can be chained.
+Sets a response header. Headers can be chained:
 
 ```js
 res
@@ -15,13 +15,13 @@ res
   .set("X-Request-Id", String(Date.now()))
 ```
 
-`set()` applies headers to the outgoing HTTP response.
+`set()` applies headers to the outgoing HTTP response. Call it before the body method.
 
 ---
 
 ## `status(code)`
 
-Sets the HTTP status code. Default is **200**.
+Sets the HTTP status code. Default is **200** if you never call it.
 
 ```js
 res.status(404).json({ error: "Not found" })
@@ -54,7 +54,7 @@ In normal webhook and webapp commands you rarely need `end()` — the platform c
 
 ---
 
-## Common patterns
+## Try it — copy-paste examples
 
 ### CORS for a JSON API
 

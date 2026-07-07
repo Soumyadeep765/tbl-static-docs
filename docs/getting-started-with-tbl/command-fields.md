@@ -1,6 +1,8 @@
 # Command Fields
 
-Each command in the TeleBotHost editor is made of fields. Together they define **what triggers the command**, **what the user sees**, and **what code runs**.
+Open any command in the TeleBotHost editor and you'll see a handful of fields. Together they answer three questions: **what triggers this?**, **what does the user see?**, and **what code runs?**
+
+No magic — just a form. Fill it in, save, test in Telegram.
 
 ---
 
@@ -10,7 +12,7 @@ Each command in the TeleBotHost editor is made of fields. Together they define *
 | --- | --- | --- |
 | **Command** | Yes | Trigger name (e.g. `/start`, `Help`, `*`) |
 | **Answer** | No* | Text sent before logic runs |
-| **Logic** | No | TBL code executed after the answer |
+| **Logic** | No | JavaScript that runs after the answer |
 | **Keyboard** | No | Reply keyboard buttons below the input |
 | **Aliases** | No | Alternative trigger names |
 | **Need Reply** | No | Wait for the user's next message |
@@ -18,13 +20,13 @@ Each command in the TeleBotHost editor is made of fields. Together they define *
 | **Public web** (`is_web`) | No | Expose command at `/public/{bot_id}/...` |
 | **Group only** | No | Restrict command to group/supergroup chats |
 
-\* Answer is required when using a **Keyboard** — buttons cannot be sent without a message.
+\* Answer is required when using a **Keyboard** — buttons cannot be sent without a message. Telegram's rules, not ours.
 
 ---
 
 ## Command name
 
-The primary trigger. Examples:
+The primary trigger — the word or phrase that wakes this command up.
 
 | Name | Matches |
 | --- | --- |
@@ -34,48 +36,52 @@ The primary trigger. Examples:
 | `@` | Runs before every command |
 | `/handle_callback_query` | Callback button updates (see [Dynamic Handlers](dynamic-commands.md)) |
 
-Multi-word commands are supported — TBL matches the longest name first (`/set name` before `/set`).
+Multi-word commands work fine. TBL always tries the **longest** name first — `/set name` wins over `/set` when both exist.
+
+Matching rules in depth: [Matching & Priority](matching-order.md).
 
 ---
 
 ## Answer
 
-Plain text or [Telegram-formatted](markdown-and-formatting.md) message sent **before** logic executes.
+Plain text (or [Telegram-formatted](markdown-and-formatting.md) text) sent **automatically before** Logic executes.
 
 ```
 *Welcome!*
 Choose an option below.
 ```
 
-If the command has an Answer, it is sent automatically. You do not need `Bot.sendMessage()` for the same text unless logic should send *additional* messages.
+If you fill in Answer, TBL sends it for you. You don't need [`Bot.sendMessage()`](../bot-instance/index.md) for the same text unless Logic should send *additional* messages on top.
 
-**Not used for:** public web commands (source is served as a file, not sent as a chat message).
+**Not used for:** public web commands — those serve source as a file, not a chat message. See [Public Web Commands](public-web-commands.md).
 
 ---
 
 ## Logic
 
-TBL JavaScript that runs after the Answer (if any). Use for:
+JavaScript that runs **after** the Answer (if any). This is where the interesting stuff happens:
 
 - Conditional replies
 - Database reads/writes
-- Inline keyboards
+- Inline keyboards (via [`Api`](../api-instance/index.md))
 - HTTP calls
 - `res.json()` in webhook/webapp commands
 
 ```js
 let count = await db.bot.get("visits") || 0
 await db.bot.set("visits", count + 1)
-Bot.sendMessage("Visit #" + (count + 1))
+Bot.sendMessage(chat.id, "Visit #" + (count + 1))
 ```
 
-Leave Logic empty for answer-only commands.
+[`Bot`](../bot-instance/index.md) is a global — no import needed. [`chat`](../globals/chat.md) and [`user`](../globals/user.md) tell you who's talking. Leave Logic empty for answer-only commands — totally valid.
+
+When does Answer run vs Logic? [Execution Flow](execution-flow.md).
 
 ---
 
 ## Keyboard
 
-Reply keyboard — buttons shown **below** the chat input. Tapping a button sends its label as a normal text message.
+A **reply keyboard** — buttons shown **below** the chat input. Tap a button and Telegram sends its label as a normal text message.
 
 ```
 Help, About
@@ -88,41 +94,43 @@ Settings
 | Two rows | `Help\nAbout` |
 | Mixed | `Yes, No\nCancel` |
 
-Pair keyboard labels with [aliases](adding-aliases.md) so taps match reliably.
+Pair button labels with [aliases](adding-aliases.md) so taps match reliably — aliases are case-sensitive.
 
-For buttons **inside** the message bubble, use inline keyboards in Logic — see [Handling Callbacks](handling-callbacks.md).
+For buttons **inside** the message bubble (inline keyboards), skip this field and build them in Logic instead — [Handling Callbacks](handling-callbacks.md).
+
+Walkthrough: [Adding a Keyboard](adding-keyboard.md).
 
 ---
 
 ## Aliases
 
-Comma-separated alternative triggers for the same command.
+Comma-separated alternative triggers for the **same** command.
 
 ```
 help, HELP, /h
 ```
 
-Aliases are **case-sensitive**. If your keyboard button says `Help`, add `Help` as an alias.
+Aliases are **case-sensitive**. Keyboard says `Help`? Add `Help` as an alias, not `help` — unless you want both.
+
+Full guide: [Using Aliases](adding-aliases.md).
 
 ---
 
 ## Need Reply
 
-When enabled, the command:
+When enabled, the command doesn't finish in one shot:
 
 1. Sends the Answer (and keyboard if set)
 2. **Pauses** and waits for the user's next message
 3. Runs Logic with that message as input
 
-See [Handling User Input](handle-need-reply.md).
-
-Sending any other valid command cancels the wait.
+See [Handling User Input](handle-need-reply.md). Sending any other valid command (like `/start`) cancels the wait — users aren't trapped.
 
 ---
 
 ## Parse mode
 
-Controls formatting of the **Answer** field. Default is **Markdown**.
+Controls formatting of the **Answer** field only. Default is **Markdown**.
 
 | Value | Effect |
 | --- | --- |
@@ -130,7 +138,7 @@ Controls formatting of the **Answer** field. Default is **Markdown**.
 | `HTML` | `<b>bold</b>`, `<i>italic</i>` |
 | `MarkdownV2` | Telegram MarkdownV2 rules |
 
-Set in the command editor. Logic messages use `parse_mode` on each `Bot.sendMessage()` / `Api.sendMessage()` call separately.
+Logic messages need their own `parse_mode` on each [`Bot.sendMessage()`](../bot-instance/index.md) or [`Api.sendMessage()`](../api-instance/index.md) call — the command setting doesn't carry over.
 
 Details: [Markdown & Formatting](markdown-and-formatting.md).
 
@@ -154,7 +162,7 @@ See [Public Web Commands](public-web-commands.md).
 
 ## Group only
 
-When enabled, the command runs only in **groups and supergroups**. Private chats are ignored (no Answer, no Logic).
+When enabled, the command runs only in **groups and supergroups**. Private chats are ignored — no Answer, no Logic, no awkward silence in DMs.
 
 ---
 
@@ -176,3 +184,4 @@ When enabled, the command runs only in **groups and supergroups**. Private chats
 
 - [Execution Flow](execution-flow.md) — when Answer and Logic run
 - [Matching & Priority](matching-order.md) — how triggers resolve
+- [Your First Bot](first-hello-bot.md) — put two fields together in five minutes

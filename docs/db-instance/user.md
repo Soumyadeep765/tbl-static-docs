@@ -1,6 +1,14 @@
 # User-Level Storage (`db.user`)
 
-`db.user` stores data **unique to each user** interacting with the bot — profiles, balances, game progress, language preferences, and flow state.
+Every user gets their own drawer. Alice's credits don't leak into Bob's. Your onboarding step counter doesn't reset when someone else joins. That's `db.user` — per-user, per-bot storage that actually respects boundaries.
+
+If you need data visible to *everyone*, that's [`db.bot`](bot.md). If you need it across *all your bots*, that's [`db.global`](global.md). This page is for the personal stuff.
+
+---
+
+## What is `db.user`?
+
+**`db.user`** stores data **unique to each user** interacting with the bot — profiles, balances, game progress, language preferences, and flow state.
 
 | Property | Value |
 | --- | --- |
@@ -8,17 +16,38 @@
 | Isolation | Each user-bot pair has separate data |
 | Default context | Current bot + current `user.id` from the update |
 
+---
+
+## How to use it
+
+The happy path — read, write, increment:
+
+```js
+let balance = await db.user.incr("credits", 10)
+Bot.sendMessage(chat.id, "New balance: " + balance + " credits")
+```
+
+Three things worth knowing upfront:
+
+1. **`user_id` is auto-filled** — for the current user, you rarely need to pass it.
+2. **`incr` / `decr` throw on failure** — unlike `set`, which returns `{ ok: false }`. Different methods, different moods.
+3. **`del` is positional only** — `db.user.del("key", { user_id })`, not `db.user.del({ key })`.
+
+---
+
 ## Methods
 
 All [unified CRUD methods](unified-methods.md) and [advanced operations](advanced-operations.md) (`incr`, `decr`, `push`, `pull`, `mget`).
 
-## Examples
+---
+
+## Try it — copy-paste examples
 
 ### User balance
 
 ```js
 let balance = await db.user.incr("credits", 10)
-Bot.sendMessage(`New balance: ${balance} credits`)
+Bot.sendMessage(chat.id, "New balance: " + balance + " credits")
 ```
 
 ### Save preference
@@ -44,6 +73,8 @@ if (step === 2) {
 ```js
 await db.user.set("otp_code", "482910", { ttl: 300, type: "string" })
 ```
+
+OTP codes that expire on their own — because nobody wants a stale verification code haunting their bot forever.
 
 ### Admin: access another user's data
 
@@ -97,6 +128,8 @@ let all = await db.user.getAll({ limit: 30 })
 await db.user.delAll({ user_id: 123456789 })
 ```
 
+---
+
 ## Scoping rules
 
 | Operation | Default scope | Override |
@@ -108,7 +141,9 @@ await db.user.delAll({ user_id: 123456789 })
 | `delAll()` (no user_id) | Entire bot | Deletes **all user keys for every user** |
 
 !!! warning "delAll without user_id"
-    `db.user.delAll()` with no `user_id` wipes **all user data for the entire bot**. Use only in admin/reset commands.
+    `db.user.delAll()` with no `user_id` wipes **all user data for the entire bot**. Use only in admin/reset commands. Seriously.
+
+---
 
 ## Common use cases
 
@@ -117,6 +152,8 @@ await db.user.delAll({ user_id: 123456789 })
 - User preferences and settings
 - Game state and inventory (`push` / `pull` for lists)
 - Per-user cooldowns with TTL
+
+---
 
 ## Important notes
 

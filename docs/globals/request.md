@@ -1,30 +1,57 @@
-# The `request` Variable
+# request
 
-In TBL, `request` points to the **active payload** for the current update. TBL automatically maps the relevant part of the update so you don't have to dig through the full `update` object.
+The active payload — already unwrapped so you don't have to.
 
-## Telegram Updates
+## What is it?
 
-For normal Telegram commands, `request` is the sub-object that triggered the command:
+**`request`** points to the specific part of the current update that matters. TeleBotHost automatically maps it for you, so you don't need to write `update.message` vs `update.callback_query` vs `update.inline_query` every time.
 
-| `update_type` | `request` equals |
+It's your command's "this thing right here" pointer.
+
+## When would you use it?
+
+- **Callback buttons** — read `request.data` for the button payload
+- **Inline queries** — grab `request.query` for what the user typed
+- **Member updates** — inspect who joined or left
+- **Webhook commands** — `request` becomes the HTTP request object (URL, headers, body, query params)
+
+If you already know the [`update_type`](update_type.md), `request` is usually the object you want to read from.
+
+---
+
+## Try it — Telegram updates
+
+```js
+// Button press? request has the callback data
+if (update_type === "callback_query") {
+  let data = request.data
+  Bot.sendMessage(request.from.id, "You pressed: " + data)
+}
+
+// Inline search? request has the query string
+if (update_type === "inline_query") {
+  let query = request.query
+  Bot.answerInlineQuery(request.id, [
+    { type: "article", id: "1", title: "Result for " + query, input_message_content: { message_text: query } }
+  ])
+}
+```
+
+### What `request` equals
+
+| `update_type` | `request` is |
 | --- | --- |
 | `message` | `update.message` |
 | `callback_query` | `update.callback_query` |
 | `inline_query` | `update.inline_query` |
 | `chat_member` | `update.chat_member` |
-| Other types | The matching sub-object on `update` |
+| Other types | The matching sub-object on [`update`](update.md) |
 
-```javascript
-// Handle callback queries without parsing update manually
-if (update_type === 'callback_query') {
-  let data = request.data
-  Bot.sendMessage(request.from.id, `You pressed: ${data}`)
-}
-```
+---
 
-## Webhook and Webapp Mode
+## Try it — webhooks and webapps
 
-When a command runs via [Webhook](../webhook-instance/index.md) or [Webapp](../webapp-instance/index.md), `request` contains **HTTP request data** instead of a Telegram sub-object.
+In [Webhook](../webhook-instance/index.md) and [Webapp](../webapp-instance/index.md) mode, `request` holds **HTTP request data** instead of a Telegram sub-object:
 
 | Field | Type | Description |
 | --- | --- | --- |
@@ -35,16 +62,21 @@ When a command runs via [Webhook](../webhook-instance/index.md) or [Webapp](../w
 | `query` | `Object` | URL query parameters |
 | `body` | `Object \| null` | POST body (webhook POST requests) |
 
-```javascript
-// Webhook command: read query params
-let page = request.query.page || '1'
+```js
+// Webhook: read query params
+let page = request.query.page || "1"
 
 // Webhook POST: read body
 let name = request.body?.name
+Bot.sendMessage(chat.id, "Hello, " + name)
 ```
 
-## Important Notes
+[`params`](params.md) may also be populated from query or body — handy for simple single-value input.
+
+---
+
+## Good to know
 
 - `request` is read-only and exists only during command execution
-- Its structure depends on how the command was triggered (Telegram update vs HTTP request)
-- For webhook routing details, see [Webhook](../webhook-instance/index.md)
+- Its shape depends on how the command was triggered — Telegram update vs HTTP request
+- For webhook routing patterns, see [Webhook](../webhook-instance/index.md) and [Public Web Commands](../getting-started-with-tbl/public-web-commands.md)

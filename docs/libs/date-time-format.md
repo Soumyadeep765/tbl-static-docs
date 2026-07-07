@@ -1,10 +1,73 @@
 # dateTimeFormat
 
-`Libs.dateTimeFormat` handles date formatting, arithmetic, comparisons, and Unix timestamps. All methods are **synchronous**.
+Dates in JavaScript are powerful and also a little cursed. **`Libs.dateTimeFormat`** handles the boring parts — formatting, arithmetic, comparisons, Unix timestamps — so you can focus on bot logic instead of googling "javascript date add 7 days" for the fifteenth time.
+
+All methods are **synchronous**. No `await`.
+
+---
+
+## What is it?
+
+`Libs.dateTimeFormat` formats dates, adds/subtracts time, compares dates, and converts to/from Unix timestamps. Think of it as your bot's calendar assistant — minus the passive-aggressive meeting reminders.
+
+Access: `Libs.dateTimeFormat.<method>()`
+
+---
+
+## How to use it
+
+The quickest win — today's date as an ISO string:
 
 ```js
-let now = Libs.dateTimeFormat.getCurrentDate("isoDateTime")
+let today = Libs.dateTimeFormat.getCurrentDate("isoDate")
+Bot.sendMessage(chat.id, "Today: " + today)
+```
+
+Need a date seven days from now?
+
+```js
 let nextWeek = Libs.dateTimeFormat.addDays(new Date(), 7)
+Bot.sendMessage(chat.id, "Event date: " + Libs.dateTimeFormat.format(nextWeek, "isoDate"))
+```
+
+All methods return immediately — **no `await` needed**.
+
+---
+
+## Try it — beginner examples
+
+### Countdown to an event
+
+```js
+let eventDate = Libs.dateTimeFormat.addDays(new Date(), 7)
+let diff = Libs.dateTimeFormat.getTimeDifference(new Date(), eventDate)
+
+Bot.sendMessage(chat.id,
+  "Event in " + diff.days + " days, " + (diff.hours % 24) + " hours"
+)
+```
+
+### Subscription expiry check
+
+```js
+let expiry = Libs.dateTimeFormat.addTime(new Date(), { months: 1 })
+
+if (new Date() > expiry) {
+  Bot.sendMessage(chat.id, "Subscription expired.")
+} else {
+  let left = Libs.dateTimeFormat.getTimeDifference(new Date(), expiry)
+  Bot.sendMessage(chat.id, "Active — " + left.days + " days left.")
+}
+```
+
+### Display a join date
+
+```js
+let formatted = Libs.dateTimeFormat.format(
+  user.joined_at,
+  "dddd, mmmm d 'at' h:MM TT"
+)
+Bot.sendMessage(chat.id, "You joined on " + formatted)
 ```
 
 ---
@@ -124,6 +187,8 @@ Libs.dateTimeFormat.isValidDate("2025-07-07")  // true
 Libs.dateTimeFormat.isValidDate("not-a-date")  // false
 ```
 
+Always validate user-provided date strings before formatting — invalid dates in `format()` throw `SyntaxError: invalid date`.
+
 ### `getTimeZoneOffset(date?)`
 
 Returns timezone offset in minutes (e.g. `-300` for EST).
@@ -140,44 +205,6 @@ Returns timezone offset in minutes (e.g. `-300` for EST).
 ```js
 let ts = Libs.dateTimeFormat.toUnixTimestamp(new Date())  // 1751895045
 let date = Libs.dateTimeFormat.fromUnixTimestamp(ts)
-```
-
----
-
-## Examples
-
-### Countdown
-
-```js
-let eventDate = Libs.dateTimeFormat.addDays(new Date(), 7)
-let diff = Libs.dateTimeFormat.getTimeDifference(new Date(), eventDate)
-
-Bot.sendMessage(chat.id,
-  "Event in " + diff.days + " days, " + (diff.hours % 24) + " hours"
-)
-```
-
-### Subscription expiry
-
-```js
-let expiry = Libs.dateTimeFormat.addTime(new Date(), { months: 1 })
-
-if (new Date() > expiry) {
-  Bot.sendMessage(chat.id, "Subscription expired.")
-} else {
-  let left = Libs.dateTimeFormat.getTimeDifference(new Date(), expiry)
-  Bot.sendMessage(chat.id, "Active — " + left.days + " days left.")
-}
-```
-
-### Display join date
-
-```js
-let formatted = Libs.dateTimeFormat.format(
-  user.joined_at,
-  "dddd, mmmm d 'at' h:MM TT"
-)
-Bot.sendMessage(chat.id, "You joined on " + formatted)
 ```
 
 ---

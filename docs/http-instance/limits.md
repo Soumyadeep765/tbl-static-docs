@@ -1,6 +1,10 @@
 # Limits & Timeouts
 
-Public limits for the `HTTP` instance. Values outside allowed ranges are **clamped automatically**.
+Every `HTTP` request operates inside guardrails — timeouts, response sizes, redirect caps, stream lifetimes. Values outside allowed ranges are **clamped automatically**. You won't get a mysterious crash; you'll get a polite `res.ok === false`.
+
+This page is the cheat sheet. Bookmark it for when something times out and you're not sure why.
+
+---
 
 ## Request timeout
 
@@ -37,7 +41,7 @@ On timeout: `res.ok === false`, `res.status === 408`, `res.error.code === "TIMEO
 
 Responses larger than the limit return `res.ok === false` with `error.code` of `"RESPONSE_SIZE_EXCEEDED"` or `"RESPONSE_TOO_LARGE"`.
 
-For very large payloads, use `responseType: "stream"` and read incrementally — see [Streaming](streaming.md).
+For very large payloads, use `responseType: "stream"` and read incrementally — see [Streaming](streaming.md). Don't try to swallow a whale in one bite.
 
 ---
 
@@ -121,7 +125,7 @@ Each `success` or `error` HTTP callback counts toward the **6 nested command** l
 | `success` / `error` | Must be strings (command names) |
 | `proxy` | Valid URL with supported protocol |
 
-Invalid options throw before the request is sent.
+Invalid options throw before the request is sent. Catches typos early.
 
 ---
 

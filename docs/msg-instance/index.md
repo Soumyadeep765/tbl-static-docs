@@ -1,6 +1,29 @@
 # msg Instance
 
-`msg` is the **current Telegram message** with built-in helper methods. Read message fields directly (`msg.text`, `msg.photo`) and act on the message without passing `chat_id` or `message_id` every time.
+The message you're replying to — with helper methods baked in so you don't pass `chat_id` and `message_id` on every line.
+
+Read `msg.text`, reply with `msg.reply()`, edit with `msg.editText()`. The boring IDs are already filled in.
+
+---
+
+## What is `msg`?
+
+**`msg`** is the **current Telegram message** with built-in helper methods. Read message fields directly (`msg.text`, `msg.photo`) and act on the message without passing `chat_id` or `message_id` every time.
+
+| You get | You skip |
+| --- | --- |
+| `msg.reply()`, `msg.editText()`, `msg.react()` | Manual `chat_id` / `message_id` |
+| Raw Telegram fields (`text`, `photo`, `entities`) | Parsing `update` yourself |
+| Shorthand and full API call styles | Choosing one format forever |
+
+!!! note "Global `msg` vs this section"
+    The global [`msg`](../globals/msg.md) variable **is** this instance — same object, same methods. This section documents the full API in detail.
+
+---
+
+## How to use it
+
+Drop this in any command's **Logic** field (when `msg` is available):
 
 ```js
 await msg.reply("Got it!")
@@ -8,8 +31,14 @@ await msg.editText("Updated.")
 await msg.react("👍")
 ```
 
-!!! note "Global `msg` vs this section"
-    The global [`msg`](../globals/msg.md) variable **is** this instance — same object, same methods. This section documents the full API in detail.
+Three things worth knowing upfront:
+
+1. **Check `msg` before calling methods** — it's `null` for callbacks, webhooks, and webapps.
+2. **Reply methods auto-set `reply_to_message_id`** — edits and deletes auto-set `chat_id` and `message_id`.
+3. **Default parse mode is Markdown** for shorthand syntax — override per call if needed.
+
+!!! tip "New to TBL?"
+    `user` and `chat` are globals available in every command. Quick intro: [Learning TBL](../learning-tbl.md). For callback buttons (where `msg` is `null`), use [`Api`](../api-instance/index.md).
 
 ---
 
@@ -35,6 +64,53 @@ await msg.reply("Hello!")
 
 ---
 
+## Try it — copy-paste examples
+
+Start simple. Each example only introduces what it needs.
+
+### Reply to the user's message
+
+```js
+if (!msg) return
+await msg.reply("Hi " + user.first_name + "!")
+```
+
+### Read message content
+
+```js
+let body = msg.text || msg.caption
+if (!body) {
+  return await msg.reply("Send me some text!")
+}
+await msg.reply("You said: " + body)
+```
+
+### Edit your reply after sending
+
+```js
+await msg.sendChatAction("typing")
+await sleep(1)
+
+let sent = await msg.reply("You said: " + msg.getText())
+await sent.react("👍")
+```
+
+### Full Telegram API params
+
+Every helper accepts shorthand strings or a full params object:
+
+```js
+await msg.reply({
+  text: "Pick one:",
+  parse_mode: "HTML",
+  reply_markup: { inline_keyboard: [[{ text: "OK", callback_data: "/ok" }]] }
+})
+```
+
+For callback buttons, use [`Api`](../api-instance/index.md) method chaining instead — see [Method Chaining](../api-instance/method-chaining.md).
+
+---
+
 ## What `msg` contains
 
 `msg` is the raw Telegram **Message object** plus helper methods attached on top:
@@ -44,15 +120,6 @@ await msg.reply("Hello!")
 | Telegram fields | `text`, `caption`, `photo`, `entities`, `reply_markup`, `from`, `chat`, `message_id`, `date` |
 | Helper methods | `reply()`, `editText()`, `delete()`, `react()`, `pin()`, … |
 | Getter helpers | `getText()`, `getMessageId()`, `getChatId()`, `isBusiness()` |
-
-```js
-// Read data
-let body = msg.text || msg.caption
-let sender = msg.from.first_name
-
-// Act on the message
-await msg.reply("Hi " + sender + "!")
-```
 
 ---
 
@@ -116,12 +183,6 @@ await msg.photo("https://example.com/img.jpg", { caption: "Photo" })
 
 ---
 
-## Rate limit
-
-`msg` methods share a rate limit of **10 calls per second** (same bucket as the underlying `Api` calls they wrap).
-
----
-
 ## `msg` vs other variables
 
 | Variable | What it is |
@@ -132,7 +193,11 @@ await msg.photo("https://example.com/img.jpg", { caption: "Photo" })
 | `chat` | Current chat info (`id`, `type`, `title`) |
 | `user` | Sender info (`id`, `first_name`, `username`) |
 
-For callback buttons, use [`Api`](../api-instance/index.md) method chaining on the sent message instead — see [Method Chaining](../api-instance/method-chaining.md).
+---
+
+## Rate limit
+
+`msg` methods share a rate limit of **10 calls per second** (same bucket as the underlying `Api` calls they wrap).
 
 ---
 
@@ -144,21 +209,3 @@ For callback buttons, use [`Api`](../api-instance/index.md) method chaining on t
 | [Editing](editing.md) | `editText`, `editCaption`, `editMedia`, keyboards, live location |
 | [Actions](actions.md) | Delete, pin, react, forward, copy, chat actions, business read |
 | [Message Data](message-data.md) | Fields, getters, business messages, availability |
-
----
-
-## Quick example
-
-```js
-// /start command — user sent a message, msg is available
-if (!msg.hasText()) {
-  await msg.reply("Send me some text!")
-  return
-}
-
-await msg.sendChatAction("typing")
-await sleep(1)
-
-let sent = await msg.reply("You said: " + msg.getText())
-await sent.react("👍")
-```

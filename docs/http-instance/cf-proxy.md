@@ -1,6 +1,24 @@
 # Cloudflare Worker Proxy (cfProxy)
 
-`cfProxy` routes your bot's HTTP requests through a **Cloudflare Worker** you deploy. TBL sends the request to your Worker; the Worker forwards it to the target API and returns the response.
+Want your API calls to appear from a Cloudflare edge IP instead of the platform's servers? Deploy a tiny Worker, point `cfProxy` at it, and route requests through Cloudflare's global network.
+
+It's not magic — it won't bypass API quotas or defeat anti-bot systems. But it *does* change the visible egress IP, which helps with IP-based rate limits and hiding your origin.
+
+---
+
+## What is cfProxy?
+
+Normally, `HTTP` requests go directly from the platform to the target URL. With `cfProxy`, the path looks like this:
+
+```
+Your bot command
+    → HTTP client
+        → Your Cloudflare Worker (*.workers.dev)
+            → Target API (api.example.com)
+                → Response flows back the same way
+```
+
+The target API sees a **Cloudflare edge IP**, not the platform server IP.
 
 ```js
 await HTTP.get("https://api.example.com/data", {
@@ -10,29 +28,13 @@ await HTTP.get("https://api.example.com/data", {
 
 ---
 
-## What is cfProxy?
-
-Normally, `HTTP` requests go directly from TBL servers to the target URL. With `cfProxy`, the path looks like this:
-
-```
-Your bot command
-    → TBL HTTP client
-        → Your Cloudflare Worker (*.workers.dev)
-            → Target API (api.example.com)
-                → Response flows back the same way
-```
-
-The target API sees a **Cloudflare edge IP**, not the TBL server IP.
-
----
-
-## Why use cfProxy?
+## Why use it?
 
 | Benefit | Explanation |
 | --- | --- |
 | **Different egress IP** | Requests appear to come from Cloudflare's global network |
 | **Reduce IP-based rate limits** | Some APIs rate-limit by IP — Cloudflare edge IPs can help spread load |
-| **Hide origin** | Your target server does not see the TBL server address |
+| **Hide origin** | Your target server does not see the platform server address |
 | **Edge caching** | Add caching logic inside your Worker for frequently requested data |
 | **Custom routing** | Rewrite headers, add auth, or route to different backends in Worker code |
 | **Free tier available** | Cloudflare Workers free plan covers light bot traffic |
@@ -59,9 +61,9 @@ Custom domains (e.g. `proxy.yourdomain.com`) are **not** accepted — only `*.wo
 
 ---
 
-## Where to get a cfProxy Worker
+## Where to get a Worker
 
-You need to **deploy your own** Cloudflare Worker. TBL does not provide a shared cfProxy endpoint.
+You need to **deploy your own** Cloudflare Worker. There is no shared cfProxy endpoint — roll your own.
 
 The recommended open-source router is **[cf-http-router](https://github.com/Soumyadeep765/cf-http-router)** — a universal HTTP proxy router for Cloudflare Workers that:
 
@@ -113,7 +115,7 @@ Published my-router (X.XX sec)
   https://my-router.<your-subdomain>.workers.dev
 ```
 
-That URL is your `cfProxy` value.
+That URL is your `cfProxy` value. Copy it. You'll need it twice — once in ENV, once in your head.
 
 ### One-click deploy
 
@@ -121,7 +123,7 @@ The repository also supports deploying directly from GitHub via Cloudflare's dep
 
 ---
 
-## Using cfProxy in TBL
+## Using cfProxy in your bot
 
 Store the Worker URL in an ENV variable:
 
@@ -157,9 +159,9 @@ Successful cfProxy responses include `usedWorkerProxy: true` on the response obj
 
 ---
 
-## How TBL talks to your Worker
+## How requests reach your Worker
 
-TBL automatically formats requests for compatible Workers like cf-http-router:
+The HTTP client automatically formats requests for compatible Workers like cf-http-router:
 
 **GET requests** — query parameters on the Worker URL:
 
@@ -178,7 +180,7 @@ GET https://my-router.workers.dev?url=https://api.example.com/data
 }
 ```
 
-You do not need to construct this yourself — just set `cfProxy` and TBL handles it.
+You do not need to construct this yourself — just set `cfProxy` and the client handles it.
 
 ---
 

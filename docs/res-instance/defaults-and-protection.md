@@ -1,6 +1,6 @@
 # Defaults & Protection
 
-How `res` behaves when you send nothing, how HTML pages are protected, and what gets injected automatically.
+How `res` behaves when you send nothing, how HTML pages are protected, and what gets injected automatically. The safety net under every webhook and webapp response.
 
 ---
 
@@ -14,13 +14,19 @@ If your webhook or webapp command **does not** call any `res` send method, the p
 
 with HTTP status **200**.
 
-Use explicit `res.json()` or `res.html()` when callers expect a specific body.
+Fine for fire-and-forget cron triggers. Not fine when your caller parses the body — use explicit `res.json()` or `res.html()`.
 
 ---
 
 ## Sending ends execution
 
 Once `res.json()`, `res.html()`, `res.send()`, `res.redirect()`, or `res.render()` delivers a response, **no further code output is processed** for that request. Treat response calls as `return` points.
+
+```js
+res.json({ ok: true })
+// Code below still runs in JavaScript — but the HTTP response is already sent.
+// Don't send twice.
+```
 
 ---
 

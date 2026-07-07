@@ -1,12 +1,12 @@
 # JSON, Text & XML
 
-Send structured or plain-text HTTP bodies with `json()`, `text()`, `xml()`, or the generic `send()`.
+Send structured or plain-text HTTP bodies with `json()`, `text()`, `xml()`, or the generic `send()`. Pick the method that matches what your caller expects.
 
 ---
 
 ## `json(obj)`
 
-Sets `Content-Type: application/json` and sends JSON.
+Sets `Content-Type: application/json` and sends JSON. The workhorse for API responses.
 
 ```js
 res.json({
@@ -27,6 +27,8 @@ res.json('{"ok":true}')
 ```json
 { "error": "JSON serialization failed", "message": "..." }
 ```
+
+Circular references are JavaScript's way of saying "nice try."
 
 ---
 
@@ -70,7 +72,7 @@ For HTML bodies, `send()` applies the same HTML access protection as `html()`. P
 
 ---
 
-## Examples
+## Try it — copy-paste examples
 
 ### JSON API with validation
 

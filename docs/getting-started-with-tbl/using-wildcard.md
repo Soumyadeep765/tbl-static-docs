@@ -1,110 +1,108 @@
 # Using the Wildcard (*) Command
 
-Now let’s build a bot that **always replies**, no matter what the user sends.
+Most bots have named commands — `/start`, `Help`, settings, whatever. But users don't read manuals. They send `hi`, `??`, or `/randomthing`. The **wildcard command (`*`)** catches everything else.
 
-This is done using the **wildcard command (`*`)**.
+One command. Every unmatched message. Your bot's polite "I didn't get that."
 
-## What is the * Command?
+---
 
-The `*` command is a **catch-all command**.
+## What is the `*` command?
 
-It runs when:
+The **`*`** command is a **catch-all**. It runs when:
 
-- No other command matches
-- The input is unknown
-- The user sends random text or commands
+- No command name matches
+- No alias matches
+- Nothing more specific wins
 
-In simple words:
+In plain terms: **if nothing else fits, `*` runs.**
 
-If nothing else matches, `*` runs.
+It's priority #4 in matching — [Matching & Priority](matching-order.md). Named commands always beat it.
 
-## What We Are Building
+---
 
-We will create a bot that:
+## What we're building
 
-- Replies to any message
-- Does not require specific commands
-- Always sends the same answer
+A bot that always replies to unknown input — same friendly fallback every time. No Logic required for the simplest version.
 
-This is useful for simple auto-reply bots or fallback responses.
+---
 
-## Step 1 — Create the Command
+## Step 1 — Create the command
 
-Open your bot’s **Commands** section and add a new command.
+Dashboard → **Commands** → **Add Command**
 
-Command : `*`  
-Answer : `Hello 👋 I reply to everything you send!`
+**Command:** `*`
 
-That’s it.  
-No logic is required.
+**Answer:** `Hello 👋 I reply to everything you send!`
 
-## How the * Command Works
+Save. Done. (For this demo, make it your only command — or pair it with `/start` below.)
 
-When a user sends any message:
+Special command details: [Special Commands](special-commands.md).
 
-- TBL checks all defined commands
-- If no command matches
-- The `*` command is selected
-- The answer is sent
+---
 
-This happens for:
+## How the `*` command works
 
-- Normal text
-- Unknown commands
-- Random input
-- All Telegram update types
+When a user sends a message:
 
-!!! tip
-    The `*` command can capture all Telegram update types when no other command matches.
+1. TBL checks all defined command names and aliases
+2. If nothing matches → `*` is selected
+3. Answer is sent (Logic runs too, if you add it)
 
-## Example Behavior
+Works for normal text, unknown slash commands, random keyboard mash — anything that didn't match something specific.
 
-With only the `*` command defined:
+---
 
-- User sends `Hi` → bot replies
-- User sends `/test` → bot replies
-- User sends anything → bot replies
+## Example behavior
 
-The same answer is sent every time.
+**Only `*` defined:**
 
-!!! info
-    The `*` command only runs when no other command matches.
+| User sends | Result |
+| --- | --- |
+| `Hi` | `*` runs |
+| `/test` | `*` runs |
+| `🎉` | `*` runs (if no other match) |
 
-## * With Other Commands
+Same answer every time.
 
-If your bot also has a `/start` command:
+**`*` plus `/start`:**
 
-- `/start` → `/start` command runs
-- Anything else → `*` command runs
+| User sends | Result |
+| --- | --- |
+| `/start` | `/start` runs |
+| Anything else | `*` runs |
 
-This makes `*` perfect as a fallback.
+That's the usual pattern: real commands for real actions, `*` for the rest.
 
-## Good Use Cases
+---
 
-Use the `*` command for:
+## Good use cases
 
-- Default replies
-- Unknown input handling
-- Help prompts
-- Maintenance messages
+- Default "I didn't understand" reply
+- Point users to `/start` or your menu
+- Maintenance mode message
+- Channel/update fallback when no dynamic handler exists
 
 !!! warning
-    Do not place important bot logic inside `*`.  
-    Use it as a fallback, not a primary command.
+    Don't put your **main** bot logic in `*`. It's a safety net, not the star of the show. Important flows deserve named commands.
 
-## Test the Bot
+---
+
+## Test it
 
 - Open your bot in Telegram
-- Send any message
-- The bot should always reply
+- Send random text
+- Bot should reply with your fallback
 
-If it does, your wildcard command is working 🎉
+If `/start` still works separately, even better — you've got proper routing.
 
-## What You Learned
+Wildcard working 🎉
 
-You now understand how:
+---
 
-- The `*` command works
-- To build an always-replying bot
-- To handle unknown input safely
-- To use `*` as a fallback command
+## What's next
+
+- Combine with [aliases](adding-aliases.md) so common phrases hit named commands first
+- Add Logic to `*` for smarter fallbacks (keyword hints, fuzzy help)
+- [Dynamic Handlers](dynamic-commands.md) for update types text matching can't catch
+
+You now have a bot that never leaves users talking into the void.

@@ -1,12 +1,14 @@
 # Markdown & Formatting
 
-TBL supports formatted text in command **Answers** and in messages sent from **Logic**.
+Plain text works. *Bold welcome messages* work better. TBL lets you format command **Answers** and messages sent from **Logic** — but Telegram is picky about syntax, and the two places behave slightly differently.
+
+Concept first, then examples.
 
 ---
 
 ## Answer field formatting
 
-Every command has a **parse mode** (default: `Markdown`). It controls how the **Answer** text is rendered when sent automatically.
+Every command has a **parse mode** setting (default: **Markdown**). It controls how the **Answer** text renders when TBL sends it automatically — you don't pass `parse_mode` yourself for Answer.
 
 | Parse mode | Example in Answer |
 | --- | --- |
@@ -19,17 +21,23 @@ Every command has a **parse mode** (default: `Markdown`). It controls how the **
 _Pick an option below._
 ```
 
-Set parse mode in the command editor. See [Command Fields](command-fields.md).
+Set parse mode in the command editor — [Command Fields](command-fields.md).
 
 ---
 
-## Logic messages
+## Logic messages — you're on your own
 
-Answers are formatted automatically, but messages you send in Logic need an explicit `parse_mode`:
+Answers are formatted automatically. Messages **you** send in Logic need an explicit `parse_mode` on each call — the command setting does **not** carry over.
+
+[`Bot`](../bot-instance/index.md) for quick sends:
 
 ```js
-Bot.sendMessage("*Done!* Your settings were saved.", { parse_mode: "Markdown" })
+Bot.sendMessage(chat.id, "*Done!* Your settings were saved.", { parse_mode: "Markdown" })
+```
 
+[`Api`](../api-instance/index.md) when you need full control:
+
+```js
 await Api.sendMessage({
   chat_id: chat.id,
   text: "<b>Order</b> confirmed.",
@@ -37,13 +45,13 @@ await Api.sendMessage({
 })
 ```
 
-`Bot` and `Api` do not inherit the command's parse mode — set it per call.
+Forget `parse_mode` and asterisks show up literally. Telegram's favorite prank.
 
 ---
 
 ## `modules.md2html` — Markdown to HTML
 
-Convert Telegram-style Markdown to HTML inside Logic — useful before sending HTML messages or building web content:
+Convert Telegram-style Markdown to HTML inside Logic — handy before sending HTML messages or building web content:
 
 ```js
 let md = "*Sale!* Visit [our site](https://example.com)"
@@ -62,7 +70,7 @@ See [md2html module](../modules/md2html.md) for details and plan buffer limits.
 
 ## `Libs.tgutil` helpers
 
-Escape and link helpers for safe formatting:
+User input plus raw Markdown equals broken messages. Escape and link helpers keep things safe:
 
 ```js
 let safe = Libs.tgutil.escapeText(userInput, "markdown")
@@ -75,7 +83,7 @@ See [tgutil](../libs/tgutil.md).
 
 ## Rich messages (Api)
 
-For tables and advanced layouts, use Api rich message fields:
+Tables and advanced layouts? Api rich message fields:
 
 ```js
 await Api.sendMessage({
@@ -104,6 +112,8 @@ Commands with a `.md` extension served via [public web](public-web-commands.md) 
 | HTML tags show as text | Use `parse_mode: "HTML"`, not Markdown |
 | User input breaks formatting | Escape with `Libs.tgutil.escapeText()` |
 | Special chars in MarkdownV2 | Escape per Telegram rules |
+
+Start with plain **Markdown** in Answer. Level up to HTML and md2html when you need links and tables.
 
 ---
 

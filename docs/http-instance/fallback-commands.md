@@ -1,8 +1,12 @@
 # Fallback Commands
 
-Chain HTTP requests to other commands using `success` and `error`. The HTTP call returns immediately; callback commands run when the response arrives.
+Fire an HTTP request, keep coding. When the response lands, run `/onSuccess` or `/onError` automatically. No `await`, no blocking, no staring at a spinner in your command logic.
 
-## Basic setup
+That's the fallback command pattern — chain HTTP to other commands using `success` and `error`.
+
+---
+
+## How it works
 
 ```js
 HTTP.get({
@@ -18,7 +22,11 @@ HTTP.get({
 | `success` | HTTP status is **2xx** (`res.ok === true`) |
 | `error` | HTTP status is **not 2xx** (`res.ok === false`) |
 
+The HTTP call returns immediately. Your current command continues. Callback commands run when the response arrives.
+
 If the request fails and `error` is **not defined**, no callback command runs. Use `await` inline when you need to handle failures in the same command.
+
+---
 
 ## Passing data with `tbl_options`
 
@@ -32,6 +40,8 @@ HTTP.post({
 ```
 
 Inside `/onOrderDone`, read `tbl_options.item` and `tbl_options.userId`. See [`tbl_options`](../globals/tbl_options.md).
+
+---
 
 ## Success callback (`/onSuccess`)
 
@@ -54,6 +64,8 @@ if (response.ok && response.isJson) {
   Bot.sendMessage(chat.id, "Response: " + content)
 }
 ```
+
+---
 
 ## Error callback (`/onError`)
 
@@ -81,6 +93,8 @@ if (error.status === 404) {
 
 `http_response`, `response`, `content`, `headers`, and `cookies` are also set the same way as in success callbacks.
 
+---
+
 ## Inline vs callback
 
 | Approach | Best for |
@@ -101,17 +115,25 @@ HTTP.get({
 })
 ```
 
+Pick your style. Callbacks keep commands short. Inline keeps everything in one place. Both are valid.
+
+---
+
 ## Command chain limit
 
-Each `success` or `error` callback counts toward the **6-command chain limit** per execution (same as `Bot.run`). Deep HTTP → command → HTTP chains should be kept shallow.
+Each `success` or `error` callback counts toward the **6-command chain limit** per execution (same as `Bot.run`). Deep HTTP → command → HTTP chains should be kept shallow. Your future self debugging at 2 AM will appreciate it.
+
+---
 
 ## What fallback commands do not catch
 
 | Not caught by `error` callback | Handle with |
 | --- | --- |
-| TBL script errors in the same command | `!` error handler |
+| Script errors in the same command | `!` error handler |
 | Invalid HTTP options (bad URL, etc.) | `!` error handler (throws before request) |
 | Network-level throws in validation | `!` error handler |
+
+---
 
 ## Full pipeline example
 
@@ -139,6 +161,8 @@ Bot.sendMessage(chat.id, tbl_options.city + ": " + temp + "°")
 // /weatherError command
 Bot.sendMessage(chat.id, "Could not fetch weather (" + error.status + ")")
 ```
+
+---
 
 ## Important notes
 

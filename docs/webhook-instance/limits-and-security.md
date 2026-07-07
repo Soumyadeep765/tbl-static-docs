@@ -1,12 +1,12 @@
 # Limits & Security
 
-Webhooks are signed and rate-limited. This page covers security mechanics and plan-based quotas.
+Webhooks are signed, rate-limited, and depth-capped. This page covers the security mechanics and plan-based quotas — the stuff that keeps forged URLs and runaway chains from ruining your afternoon.
 
 ---
 
 ## Signature verification
 
-Every webhook request must include a valid `sig` query parameter.
+Every webhook request must include a valid `sig` query parameter. No signature, no sandbox.
 
 **Algorithm:** HMAC-SHA256 with your bot token as the key.
 
@@ -20,19 +20,19 @@ Every webhook request must include a valid `sig` query parameter.
 - Global webhook: `userId` is empty (`""`)
 - Legacy signatures without `expires` are still accepted for backward compatibility
 
-Invalid or missing signatures return **401** / **403** before your command executes.
+Invalid or missing signatures return **401** / **403** before your command executes. Tampering with `command`, `options`, `user`, or `expires` after signing breaks the signature too.
 
 ---
 
 ## URL expiry
 
-Pass `expiresIn` (seconds) when generating URLs:
+Pass `expiresIn` (seconds) when generating URLs for one-time or time-sensitive links:
 
 ```js
 Webhook.getUrl("action", { expiresIn: 3600 })  // valid 1 hour
 ```
 
-The URL includes `expires={unixTimestamp}`. Requests after that time are rejected.
+The URL includes `expires={unixTimestamp}`. Requests after that time are rejected with **403**.
 
 ---
 
@@ -44,13 +44,13 @@ The URL includes `expires={unixTimestamp}`. Requests after that time are rejecte
 | `params` | 10,000 characters |
 | Request body | 1 MB (platform default) |
 
-Oversized payloads return **413**.
+Oversized payloads return **413**. Keep `options` lean — it's signed *and* counted.
 
 ---
 
 ## Webhook depth limit
 
-User and global webhooks enforce a **chain depth limit** (default **10**, configurable via `TBH_MAX_CHAIN_DEPTH`). This prevents runaway nested webhook calls.
+User and global webhooks enforce a **chain depth limit** (default **10**, configurable via `TBH_MAX_CHAIN_DEPTH`). This prevents runaway nested webhook calls — webhook A triggers webhook B triggers webhook C until the heat death of the universe.
 
 Webapp requests are **not** subject to this depth check.
 
@@ -58,7 +58,7 @@ Webapp requests are **not** subject to this depth check.
 
 ## Plan-based rate limits
 
-Each bot is limited by the owner's plan:
+Each bot is limited by the owner's plan. These limits apply to **webhooks**, **webapps**, and **public web** combined per bot:
 
 | Plan | Per minute | Per day |
 | --- | --- | --- |
@@ -76,9 +76,7 @@ Exceeded limits return **429**:
 }
 ```
 
-(or daily quota message)
-
-These limits apply to **webhooks**, **webapps**, and **public web** combined per bot.
+(or a daily quota message)
 
 ---
 

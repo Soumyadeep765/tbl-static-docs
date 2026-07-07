@@ -1,8 +1,42 @@
-# The `bot` Variable
+# bot
 
-In TBL, `bot` contains **information about the current bot** running the command. It provides the bot's identity, owner email, and platform status.
+Your bot's identity card — name, username, and whether it's actually awake.
 
-## Properties
+## What is it?
+
+**`bot`** is an object with metadata about the bot running your command right now: its display name, Telegram username, platform ID, owner email, and current status.
+
+It's the mirror your bot looks into. "Who am I? Am I online? Who built me?" All answered here.
+
+## When would you use it?
+
+- Show the bot's name in welcome messages
+- Build admin panels that display bot info
+- Check if the bot is running (`status === "working"`)
+- Log identity in debug commands
+
+This is **platform metadata**, not Telegram update data. For sending messages, you still use [Bot](../bot-instance/index.md) or [Api](../api-instance/index.md). The bot token is never exposed here — that's by design, not an oversight.
+
+---
+
+## Try it
+
+```js
+// Introduce yourself
+Bot.sendMessage(user.id, "Welcome! I'm " + bot.first_name + ".")
+
+// Health check
+if (bot.status !== "working") {
+  Bot.sendMessage(user.id, "Bot is currently offline. Try again later.")
+}
+
+// Admin debug
+Bot.inspect("Running as @" + bot.username + " (ID " + bot.id + ")")
+```
+
+---
+
+## Fields
 
 | Field | Type | Description |
 | --- | --- | --- |
@@ -12,11 +46,11 @@ In TBL, `bot` contains **information about the current bot** running the command
 | `username` | `string` | Telegram @username |
 | `name` | `string` | Alias for `username` |
 | `owner` | `string` | Owner email address |
-| `status` | `string` | `"working"` when the bot is active, `"stopped"` otherwise |
+| `status` | `string` | `"working"` when active, `"stopped"` otherwise |
 | `created_at` | `string` | Bot creation timestamp |
 | `updated_at` | `string` | Last update timestamp |
 
-## Example
+### Example object
 
 ```json
 {
@@ -32,23 +66,10 @@ In TBL, `bot` contains **information about the current bot** running the command
 }
 ```
 
-## Usage Examples
+---
 
-```javascript
-// Greet with the bot's display name
-Bot.sendMessage(user.id, `Welcome! I'm ${bot.first_name}.`)
-
-// Check if the bot is running
-if (bot.status !== 'working') {
-  Bot.sendMessage(user.id, 'Bot is currently offline.')
-}
-
-// Log bot identity for admin commands
-Bot.inspect(`Bot @${bot.username} (ID ${bot.id})`)
-```
-
-## Important Notes
+## Good to know
 
 - `bot` is read-only and exists only during command execution
-- It represents platform-level bot metadata, not Telegram update data
-- The Telegram bot token is **not** exposed as a global variable — use the [Api instance](../api-instance/index.md) to call the Telegram API
+- For owner account details (subscription, billing), see [`owner`](owner.md)
+- For plan limits that affect your scripts, see [`plan`](plan.md)

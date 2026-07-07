@@ -1,23 +1,18 @@
 # refLib
 
-`Libs.refLib` builds referral links, tracks who invited whom, and maintains a leaderboard. All methods are **synchronous**.
+Want users to invite friends and track who brought whom? **`Libs.refLib`** builds referral links, detects when someone arrives via a link, and keeps a leaderboard — without you hand-rolling deep-link parsing.
 
-Call `Libs.refLib.track()` once (typically in your `/start` command or master script) to activate tracking.
-
-```js
-Libs.refLib.track({
-  onAttracted: (referrer) => {
-    Bot.sendMessage(chat.id, "Welcome! Referred by " + referrer.first_name)
-  }
-})
-
-let link = Libs.refLib.getLink()
-Bot.sendMessage(chat.id, "Your link: " + link)
-```
+All methods are **synchronous**. No `await`.
 
 ---
 
-## How it works
+## What is it?
+
+`Libs.refLib` builds referral links, tracks who invited whom, and maintains a leaderboard.
+
+Access: `Libs.refLib.<method>()`
+
+The flow in plain English:
 
 1. User shares `https://t.me/YourBot?start=user123456`
 2. New user opens the link → `/start user123456`
@@ -25,6 +20,75 @@ Bot.sendMessage(chat.id, "Your link: " + link)
 4. Referrer's count and leaderboard update automatically
 
 Referral data is stored in user and bot properties (`REFLIB_*` keys).
+
+---
+
+## How to use it
+
+**Step 1:** Call `track()` once per session — typically in your `/start` command or master script:
+
+```js
+Libs.refLib.track({
+  onAttracted: (referrer) => {
+    Bot.sendMessage(chat.id, "Welcome! Referred by " + referrer.first_name)
+  }
+})
+```
+
+**Step 2:** Give users their link:
+
+```js
+let link = Libs.refLib.getLink()
+Bot.sendMessage(chat.id, "Share this: " + link)
+```
+
+Without `track()`, deep links won't be detected. The library can't read minds — only `params`.
+
+!!! tip "Globals"
+    `params` holds the text after `/start` (e.g. `/start user123` → `params` is `"user123"`). See [Global Variables](../globals/index.md).
+
+---
+
+## Try it — beginner examples
+
+### /mylink command
+
+```js
+// Command: /mylink
+Bot.sendMessage(chat.id,
+  "Your referral link:\n" + Libs.refLib.getLink() +
+  "\n\nReferrals: " + Libs.refLib.getRefCount()
+)
+```
+
+### Reward the referrer
+
+```js
+Libs.refLib.track({
+  onAttracted: (referrer) => {
+    let count = Libs.refLib.getRefCount(referrer.id)
+    let reward = 10 + (count % 10 === 0 ? 50 : 0)
+
+    Api.sendMessage({
+      chat_id: referrer.id,
+      text: user.first_name + " joined via your link! +" + reward + " points (total: " + count + ")"
+    })
+  }
+})
+```
+
+### Leaderboard command
+
+```js
+// Command: /toprefs
+let leaders = Libs.refLib.getTopList()
+let lines = Object.entries(leaders)
+  .sort((a, b) => b[1] - a[1])
+  .slice(0, 10)
+  .map(([id, count], i) => (i + 1) + ". User " + id + ": " + count)
+
+Bot.sendMessage(chat.id, "Top referrers:\n" + lines.join("\n"))
+```
 
 ---
 
@@ -141,48 +205,7 @@ let top = Object.entries(leaders)
 
 ---
 
-## Examples
-
-### /mylink command
-
-```js
-// Command: /mylink
-Bot.sendMessage(chat.id,
-  "Your referral link:\n" + Libs.refLib.getLink() +
-  "\n\nReferrals: " + Libs.refLib.getRefCount()
-)
-```
-
-### Reward on referral
-
-```js
-Libs.refLib.track({
-  onAttracted: (referrer) => {
-    let count = Libs.refLib.getRefCount(referrer.id)
-    let reward = 10 + (count % 10 === 0 ? 50 : 0)
-
-    Api.sendMessage({
-      chat_id: referrer.id,
-      text: user.first_name + " joined via your link! +" + reward + " points (total: " + count + ")"
-    })
-  }
-})
-```
-
-### Leaderboard command
-
-```js
-// Command: /toprefs
-let leaders = Libs.refLib.getTopList()
-let lines = Object.entries(leaders)
-  .sort((a, b) => b[1] - a[1])
-  .slice(0, 10)
-  .map(([id, count], i) => (i + 1) + ". User " + id + ": " + count)
-
-Bot.sendMessage(chat.id, "Top referrers:\n" + lines.join("\n"))
-```
-
-### Master script pattern
+## Master script pattern
 
 ```js
 // In your @ master script or /start command

@@ -1,8 +1,23 @@
 # Command Flow
 
-Every Telegram bot on TeleBotHost is a collection of **commands**. TBL receives an update, picks one command, runs it, and finishes. No background process, no event loop.
+Every bot is a pile of commands. Telegram sends an update, your bot picks one command, runs it, and calls it a day. No background process, no event loop — just match, run, done.
 
 This section explains how commands are built, matched, and executed — from basic `/start` replies to callbacks, markdown, and public web pages.
+
+---
+
+## What is command flow?
+
+Every Telegram bot on TeleBotHost is a collection of **commands**. The platform receives an update, picks one command, runs it, and finishes.
+
+| You get | You skip |
+| --- | --- |
+| Answer + Keyboard without code | Building a web server |
+| Logic when you need it | Event-driven architecture |
+| Special handlers (`@`, `!`, `@@`) | Custom error middleware |
+
+!!! tip "New to TBL?"
+    Brand new? Start with [Getting Started](../getting-started.md), then [Your First Bot](first-hello-bot.md). The big picture: [What is TBL?](../about-tbl.md). Quick intro: [Learning TBL](../learning-tbl.md).
 
 ---
 
@@ -37,6 +52,36 @@ See [Execution Flow](execution-flow.md) for the full lifecycle.
 
 ---
 
+## Try it — your first command
+
+No Logic needed — just an **Answer** field:
+
+1. Create a command named `/start`
+2. Set **Answer** to: `Welcome! Type /help for commands.`
+3. Save and message your bot `/start`
+
+That's command flow in action. Add **Logic** when you need dynamic behavior:
+
+```js
+Bot.sendMessage("Hey " + user.first_name + "! Your chat ID is " + chat.id)
+```
+
+Globals like `user` and `chat`: [Global Variables](../globals/index.md)
+
+---
+
+## Command surfaces at a glance
+
+| Surface | Trigger | Answer field | Logic + `res` |
+| --- | --- | --- | --- |
+| Telegram message | User sends text/command | Yes | Yes |
+| Callback query | Inline button tap | Yes (then logic) | Yes |
+| Webhook | Signed HTTP URL | No | Yes + `res` |
+| Webapp | `/webapp/{bot_id}/{cmd}` | No | Yes + `res` |
+| Public web | `/public/{bot_id}/{path}` | N/A — serves command source | **No sandbox** |
+
+---
+
 ## Pages in this section
 
 ### Core concepts
@@ -44,7 +89,7 @@ See [Execution Flow](execution-flow.md) for the full lifecycle.
 | Page | What you'll learn |
 | --- | --- |
 | [Command Fields](command-fields.md) | Answer, Logic, Keyboard, aliases, `need_reply`, `is_web`, `parse_mode` |
-| [Matching & Priority](matching-order.md) | How TBL picks which command runs |
+| [Matching & Priority](matching-order.md) | How the platform picks which command runs |
 | [Execution Flow](execution-flow.md) | `@`, `!`, `@@`, answer-before-logic, sessions |
 | [Special Commands](special-commands.md) | `/start`, `@`, `!`, `@@`, `*` |
 | [Dynamic Handlers](dynamic-commands.md) | `/handle_{update_type}`, inline query, channel |
@@ -72,18 +117,6 @@ See [Execution Flow](execution-flow.md) for the full lifecycle.
 | [Your First Bot](first-hello-bot.md) | `/start` with an answer |
 | [Adding a Keyboard](adding-keyboard.md) | Reply keyboard menu |
 | [Command Structure](command-structure.md) | Short overview + links |
-
----
-
-## Command surfaces at a glance
-
-| Surface | Trigger | Answer field | Logic + `res` |
-| --- | --- | --- | --- |
-| Telegram message | User sends text/command | Yes | Yes |
-| Callback query | Inline button tap | Yes (then logic) | Yes |
-| Webhook | Signed HTTP URL | No | Yes + `res` |
-| Webapp | `/webapp/{bot_id}/{cmd}` | No | Yes + `res` |
-| Public web | `/public/{bot_id}/{path}` | N/A — serves command source | **No sandbox** |
 
 ---
 

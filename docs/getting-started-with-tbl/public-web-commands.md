@@ -1,14 +1,28 @@
 # Public Web Commands
 
-Mark commands as **public web** resources to serve static pages, assets, and templates at a per-bot URL — without running Logic or the TBL sandbox.
+Want a landing page for your bot without spinning up a separate website? **Public web commands** serve HTML, CSS, JS, and JSON at a per-bot URL — no Logic execution, no sandbox, no cold start drama.
+
+Static files. Fast. Good enough for docs, link-in-bio pages, and simple mini-sites.
+
+---
+
+## What is public web?
+
+Normally, command **Logic** runs in a sandbox when someone interacts with your bot. Public web is different:
+
+- You mark a command with **Public web** (`is_web`)
+- The command **source** (what you write in the editor) is served as a file
+- **Answer** and **Logic** are ignored — they never run
+
+Think of it as hosting static assets under `/public/{bot_id}/...`.
 
 ---
 
 ## Enable public web
 
-In the command editor, enable **Public web** (`is_web = 1`) on the command.
+In the command editor, turn on **Public web** (`is_web = 1`).
 
-Only flagged commands are served. Others return **403** if accessed via the public URL.
+Only flagged commands are served. Hit a non-public command's URL and you get **403**. Security by opt-in.
 
 ---
 
@@ -18,7 +32,7 @@ Only flagged commands are served. Others return **403** if accessed via the publ
 https://{domain}/public/{bot_id}/{command_name}
 ```
 
-Generate links in Logic:
+Generate links in Logic when you want to share them in chat:
 
 ```js
 let home = Webapp.getUrl("index.html", { public: true })
@@ -30,11 +44,13 @@ await Api.sendMessage({
 })
 ```
 
+[`Api`](../api-instance/index.md) sends the message; `Webapp.getUrl` builds the link.
+
 ---
 
 ## What to put in the command
 
-Public web serves the command **source** directly — not the Answer field.
+Public web serves the command **source** directly — **not** the Answer field.
 
 | Command name | Use for |
 | --- | --- |
@@ -64,7 +80,7 @@ Public web serves the command **source** directly — not the Answer field.
 </html>
 ```
 
-EJS tags (`<%`, `<%=`) work with limited context: `bot`, `params`, `request`. No `user`, `Api`, or `db`.
+EJS tags (`<%`, `<%=`) work with limited context: `bot`, `params`, `request`. No `user`, [`Api`](../api-instance/index.md), or `db` — this is static serving, not Logic.
 
 ---
 
@@ -89,7 +105,7 @@ Build the page in the command editor body (the code/source area), not in Answer.
 | `db`, `Api`, `res` | No | Yes |
 | Best for | Static HTML/CSS/JS | Dynamic APIs, DB-backed pages |
 
-Need server logic? Use a [webapp](../webapp-instance/index.md). Need a fast landing page? Use public web.
+Need server logic? Use a [webapp](../webapp-instance/index.md). Need a fast landing page? Public web.
 
 ---
 
@@ -101,18 +117,18 @@ Name a command `index.html` (or alias `index` / `app`) with `is_web` enabled:
 https://{domain}/public/{bot_id}/
 ```
 
-Empty path resolves to `index.html`.
+Empty path resolves to `index.html`. Your bot's front door on the web.
 
 ---
 
 ## Full guide
 
-For routing, assets, rate limits, and EJS context, see the complete [Public Web](../webapp-instance/public-web.md) reference.
+Routing, assets, rate limits, and EJS context — [Public Web](../webapp-instance/public-web.md).
 
 ---
 
 ## See also
 
-- [Command Fields](command-fields.md)
+- [Command Fields](command-fields.md) — `is_web` toggle
 - [Webapp Methods](../webapp-instance/webapp-methods.md)
-- [Execution Flow](execution-flow.md)
+- [Execution Flow](execution-flow.md) — public web skips the sandbox

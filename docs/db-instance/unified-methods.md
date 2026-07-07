@@ -1,8 +1,32 @@
 # Unified CRUD Methods
 
-All three collections share the same core method names. Signatures differ slightly per collection — this page is the authoritative reference.
+`db.bot`, `db.user`, and `db.global` all speak the same language — `get`, `set`, `has`, `del`, and friends. The method names match; the scoping rules differ. This page is the authoritative reference for every signature.
+
+Before you memorize anything, pick your collection. Bot-wide? [`db.bot`](bot.md). Per-user? [`db.user`](user.md). Account-wide? [`db.global`](global.md).
+
+---
+
+## What methods are shared?
+
+Every collection supports the same core CRUD operations:
+
+| Method | What it does |
+| --- | --- |
+| `get` | Read a value (returns `fallback` if missing) |
+| `set` | Store or update a value |
+| `has` | Check if a key exists |
+| `del` | Delete a single key |
+| `mget` | Batch-read multiple keys |
+| `getAll` | List keys (paginated) |
+| `delAll` | Delete all keys in scope |
+
+`db.bot` also has `clearAllData()` — see [below](#clearalldataoptions--bot-only).
+
+---
 
 ## Syntax support matrix
+
+Not every method accepts every call style. Check before you copy-paste:
 
 | Method | `db.bot` | `db.user` | `db.global` |
 | --- | --- | --- | --- |
@@ -13,6 +37,8 @@ All three collections share the same core method names. Signatures differ slight
 | `mget` | positional + object | positional only | positional only |
 | `getAll` | optional object | optional object | optional object |
 | `delAll` | optional object | optional object | no params |
+
+Object syntax looks like `db.user.get({ key: "level", fallback: 1 })`. Positional looks like `db.user.get("level", 1)`. Same result, different handwriting.
 
 ---
 
@@ -199,7 +225,7 @@ let res = await db.bot.clearAllData()
 await db.bot.clearAllData({ bot_id: 42 })
 ```
 
-Does not affect `db.global` data. Use with extreme caution.
+Does not affect `db.global` data. Use with extreme caution — there's no undo button.
 
 ---
 
@@ -211,10 +237,12 @@ let step = await db.user.get("onboard_step", 0)
 
 if (step === 0) {
   await db.user.set("onboard_step", 1)
-  Bot.sendMessage("Step 1 complete.")
+  Bot.sendMessage(chat.id, "Step 1 complete.")
 }
 
 // Check storage result
 let res = await db.bot.set("cache", largeObject)
-if (!res.ok) Bot.sendMessage(res.message)
+if (!res.ok) Bot.sendMessage(chat.id, res.message)
 ```
+
+For counters and lists, see [Advanced Operations](advanced-operations.md).

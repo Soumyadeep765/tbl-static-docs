@@ -73,7 +73,8 @@ let chatId = msg.getChatId()
 let msgId = msg.getMessageId()
 ```
 
-Note: `getText` as a **method** returns text/caption. The `text` **alias** calls the getter — but `msg.text` as a **property** is the raw Telegram text field only (not caption).
+!!! note "text property vs getText()"
+    `getText()` as a **method** returns text *or* caption. The `text` **alias** calls the getter — but `msg.text` as a **property** is the raw Telegram text field only (not caption). Caption-only messages? Use `getText()`.
 
 ---
 
@@ -206,3 +207,11 @@ Method names work in any casing — `msg.replyPhoto()`, `msg.replyphoto()`, and 
 - Do not confuse with [Libs](../libs/index.md) or [modules](../modules/index.md) — unrelated
 - For sending without a triggering message, use [`Bot`](../bot-instance/index.md) or [`Api`](../api-instance/index.md)
 - Entity parsing for formatted text: [tgutil](../libs/tgutil.md) `parseEntities()`
+
+---
+
+## See also
+
+- [Replying](replying.md)
+- [Editing](editing.md)
+- [Actions](actions.md)

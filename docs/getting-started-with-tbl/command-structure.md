@@ -1,6 +1,8 @@
 # Command Structure in TBL
 
-Commands are the foundation of every TeleBotHost bot. Each incoming update triggers **exactly one** matched command (plus the automatic `@` and `@@` wrappers).
+Every TeleBotHost bot is a collection of **commands**. Not routes, not controllers, not event listeners — commands. Telegram sends an update, TBL matches **exactly one**, runs it, and finishes.
+
+One update in. One path through your code out. That's the whole model.
 
 ---
 
@@ -10,18 +12,22 @@ Commands are the foundation of every TeleBotHost bot. Each incoming update trigg
 User action  →  Telegram update  →  TBL matches command  →  Answer + Logic  →  Done
 ```
 
-No listeners. No long-running process. One update, one path through your code.
+No background process humming away. No `while(true)` loop. Each message is a fresh, self-contained run — plus automatic `@` and `@@` wrappers around it ([Special Commands](special-commands.md)).
 
 ---
 
 ## What a command contains
 
+Think of a command as a small form with a few parts:
+
 | Part | Role |
 | --- | --- |
 | **Name** | What triggers it (`/start`, `Help`, `*`) |
 | **Answer** | Optional auto-reply before logic |
-| **Logic** | TBL code for dynamic behavior |
+| **Logic** | JavaScript for dynamic behavior |
 | **Options** | Keyboard, aliases, need reply, public web, parse mode |
+
+**Answer** is the fast path — static text TBL sends for you. **Logic** is where [`Bot`](../bot-instance/index.md), [`Api`](../api-instance/index.md), `db`, and [globals](../globals/index.md) like [`user`](../globals/user.md) and [`params`](../globals/params.md) come in.
 
 Full field reference: [Command Fields](command-fields.md).
 
@@ -51,4 +57,12 @@ Full field reference: [Command Fields](command-fields.md).
 
 ### Hands-on
 
-12. [Your First Bot](first-hello-bot.md) — start here
+12. [Your First Bot](first-hello-bot.md) — **start here** if you haven't built anything yet
+
+---
+
+## Where to go next
+
+Built `/start` already? Add [a keyboard](adding-keyboard.md). Need buttons inside messages? [Callbacks](handling-callbacks.md). Want a landing page? [Public web](public-web-commands.md).
+
+The docs are modular — read what you need, skip what you don't.

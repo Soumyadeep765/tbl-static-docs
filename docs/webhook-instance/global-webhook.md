@@ -1,8 +1,22 @@
 # Global Webhooks
 
-Generate signed URLs that run commands **without binding a Telegram user**. `user` and `chat` are `null`; the `User` instance is not available.
+Signed URLs that run commands **without binding a Telegram user**. `user` and `chat` are `null`; the `User` instance is not available.
 
-Ideal for cron jobs, monitoring hooks, account-wide reads, and backend integrations that do not act on behalf of one user.
+Think of them as system-level triggers — cron jobs, monitoring hooks, account-wide reads, and backend integrations that don't act on behalf of one person.
+
+---
+
+## What you get (and don't)
+
+| In the command | Available? |
+| --- | --- |
+| `bot`, `owner`, `plan`, `db`, `HTTP`, `modules` | ✓ |
+| `user`, `chat`, `User` | `null` |
+| `request`, `params`, `options`, `res` | ✓ |
+| `msg` | `null` |
+
+!!! warning "No default chat"
+    Without `user` or `chat`, you must pass `chat_id` explicitly to `Api.sendMessage()` and friends.
 
 ---
 
@@ -16,7 +30,7 @@ Ideal for cron jobs, monitoring hooks, account-wide reads, and backend integrati
 | `params` | object | Extra query parameters |
 | `expiresIn` | number | Optional seconds until URL expires |
 
-### Example
+### Example — cron stats job
 
 ```js
 let statsUrl = Webhook.getGlobalUrl("aggregateStats", {
@@ -29,7 +43,7 @@ let statsUrl = Webhook.getGlobalUrl("aggregateStats", {
 
 ---
 
-## Example URL
+## What the URL looks like
 
 ```
 https://{domain}/webhook/{bot_id}
@@ -46,8 +60,9 @@ Note: there is **no** `user` parameter. The signature is computed with an empty 
 
 ## Inside the command
 
+Design for `user` being `null`:
+
 ```js
-// user is null — design accordingly
 let total = await db.bot.get("total_users") || 0
 
 // content may hold prefetched redirect body
@@ -64,7 +79,7 @@ res.json({
 
 ## Sending Telegram messages
 
-Without `user` or `chat`, you must pass `chat_id` explicitly:
+No `chat`? Store an admin chat ID in bot storage, or pass one you know:
 
 ```js
 let adminChat = await db.bot.get("admin_chat_id")
@@ -78,7 +93,7 @@ if (adminChat) {
 
 ---
 
-## When to use global vs user webhook
+## Global vs user webhook — quick picker
 
 | Scenario | Use |
 | --- | --- |

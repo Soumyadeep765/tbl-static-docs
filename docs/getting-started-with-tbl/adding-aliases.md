@@ -1,104 +1,96 @@
 # Using Aliases in Your Bot
 
-Aliases allow a single command to be triggered using **multiple names**.  
-They make bots more flexible and easier to use.
+One command, one trigger name — sounds tidy until your keyboard button says `Help`, your users type `help`, and someone tries `/h`. **Aliases** let one command answer to multiple names without duplicating Logic.
 
-## What is an Alias?
+Same behavior every time. Less copy-paste. Fewer "why didn't that work?" moments.
 
-An alias is an alternative trigger for a command.
+---
 
-This means:
+## What is an alias?
 
-- One command
-- Multiple triggers
-- Same behavior every time
+An **alias** is an alternative trigger for a command you already have.
 
-## Why Aliases Are Useful
+| | |
+| --- | --- |
+| **One command** | Single Answer + Logic |
+| **Many triggers** | Main name + aliases |
+| **Same behavior** | Every alias runs the same command |
 
-Aliases help you:
+TBL checks the command name first, then aliases — [Matching & Priority](matching-order.md).
 
-- Support different typing styles
-- Match keyboard button text
-- Provide short and long command names
-- Reduce user mistakes
+---
 
-They improve usability without adding logic.
+## Why aliases are useful
 
-## Where Aliases Are Used
+- Match **keyboard button text** exactly
+- Support shorthand (`/h` for Help)
+- Catch common typos or case variations (if you add each variant)
+- Improve UX **without** extra Logic
 
-Aliases are defined inside a command’s configuration.
+Aliases are configuration, not code. Free flexibility.
 
-When a message arrives, TBL checks:
+---
 
-- The command name
-- Then its aliases
-- Then other matching rules
+## Adding aliases to a command
 
-Aliases behave exactly like the main command.
+Open a command in the editor. Fill the **Aliases** field:
 
-## Adding Aliases to a Command
+```
+help, HELP, /h
+```
 
-Open an existing command and add values in the **Aliases** field.
+Each value is a separate trigger for the **same** command.
 
-Each alias is treated as a separate trigger for the same command.
+!!! note "Case-sensitive"
+    `Help`, `help`, and `HELP` are three different triggers. Add each variation you want to support — the universe is cruel but consistent.
 
-!!! note
-    Aliases are **case-sensitive**.  
-    `Help`, `help`, and `HELP` are treated as different triggers.
+Field details: [Command Fields](command-fields.md).
 
-If you want to support multiple cases, you must add each variation as a separate alias.
+---
 
-## Aliases and Keyboards
+## Aliases and keyboards
 
-Aliases work perfectly with keyboards.
+This is the most common use case.
 
-For example:
-
-- A keyboard button labeled `Help`
-- An alias named `Help`
-
-Both trigger the same command.
+Your keyboard button says `Help`. Your command might be named `help_menu` internally. Add alias **`Help`** (exact button text) and taps just work.
 
 !!! tip
-    Always add an alias that exactly matches your keyboard button text.
+    Always add an alias that **exactly** matches each keyboard button label. See [Adding a Keyboard](adding-keyboard.md).
 
-## Best Practices for Aliases
+---
 
-Follow these guidelines:
+## Best practices
 
-- Keep aliases short and clear
-- Match keyboard labels exactly
-- Avoid overlapping aliases across commands
-- Add only meaningful alternatives
+- Keep aliases **short and clear**
+- Match keyboard labels **character for character**
+- Avoid the **same alias on two commands** — only one can win, and it might not be the one you expect
+- Fewer well-chosen aliases beat a laundry list of random words
 
-!!! tip
-    Fewer, well-chosen aliases are better than many confusing ones.
+---
 
-## Common Mistakes to Avoid
+## Common mistakes
 
-Avoid:
+| Mistake | What happens |
+| --- | --- |
+| Same alias on two commands | Unpredictable matching — pick one owner |
+| Button says `Help`, alias says `help` | Tap does nothing — case mismatch |
+| Alias on wrong command | Wrong response — double-check the editor |
 
-- Using the same alias in multiple commands
-- Adding unrelated words as aliases
-- Forgetting case variations when needed
+---
 
-Aliases should always point clearly to one command.
-
-## Test Your Aliases
-
-After adding aliases:
+## Test your aliases
 
 - Open your bot in Telegram
-- Try typing different alias forms
+- Type each alias manually
 - Tap keyboard buttons
-- Confirm they all trigger the same response
+- Confirm they all hit the **same** response
 
-If everything works, your aliases are set up correctly.
+All paths lead to one command? You're set.
 
-## What You Learned
+---
 
-With aliases, you now know how to:
+## What's next
 
-- Trigger one command in multiple ways
-- Connect keyboards and text input
-- Improve usability without logic
+- [Handling User Input](handle-need-reply.md) — pause and wait for replies
+- [Using the Wildcard](using-wildcard.md) — catch what aliases don't cover
+- [Command Flow](index.md) — full matching rules

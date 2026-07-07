@@ -1,6 +1,6 @@
 # Sending Webhook Responses
 
-Control what the HTTP caller receives using the [`res`](../res-instance/index.md) instance.
+Webhooks are HTTP endpoints — callers expect a body, not silence. Use the [`res`](../res-instance/index.md) instance to control exactly what goes back.
 
 ---
 
@@ -10,7 +10,7 @@ Control what the HTTP caller receives using the [`res`](../res-instance/index.md
 res.json({ ok: true, processed: true })
 ```
 
-The response is sent immediately and command execution stops.
+The response is sent immediately and command execution stops. Treat every `res.*()` send call like a `return`.
 
 ---
 
@@ -22,7 +22,7 @@ If you do not call `res`, the platform returns:
 { "status": "success" }
 ```
 
-with HTTP **200**. API integrations should use explicit `res.json()` so callers get predictable bodies.
+with HTTP **200**. Fine for fire-and-forget triggers. Bad for API integrations that parse the response body — use explicit `res.json()` so callers get predictable output.
 
 ---
 
@@ -79,3 +79,10 @@ if (!options.token) {
 ## Webapp responses
 
 The same `res` API applies to [webapp commands](../webapp-instance/index.md). Public web pages do **not** use `res` — see [Public Web](../webapp-instance/public-web.md).
+
+---
+
+## See also
+
+- [Handling Requests](handle-webhook.md)
+- [res Overview](../res-instance/index.md)

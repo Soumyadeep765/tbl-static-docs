@@ -1,12 +1,41 @@
 # HTTP Responses (res)
 
+Your webhook and webapp's voice — send JSON, HTML, redirects, and rendered templates back to whoever called your endpoint.
+
+Once you call `res`, the response goes out and command execution ends. Choose wisely.
+
+---
+
+## What is `res`?
+
 The **`res`** instance sends custom HTTP responses from **webhook** and **webapp** commands. Use it to build JSON APIs, HTML pages, redirects, and rendered templates.
+
+| You get | You skip |
+| --- | --- |
+| Chainable methods (`res.status().json()`) | Manual header management |
+| EJS templates built in | Separate templating setup |
+| Auto-detected content types | Guessing MIME types |
+
+Once a response is sent, command execution ends.
+
+---
+
+## How to use it
+
+Drop this in a webhook or webapp command's **Logic** field:
 
 ```js
 res.status(200).json({ ok: true, data: result })
 ```
 
-Once a response is sent, command execution ends.
+Three things worth knowing upfront:
+
+1. **`res` is only available in webhook and webapp commands** — it's `null` in normal Telegram commands.
+2. **Methods chain** — `res.status(201).set("Cache-Control", "no-store").json({ ... })`.
+3. **No `res` call?** The platform returns `{ "status": "success" }` with HTTP 200.
+
+!!! tip "New to TBL?"
+    `request` and `params` carry incoming HTTP data in webhook/webapp commands. Quick intro: [Learning TBL](../learning-tbl.md). Endpoint setup: [Webhooks](../webhook-instance/index.md) · [Webapps](../webapp-instance/index.md).
 
 ---
 
@@ -21,7 +50,59 @@ Once a response is sent, command execution ends.
 | Telegram message commands | `null` |
 | Broadcast commands | `null` |
 
-Public web pages do not run the TBL sandbox, so there is no `res` object. See [Public Web](../webapp-instance/public-web.md).
+Public web pages do not run the command sandbox, so there is no `res` object. See [Public Web](../webapp-instance/public-web.md).
+
+---
+
+## Try it — copy-paste examples
+
+Start simple. Each example only introduces what it needs.
+
+### JSON API response
+
+```js
+res.json({ ok: true, message: "Hello from your bot API" })
+```
+
+### HTML page
+
+```js
+res.html("<h1>Dashboard</h1><p>Welcome!</p>")
+```
+
+### Chain status and headers
+
+```js
+res
+  .status(201)
+  .set("Cache-Control", "no-store")
+  .json({ created: true, id: newId })
+```
+
+### Redirect (HTTPS only)
+
+```js
+res.redirect("https://example.com/done")
+```
+
+### Render another command as the response
+
+```js
+res.render("template.html", { data: { title: "My Page", items: [] } })
+```
+
+---
+
+## Choosing a method
+
+| Goal | Method |
+| --- | --- |
+| REST / API JSON | `res.json()` |
+| Plain text or logs | `res.text()` |
+| Full HTML page | `res.html()` or `res.render("page.html")` |
+| Reuse another command's code | `res.render("template.html", { data: { ... } })` |
+| Send user elsewhere | `res.redirect("https://example.com/done")` |
+| Custom headers / status | `res.set()` + `res.status()` + `res.send()` |
 
 ---
 
@@ -67,19 +148,6 @@ If your command finishes **without** calling `res`, the platform returns:
 ```
 
 with HTTP **200**. See [Defaults & Protection](defaults-and-protection.md).
-
----
-
-## Choosing a method
-
-| Goal | Method |
-| --- | --- |
-| REST / API JSON | `res.json()` |
-| Plain text or logs | `res.text()` |
-| Full HTML page | `res.html()` or `res.render("page.html")` |
-| Reuse another command's code | `res.render("template.html", { data: { ... } })` |
-| Send user elsewhere | `res.redirect("https://example.com/done")` |
-| Custom headers / status | `res.set()` + `res.status()` + `res.send()` |
 
 ---
 

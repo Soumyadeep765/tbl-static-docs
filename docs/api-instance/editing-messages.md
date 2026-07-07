@@ -1,10 +1,30 @@
 # Editing Messages
 
-Messages don't have to be permanent. Telegram lets bots edit text, captions, and keyboards on messages they sent — and Api exposes all of it.
+Messages don't have to be permanent. Telegram lets bots edit text, captions, and keyboards on messages they sent — and **`Api`** exposes all of it.
 
-You'll edit messages constantly in menu-driven bots: swap button labels, replace a status line, remove buttons after the user picks an option.
+You'll edit messages constantly in menu-driven bots: swap button labels, replace a status line, remove buttons after the user picks an option. One message morphs instead of five new ones stacking up like dirty dishes.
 
-## Edit text
+---
+
+## What can you edit?
+
+| Action | Method |
+| --- | --- |
+| Change message text | `Api.editMessageText` |
+| Change media caption | `Api.editMessageCaption` |
+| Swap inline keyboard | `Api.editMessageReplyMarkup` |
+| Remove the message | `Api.deleteMessage` |
+
+You need the `message_id` of the message you're changing. In a callback handler that's usually `update.callback_query.message.message_id`. If you just sent it yourself, `await Api.sendMessage(...)` and chain `.editText()` instead — see [Method Chaining](method-chaining.md).
+
+!!! tip "New to TBL?"
+    `Bot`, `chat`, and `user` are globals available in every command. Quick intro: [Learning TBL](../learning-tbl.md).
+
+---
+
+## How to use it
+
+### Edit text
 
 ```js
 Api.editMessageText({
@@ -15,7 +35,7 @@ Api.editMessageText({
 })
 ```
 
-You can also edit a **rich message** (Bot API 10.1) by passing `rich_message` instead of `text`:
+Rich messages (Bot API 10.1) — pass `rich_message` instead of `text`:
 
 ```js
 Api.editMessageText({
@@ -27,9 +47,7 @@ Api.editMessageText({
 })
 ```
 
-You need the `message_id` of the message you're changing. In a callback handler that's usually `update.callback_query.message.message_id`. If you just sent the message yourself, `await Api.sendMessage(...)` and chain `.editText()` instead — see [Method Chaining](method-chaining.md).
-
-## Edit caption on media
+### Edit caption on media
 
 Photos and documents use captions, not message text:
 
@@ -41,7 +59,7 @@ Api.editMessageCaption({
 })
 ```
 
-## Swap the inline keyboard
+### Swap the inline keyboard
 
 Remove buttons after a choice, or replace the whole menu:
 
@@ -57,9 +75,39 @@ Api.editMessageReplyMarkup({
 
 Pass an empty `inline_keyboard: []` to strip buttons entirely.
 
-## Delete instead of edit
+---
 
-Sometimes deletion is cleaner:
+## Try it — copy-paste examples
+
+### Typical callback flow
+
+The pattern that keeps chats tidy:
+
+```js
+// 1. Dismiss the spinner
+Api.answerCallbackQuery({
+  callback_query_id: update.callback_query.id
+})
+
+// 2. Update the same message
+Api.editMessageText({
+  chat_id: chat.id,
+  message_id: update.callback_query.message.message_id,
+  text: "You chose Option A. Processing..."
+})
+
+// 3. Optionally hand off to another command
+Bot.runCommand("/option_a_flow")
+```
+
+### Temporary notice — send, wait, delete
+
+```js
+let sent = await Api.sendMessage({ text: "Temporary notice." })
+await sent.delete()
+```
+
+Or standalone:
 
 ```js
 Api.deleteMessage({
@@ -68,12 +116,7 @@ Api.deleteMessage({
 })
 ```
 
-Or, if you have the chained response object:
-
-```js
-let sent = await Api.sendMessage({ text: "Temporary notice." })
-await sent.delete()
-```
+---
 
 ## What you can't edit
 
@@ -81,20 +124,15 @@ Bots can't edit messages they didn't send (with the usual Telegram exceptions ar
 
 Telegram returns an error if the message is too old or the content is identical to what's already there. Check `res.ok` when using `await`.
 
-## Typical callback flow
-
-1. User taps inline button
-2. `Api.answerCallbackQuery(...)` — dismiss the spinner
-3. `Api.editMessageText(...)` — update the same message
-4. Optionally `Bot.runCommand(...)` — start a new flow
-
-That pattern keeps chats tidy. One message morphs instead of five new ones stacking up.
+---
 
 ## Reference
 
-Full parameter lists live in the Telegram docs:
+Full parameter lists in the Telegram docs:
 
 - [editMessageText](https://core.telegram.org/bots/api#editmessagetext)
 - [editMessageCaption](https://core.telegram.org/bots/api#editmessagecaption)
 - [editMessageReplyMarkup](https://core.telegram.org/bots/api#editmessagereplymarkup)
 - [deleteMessage](https://core.telegram.org/bots/api#deletemessage)
+
+Also see [Method Chaining](method-chaining.md) for shorthand after `await Api.sendMessage`.

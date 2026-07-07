@@ -1,8 +1,14 @@
 # Request Options
 
-All options can be passed as the second argument or inside a single options object with `url`.
+Every knob on an `HTTP` request lives in one options object — headers, body, timeout, redirects, proxies, callbacks. Pass it as the second argument, or fold everything (including `url`) into a single object.
 
-## Options reference
+Think of it as the request's personality settings. Most are optional. `url` is not.
+
+---
+
+## What options exist?
+
+Here's the full menu. Details for each section follow.
 
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -35,7 +41,7 @@ await HTTP.post("https://api.example.com/events", {
 })
 ```
 
-Strings and buffers are sent as-is. Objects are JSON-stringified.
+Strings and buffers are sent as-is. Objects are JSON-stringified. The platform handles `Content-Type` for you.
 
 ---
 
@@ -53,7 +59,7 @@ await HTTP.get("https://slow-api.example.com/data", {
 | Maximum | Your plan's script timeout (see [Limits](limits.md)) |
 | Default | Plan timeout if omitted |
 
-If the request exceeds the timeout, `res.ok` is `false` and `res.error.code` is `"TIMEOUT"`.
+If the request exceeds the timeout, `res.ok` is `false` and `res.error.code` is `"TIMEOUT"`. The API didn't hang up on you — you hung up on it.
 
 ---
 
@@ -137,12 +143,14 @@ Available as the [`tbl_options`](../globals/tbl_options.md) global in callback c
 
 ## Validation errors
 
-Invalid options (missing URL, bad proxy format, `maxRedirect` out of range) throw before the request is sent. These are caught by the `!` error handler if defined.
+Invalid options (missing URL, bad proxy format, `maxRedirect` out of range) throw **before** the request is sent. These are caught by the `!` error handler if defined.
 
 ```js
 // Throws: URL required
 HTTP.get({ timeout: 5000 })
 ```
+
+Catches problems early — better than discovering a typo mid-flight.
 
 ---
 
