@@ -1,278 +1,142 @@
-# ResourcesLib
+# ResourcesLib (v2)
 
-Coins, XP, health bars, leaderboard points — if it's a number that should stick around between command runs, **`Libs.ResourcesLib`** is your economy engine.
-
-Persistent numeric resources scoped to a user, chat, or your whole bot. Passive growth included. All methods are **synchronous** — no `await`.
+Economy engine — coins, XP, health, passive growth, transfers. Uses async [`db.bot`](../db-instance/bot.md). Access as **`Libs.ResourcesLibv2`**. **All resource methods need `await`.**
 
 ---
 
 ## What is it?
 
-`Libs.ResourcesLib` manages **persistent numeric resources** — coins, XP, health, points — scoped to a user, chat, or the whole bot. Supports passive growth over time.
+`Libs.ResourcesLibv2` manages persistent numeric resources scoped to a user, chat, or your whole bot. Passive growth over time included.
 
-Access: `Libs.ResourcesLib.<method>()`
+| Scope | Factory | Key pattern |
+| --- | --- | --- |
+| User | `userRes("gold")` | `ResourcesLib_user_{id}_gold` |
+| Chat | `chatRes("points")` | `ResourcesLib_chat_{id}_points` |
+| Global | `globalRes("pool")` | `ResourcesLib_global_global_pool` |
+| Other user | `anotherUserRes("gold", id)` | Same as user scope |
 
-Values persist via bot properties (`ResourcesLib_*` keys). Growth state is stored as JSON.
-
-| Scope | Who shares it |
-| --- | --- |
-| User | Just that one player |
-| Chat | Everyone in that group |
-| Global | Everyone who uses your bot |
-
-Uses `user.telegramid` and `chat.chatid` for the current user/chat scope.
+!!! info "Same keys as v1"
+    Storage keys match legacy `ResourcesLib_*` format but live on async `db.bot` instead of deprecated `Bot.getProperty`.
 
 ---
 
 ## How to use it
 
-The classic pattern — give coins, show balance:
-
 ```js
-let coins = Libs.ResourcesLib.userRes("coins")
-coins.add(50)
-Bot.sendMessage(chat.id, "Balance: " + coins.value())
+let gold = Libs.ResourcesLibv2.userRes("gold")
+await gold.add(50)
+let balance = await gold.value()
+Bot.sendMessage(chat.id, "Gold: " + balance)
 ```
-
-Every resource object gives you `.value()`, `.add()`, `.set()`, `.have()`, and `.remove()`. Growth is optional — add it when you want passive income, not when you're just counting visits.
-
-!!! tip "Globals"
-    `user` and `chat` define the default scope for `userRes()` and `chatRes()`. See [Global Variables](../globals/index.md).
 
 ---
 
-## Try it — beginner examples
+## Resource methods
 
-### New player setup
+| Method | Description |
+| --- | --- |
+| `value()` | Current value (applies growth) |
+| `peek()` | Raw stored value (fast, no growth) |
+| `preview()` | Simulated value after growth (no write) |
+| `set(n)` | Set value |
+| `add(n)` | Add (uses `db.bot.incr`) |
+| `have(n)` | Has enough? |
+| `remove(n)` | Remove if enough (throws if not) |
+| `removeAnyway(n)` | Force remove |
+| `spend(n)` | Returns true/false |
+| `tryRemove(n)` | `{ ok, removed, balance }` |
+| `reset()` | Set to 0 |
+| `ensureAtLeast(min)` | Floor value |
+| `fillTo(target)` | Add until target |
+| `setClamped(n, min, max)` | Set within bounds |
+| `format({ suffix, compact })` | `"1.2K gold"` |
+| `stats()` | Dashboard bundle (one mget) |
+| `transferTo(other, n)` | Transfer between resources |
+| `exchangeTo(other, { remove_amount, add_amount })` | Different rates |
+
+---
+
+## Growth
 
 ```js
-let gold = Libs.ResourcesLib.userRes("gold")
+let gold = Libs.ResourcesLibv2.userRes("gold")
+let g = Libs.ResourcesLibv2.growthFor(gold)
 
-if (gold.value() === 0) {
-  gold.set(100)
-  Bot.sendMessage(chat.id, "Welcome! Starting gold: 100")
-}
+await g.add({ value: 1, interval: 60, max: 1000 })           // +1 per minute
+await g.addPercent({ percent: 5, interval: 300 })             // +5% of base
+await g.addCompoundInterest({ percent: 2, interval: 3600 })   // compound
 
-gold.add(25)
-Bot.sendMessage(chat.id, "Gold: " + gold.value())
+await g.stop()
+await g.resume()
+let pending = await g.previewGain()
 ```
 
-### Spend if they can afford it
+Growth keys: `{propName}_growth` on `db.bot`.
+
+---
+
+## Module helpers
 
 ```js
-let gold = Libs.ResourcesLib.userRes("gold")
+// Load multiple resources in one mget
+let bag = await Libs.ResourcesLibv2.loadAll([gold, wood, energy], { withGrowth: true })
 
-if (gold.have(30)) {
-  gold.remove(30)
-  Bot.sendMessage(chat.id, "Purchased! Remaining: " + gold.value())
+// Crafting — check all, deduct in parallel
+let craft = await Libs.ResourcesLibv2.spendAll([
+  { res: gold, amount: 50 },
+  { res: wood, amount: 10 }
+])
+if (!craft.ok) Bot.sendMessage(chat.id, "Need " + craft.need + " " + craft.missing)
+```
+
+---
+
+## Examples
+
+### Shop purchase
+
+```js
+let gold = Libs.ResourcesLibv2.userRes("gold")
+if (await gold.spend(30)) {
+  Bot.sendMessage(chat.id, "Purchased! Balance: " + await gold.peek())
 } else {
-  Bot.sendMessage(chat.id, "Not enough gold. You have: " + gold.value())
+  Bot.sendMessage(chat.id, "Not enough gold.")
 }
 ```
 
-### Passive gold growth
+### Transfer between users
 
 ```js
-let gold = Libs.ResourcesLib.userRes("gold")
-Libs.ResourcesLib.growthFor(gold).add({
-  value: 1,       // +1 per interval
-  interval: 60,   // every 60 seconds
-  max: 1000       // cap at 1000
-})
-
-Bot.sendMessage(chat.id, "Gold: " + gold.value() + " (grows over time!)")
+let myGold = Libs.ResourcesLibv2.userRes("gold")
+let theirGold = Libs.ResourcesLibv2.anotherUserRes("gold", friendId)
+await myGold.transferTo(theirGold, 20)
 ```
 
-Growth is calculated when `.value()` is called — not on a background timer. No sneaky midnight cron jobs.
-
----
-
-## Creating resources
-
-| Method | Scope | Description |
-| --- | --- | --- |
-| `userRes(name)` | Current user | Per-user resource |
-| `chatRes(name)` | Current chat | Per-chat/group resource |
-| `globalRes(name)` | Entire bot | Bot-wide shared resource |
-| `anotherUserRes(name, telegramId)` | Specific user | Another user's resource |
-| `anotherChatRes(name, chatId)` | Specific chat | Another chat's resource |
-| `growthFor(resource)` | — | Growth controller for a resource |
+### Player HUD
 
 ```js
-let myCoins = Libs.ResourcesLib.userRes("coins")
-let groupScore = Libs.ResourcesLib.chatRes("score")
-let totalVisits = Libs.ResourcesLib.globalRes("visits")
-let friendGold = Libs.ResourcesLib.anotherUserRes("gold", 123456789)
+let s = await gold.stats()
+Bot.sendMessage(chat.id,
+  await gold.format({ suffix: "gold", compact: true }) +
+  "\nPending: +" + s.pending +
+  "\nNext tick: " + Math.ceil(s.growth?.nextTickIn || 0) + "s"
+)
 ```
 
 ---
 
-## Basic operations
+## Legacy `Libs.ResourcesLib`
 
-Every resource object supports:
-
-| Method | Description | Throws |
-| --- | --- | --- |
-| `.value()` | Current value (includes growth calculation) | — |
-| `.set(amount)` | Set to exact number | if not a number |
-| `.add(amount)` | Add to current value | if not a number |
-| `.have(amount)` | `true` if value ≥ amount | — |
-| `.remove(amount)` | Subtract if enough available | if insufficient |
-| `.removeAnyway(amount)` | Subtract regardless of balance | if not a number |
-
-String values passed to `.set()` / `.add()` are auto-converted to numbers. Non-numeric values throw `ResLib: value must be number only`.
-
----
-
-## Transfers
-
-Move resources between resource objects of the **same name**:
-
-| Method | Description |
-| --- | --- |
-| `.transferTo(other, amount)` | Move if enough balance |
-| `.transferToAnyway(other, amount)` | Force move |
-| `.takeFromAnother(other, amount)` | Pull from another into this |
-| `.takeFromAnotherAnyway(other, amount)` | Force pull |
-| `.exchangeTo(other, options)` | Exchange at a custom rate |
+The original sync `Libs.ResourcesLib` used deprecated `Bot.getProperty`. It is **deprecated**. Migrate to `Libs.ResourcesLibv2` and add `await` to every resource call.
 
 ```js
-let myGold = Libs.ResourcesLib.userRes("gold")
-let friendGold = Libs.ResourcesLib.anotherUserRes("gold", friendId)
+// Old (deprecated)
+gold.add(10)
+gold.value()
 
-myGold.transferTo(friendGold, 20)
-
-// Exchange: 1 gold → 100 silver
-let silver = Libs.ResourcesLib.userRes("silver")
-gold.exchangeTo(silver, { remove_amount: 1, add_amount: 100 })
+// New
+await gold.add(10)
+await gold.value()
 ```
 
-Transfer between different resource names throws `ResLib: can not transfer different resources`.
-
----
-
-## Passive growth
-
-Attach automatic growth to any resource with `growthFor()`:
-
-```js
-let gold = Libs.ResourcesLib.userRes("gold")
-let growth = Libs.ResourcesLib.growthFor(gold)
-```
-
-### Growth types
-
-**Simple** — fixed amount per interval:
-
-```js
-Libs.ResourcesLib.growthFor(gold).add({
-  value: 1,       // +1 per interval
-  interval: 60,   // every 60 seconds
-  max: 1000       // cap at 1000
-})
-```
-
-**Percent** — percentage of base value per interval:
-
-```js
-Libs.ResourcesLib.growthFor(gold).addPercent({
-  percent: 5,     // 5% of base per interval
-  interval: 300,  // every 5 minutes
-  min: 0,
-  max: 5000
-})
-```
-
-**Compound interest** — exponential growth:
-
-```js
-Libs.ResourcesLib.growthFor(gold).addCompoundInterest({
-  percent: 2,                  // 2% compound
-  interval: 3600,            // every hour
-  max_iterations_count: 100  // stop after 100 cycles
-})
-```
-
-### Growth management
-
-| Method | Description |
-| --- | --- |
-| `.isEnabled()` | Whether growth is active |
-| `.progress()` | Current cycle progress 0–100% |
-| `.willCompleteAfter()` | Seconds until next growth tick |
-| `.stop()` | Disable growth |
-
-```js
-let g = Libs.ResourcesLib.growthFor(gold)
-
-if (g.isEnabled()) {
-  Bot.sendMessage(chat.id, "Next tick in " + g.willCompleteAfter() + "s")
-}
-
-g.stop()  // pause passive income
-```
-
----
-
-## Growth options
-
-| Option | Used in | Description |
-| --- | --- | --- |
-| `value` | `.add()` | Fixed increment per interval |
-| `percent` | `.addPercent()`, `.addCompoundInterest()` | Percentage rate |
-| `interval` | All types | Seconds between growth ticks |
-| `min` | Percent | Minimum value floor |
-| `max` | Simple, percent | Maximum value ceiling |
-| `max_iterations_count` | Compound | Max number of growth cycles |
-
----
-
-## Full example — game economy
-
-```js
-let health = Libs.ResourcesLib.userRes("health")
-let gold = Libs.ResourcesLib.userRes("gold")
-
-// New player setup
-if (gold.value() === 0) {
-  gold.set(100)
-  health.set(100)
-
-  Libs.ResourcesLib.growthFor(gold).add({ value: 1, interval: 60, max: 1000 })
-  Libs.ResourcesLib.growthFor(health).addPercent({ percent: 2, interval: 30, max: 100 })
-}
-
-// Combat
-function takeDamage(amount) {
-  health.removeAnyway(amount)
-  if (health.value() <= 0) {
-    health.set(50)
-    gold.remove(Math.floor(gold.value() * 0.1))
-    Bot.sendMessage(chat.id, "You died! Lost 10% gold. Respawned with 50 HP.")
-  }
-}
-```
-
----
-
-## Scopes compared
-
-| Scope | Method | Shared between |
-| --- | --- | --- |
-| User | `userRes("coins")` | Only that user |
-| Chat | `chatRes("points")` | All members of that chat |
-| Global | `globalRes("visits")` | All users of this bot |
-| Other user | `anotherUserRes("coins", id)` | That specific user |
-| Other chat | `anotherChatRes("score", id)` | That specific chat |
-
-Global resources are **per-bot**, not shared across different bots.
-
----
-
-## Notes
-
-- All methods are **sync** — no `await`
-- `.value()` triggers growth calculation if growth is enabled
-- Resource names are arbitrary strings — created automatically on first use
-- Stored internally via `Bot.getProperty` / `Bot.setProperty`
-- For new projects, consider [`db.user`](../db-instance/user.md) / [`db.bot`](../db-instance/bot.md) for complex non-numeric data
+[Database overview](../db-instance/index.md) · [Advanced ops (incr/push)](../db-instance/advanced-operations.md)

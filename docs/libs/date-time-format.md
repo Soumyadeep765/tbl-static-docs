@@ -102,9 +102,14 @@ Libs.dateTimeFormat.format(new Date(), "fullDate")
 | `"mediumDate"` | `Jul 7, 2025` |
 | `"longDate"` | `July 7, 2025` |
 | `"fullDate"` | `Monday, July 7, 2025` |
+| `"shortTime"` | `2:30 PM` |
+| `"mediumTime"` | `2:30:45 PM` |
+| `"longTime"` | `2:30:45 PM EST` |
 | `"isoDate"` | `2025-07-07` |
+| `"isoTime"` | `14:30:45` |
 | `"isoDateTime"` | `2025-07-07T14:30:45` |
 | `"isoUtcDateTime"` | UTC ISO with `Z` suffix |
+| `"custom"` | `2025-07-07 14:30:45 EST` |
 
 ### `getCurrentDate(mask?, utc?, locale?)`
 
@@ -209,9 +214,67 @@ let date = Libs.dateTimeFormat.fromUnixTimestamp(ts)
 
 ---
 
+## Localization
+
+Built-in locales: **`en`** (English) and **`hi`** (Hindi). Pass `locale` to `format()` and `getCurrentDate()`.
+
+### `registerLocale(localeCode, localeData)`
+
+Add or update a locale at runtime. Returns the library object (chainable).
+
+| Field | Requirement |
+| --- | --- |
+| `dayNames` | Exactly 7 short day names (Sun–Sat) |
+| `monthNames` | Exactly 12 short month names (Jan–Dec) |
+
+Full weekday and month names (`dddd`, `mmmm`) are auto-generated from the short names.
+
+```js
+Libs.dateTimeFormat.registerLocale("es", {
+  dayNames: ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"],
+  monthNames: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
+})
+
+Libs.dateTimeFormat.format(new Date(), "fullDate", false, "es")
+// "lunes, abril 7, 2025"
+```
+
+### `getLocale(localeCode)`
+
+Returns locale data object or `null` if not registered.
+
+### `getAvailableLocales()`
+
+Returns an array of registered locale codes (e.g. `["en", "hi", "es"]`).
+
+---
+
+## Relative time
+
+### `toRelativeTime(date, now?, locale?)`
+
+Human-readable relative time using `Intl.RelativeTimeFormat`. Falls back to English phrases if the locale is unsupported.
+
+```js
+Libs.dateTimeFormat.toRelativeTime(new Date(Date.now() - 3600000))
+// "1 hour ago"
+
+Libs.dateTimeFormat.toRelativeTime(new Date(Date.now() + 86400000), new Date(), "hi")
+// Hindi relative string when supported
+```
+
+| Parameter | Default | Description |
+| --- | --- | --- |
+| `date` | — | Target date |
+| `now` | `new Date()` | Reference point |
+| `locale` | `"en"` | BCP 47 locale code |
+
+---
+
 ## Notes
 
 - All methods are **sync** — no `await`
 - Invalid dates in `format()` throw `SyntaxError: invalid date`
 - Use `isValidDate()` before parsing user-provided date strings
 - For UTC-sensitive logic, pass `utc: true` to `format()` / `getCurrentDate()`
+- Use `toRelativeTime()` for "2 hours ago" style UI; use `format()` for fixed calendar dates

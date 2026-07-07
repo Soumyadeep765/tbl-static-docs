@@ -298,8 +298,10 @@ nav:
   - TBL Libraries:
       - Overview: libs/index.md
       - ResourcesLib: libs/resourceslib.md
-      - dateTimeFormat: libs/date-time-format.md
-      - MCL (Membership Checker): libs/mcl.md
-      - random: libs/random.md
       - refLib: libs/reflib.md
+      - translate: libs/translate.md
+      - cooldown: libs/cooldown.md
+      - MCL (Membership Checker): libs/mcl.md
+      - dateTimeFormat: libs/date-time-format.md
+      - random: libs/random.md
       - tgutil: libs/tgutil.md

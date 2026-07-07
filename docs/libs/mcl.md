@@ -88,8 +88,9 @@ if (!ok) {
 | `quick(userId, channels)` | Yes | `true` if all channels joined |
 | `getLeftChannels(userId, channels)` | Yes | Channels user has left |
 | `getInvalidChannels(userId, channels)` | Yes | Invalid or inaccessible channels |
-| `summaryText(userId, channels)` | Yes | Human-readable status message |
-| `getBtn(channels)` | No | Inline keyboard join buttons |
+| `summaryText(userId, channels, options?)` | Yes | Human-readable status message |
+| `getStats(userId, channels)` | Yes | Numeric summary (counts, percentages) |
+| `getBtn(channels, options?)` | No | Inline keyboard join buttons |
 
 ---
 
@@ -108,28 +109,24 @@ Main method — returns a detailed result object.
 
 ```js
 {
-  all_joined: true,
-  valid: ["@Channel1", "@Channel2"],
+  allJoined: true,
+  joined: ["@Channel1", "@Channel2"],
   left: [],
-  invalid: [],
-  details: [
-    { channel: "@Channel1", member: { /* getChatMember result */ } }
-  ]
+  invalid: []
 }
 ```
 
 | Field | Description |
 | --- | --- |
-| `all_joined` | `true` only if user joined every valid channel |
-| `valid` | Channels where membership was confirmed |
+| `allJoined` | `true` only if user joined every valid channel |
+| `joined` | Channels where membership was confirmed |
 | `left` | Channels where status is `left` or `kicked` |
-| `invalid` | Channels the bot cannot access or that don't exist |
-| `details` | Per-channel `getChatMember` response |
+| `invalid` | Objects `{ channel, reason }` for inaccessible channels |
 
 ```js
 let result = await Libs.mcl.check(user.id, ["@NewsChannel", "@CommunityGroup"])
 
-if (!result.all_joined) {
+if (!result.allJoined) {
   Bot.sendMessage(chat.id, "Please join: " + result.left.join(", "))
 }
 ```
@@ -138,7 +135,7 @@ if (!result.all_joined) {
 
 ## `quick(userId, channels)`
 
-Returns `true` or `false` — shortcut for `check().all_joined`.
+Returns `true` or `false` — shortcut for `check().allJoined`.
 
 ```js
 if (await Libs.mcl.quick(user.id, ["@Chan1", "@Chan2"])) {
@@ -171,26 +168,56 @@ let bad = await Libs.mcl.getInvalidChannels(user.id, ["@FakeChannel"])
 
 ---
 
-## `summaryText(userId, channels)`
+## `summaryText(userId, channels, options?)`
 
-Ready-to-send status message:
+Ready-to-send status message. Customize headers via `options`:
+
+| Option | Default |
+| --- | --- |
+| `joinedMessage` | `"You have joined all required channels."` |
+| `leftHeader` | `"Please join the following channels:"` |
+| `invalidHeader` | `"Inaccessible channels:"` |
+| `separator` | `"\n\n"` |
 
 ```js
 let text = await Libs.mcl.summaryText(user.id, ["@Chan1", "@Chan2"])
-// "✅ You have joined all required channels."
-// or "🚫 Please join the required channels:\n\n📤 Left:\n• @Chan2"
+// "You have joined all required channels."
+// or multi-line list of left/invalid channels
 ```
 
 ---
 
-## `getBtn(channels)`
+## `getStats(userId, channels)`
+
+Numeric breakdown for dashboards or admin panels:
+
+```js
+let stats = await Libs.mcl.getStats(user.id, channels)
+// {
+//   total: 3,
+//   joinedCount: 2,
+//   leftCount: 1,
+//   invalidCount: 0,
+//   percentJoined: 66.666...,
+//   allJoined: false,
+//   hasIssues: true
+// }
+```
+
+---
+
+## `getBtn(channels, options?)`
 
 Generates inline keyboard rows for join links. **Sync** — no `await`.
 
-Only works with `@username` strings (not numeric IDs):
+Only works with public `@username` strings (numeric IDs and private channels are skipped).
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `buttonPrefix` | `"Join"` | Text before `@channel` on each button |
 
 ```js
-let buttons = Libs.mcl.getBtn(["@Chan1", "@Chan2"])
+let buttons = Libs.mcl.getBtn(["@Chan1", "@Chan2"], { buttonPrefix: "📢 Join" })
 // [
 //   [{ text: "📢 Join @Chan1", url: "https://t.me/Chan1" }],
 //   [{ text: "📢 Join @Chan2", url: "https://t.me/Chan2" }]
@@ -211,7 +238,7 @@ Api.sendMessage({
 let channels = ["@MyChannel", "@MyGroup"]
 let result = await Libs.mcl.check(user.id, channels)
 
-if (result.all_joined) {
+if (result.allJoined) {
   Bot.run("/mainMenu")
   return
 }

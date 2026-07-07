@@ -1,241 +1,152 @@
 # refLib
 
-Want users to invite friends and track who brought whom? **`Libs.refLib`** builds referral links, detects when someone arrives via a link, and keeps a leaderboard — without you hand-rolling deep-link parsing.
-
-All methods are **synchronous**. No `await`.
+Referral engine — build invite links, track who brought whom, maintain a leaderboard. Uses async [`db.user`](../db-instance/user.md) and [`db.bot`](../db-instance/bot.md). **All methods need `await`.**
 
 ---
 
 ## What is it?
 
-`Libs.refLib` builds referral links, tracks who invited whom, and maintains a leaderboard.
+`Libs.refLib` handles the full referral lifecycle:
 
-Access: `Libs.refLib.<method>()`
+1. User shares `https://t.me/YourBot?start=ref123456`
+2. New user opens link → `/start ref123456`
+3. `track()` parses `params`, attributes the referral, updates counts
+4. Leaderboard cache updates automatically
 
-The flow in plain English:
+| Feature | Implementation |
+| --- | --- |
+| Referral count | `db.user.incr` (atomic) |
+| Referral list | `db.user.push` (append-only) |
+| Leaderboard | Bounded top-50 cache on `db.bot` |
+| Profile cache | `db.bot` on `register()` |
 
-1. User shares `https://t.me/YourBot?start=user123456`
-2. New user opens the link → `/start user123456`
-3. `track()` detects the deep link via `params` and records the referral
-4. Referrer's count and leaderboard update automatically
-
-Referral data is stored in user and bot properties (`REFLIB_*` keys).
+!!! warning "Storage keys changed"
+    v1 used `REFLIB_*` (deprecated `Bot`/`User` properties). v1.0.0 uses `rfl:*` keys on async `db`. Data does not auto-migrate.
 
 ---
 
 ## How to use it
 
-**Step 1:** Call `track()` once per session — typically in your `/start` command or master script:
+**Step 1** — Track in `/start`:
 
 ```js
-Libs.refLib.track({
-  onAttracted: (referrer) => {
+let result = await Libs.refLib.track({
+  prefixes: ["ref", "vip"],
+  onJoin: async ({ referrer, count }) => {
     Bot.sendMessage(chat.id, "Welcome! Referred by " + referrer.first_name)
-  }
+    Api.sendMessage({
+      chat_id: referrer.id,
+      text: user.first_name + " joined! You now have " + count + " referrals."
+    })
+  },
+  onSelf: async () => Bot.sendMessage(chat.id, "That's your own link!"),
+  onRepeat: async () => Bot.sendMessage(chat.id, "Already registered."),
+  onOrganic: async () => {} // normal /start, no code
 })
 ```
 
-**Step 2:** Give users their link:
+`result.type` is `"join"` | `"self"` | `"repeat"` | `"organic"`.
+
+**Step 2** — Give users their link (in `/mylink`):
 
 ```js
-let link = Libs.refLib.getLink()
-Bot.sendMessage(chat.id, "Share this: " + link)
+let url = await Libs.refLib.register({ prefix: "ref" })
+Bot.sendMessage(chat.id, "Share: " + url)
 ```
 
-Without `track()`, deep links won't be detected. The library can't read minds — only `params`.
-
-!!! tip "Globals"
-    `params` holds the text after `/start` (e.g. `/start user123` → `params` is `"user123"`). See [Global Variables](../globals/index.md).
+`register()` caches profile + saves prefix. `link()` builds the URL string with zero db I/O.
 
 ---
 
-## Try it — beginner examples
+## Core methods
+
+| Method | Returns | Description |
+| --- | --- | --- |
+| `track(handlers)` | `{ type, ... }` | Process current update + fire events |
+| `configure({ prefixes })` | void | Set default link prefixes (skip db read) |
+| `link({ bot, prefix })` | string | Build URL (sync, no db) |
+| `register({ prefix, bot })` | string | Cache profile + register prefix + return URL |
+| `count(userId?)` | number | Referral count |
+| `referrer()` | object\|null | Who referred current user |
+| `isReferred()` | boolean | Has a referrer |
+| `list(userId?, { limit })` | array | Referral list |
+| `leaderboard(top?)` | array | `[{ userId, count, rank }]` |
+| `rank(userId?)` | number | Leaderboard rank (0 = unranked) |
+| `stats(userId?)` | object | Dashboard bundle (one mget) |
+| `addCount(userId, amount?)` | number | Manual increment (admin/rewards) |
+
+### Legacy aliases (still work)
+
+| Old | New |
+| --- | --- |
+| `getLink()` | `register()` |
+| `getRefCount()` | `count()` |
+| `getAttractedBy()` | `referrer()` |
+| `getRefList()` | `list()` |
+| `getTopList()` | `leaderboardMap()` |
+| `onAttracted` | `onJoin` |
+| `onTouchOwnLink` | `onSelf` |
+| `onAlreadyAttracted` | `onRepeat` |
+
+---
+
+## Examples
 
 ### /mylink command
 
 ```js
-// Command: /mylink
+let s = await Libs.refLib.stats()
 Bot.sendMessage(chat.id,
-  "Your referral link:\n" + Libs.refLib.getLink() +
-  "\n\nReferrals: " + Libs.refLib.getRefCount()
+  "Referrals: " + s.count + "\n" +
+  "Rank: " + (s.rank || "unranked") + "\n" +
+  "Link: " + s.link
 )
 ```
 
-### Reward the referrer
+### Leaderboard
 
 ```js
-Libs.refLib.track({
-  onAttracted: (referrer) => {
-    let count = Libs.refLib.getRefCount(referrer.id)
-    let reward = 10 + (count % 10 === 0 ? 50 : 0)
-
-    Api.sendMessage({
-      chat_id: referrer.id,
-      text: user.first_name + " joined via your link! +" + reward + " points (total: " + count + ")"
-    })
-  }
-})
+let top = await Libs.refLib.leaderboard(10)
+let text = top.map(r => r.rank + ". User " + r.userId + ": " + r.count).join("\n")
+Bot.sendMessage(chat.id, "Top referrers:\n" + text)
 ```
 
-### Leaderboard command
+### Reward on join
 
 ```js
-// Command: /toprefs
-let leaders = Libs.refLib.getTopList()
-let lines = Object.entries(leaders)
-  .sort((a, b) => b[1] - a[1])
-  .slice(0, 10)
-  .map(([id, count], i) => (i + 1) + ". User " + id + ": " + count)
-
-Bot.sendMessage(chat.id, "Top referrers:\n" + lines.join("\n"))
-```
-
----
-
-## Setup — `track(options)`
-
-Initialize tracking. Call once per session when a user interacts with the bot.
-
-```js
-Libs.refLib.track({
-  onAttracted: (referrer) => {
-    // New user arrived via someone's link
-    Bot.sendMessage(chat.id, "Referred by " + referrer.first_name)
-  },
-
-  onTouchOwnLink: () => {
-    // User clicked their own referral link
-    Bot.sendMessage(chat.id, "That's your own link — share it with friends!")
-  },
-
-  onAlreadyAttracted: () => {
-    // User already has a referrer
-    let ref = Libs.refLib.getAttractedBy()
-    if (ref) {
-      Bot.sendMessage(chat.id, "You were invited by " + ref.first_name)
-    }
-  }
-})
-```
-
-| Event | When it fires |
-| --- | --- |
-| `onAttracted(referrer)` | New user joined via a valid referral link |
-| `onTouchOwnLink()` | User opened their own referral link |
-| `onAlreadyAttracted()` | User already attributed to a referrer |
-
-`track()` only processes deep links when `message` starts with `/start` and `params` contains the referral prefix.
-
----
-
-## Generating links — `getLink(botName?, prefix?)`
-
-| Param | Default | Description |
-| --- | --- | --- |
-| `botName` | `bot.name` | Bot username for the `t.me` URL |
-| `prefix` | `"user"` | Start parameter prefix |
-
-```js
-// Default: https://t.me/MyBot?start=user5723455420
-let link = Libs.refLib.getLink()
-
-// Custom bot name and prefix
-let promo = Libs.refLib.getLink("MyBot", "promo")
-// https://t.me/MyBot?start=promo5723455420
-```
-
-Also stores referrer info in bot properties so attracted users can be resolved later.
-
----
-
-## Data methods
-
-### `getRefCount(userId?)`
-
-Referral count for a user. Defaults to current user.
-
-```js
-let myCount = Libs.refLib.getRefCount()
-let theirCount = Libs.refLib.getRefCount(123456789)
-```
-
-### `getRefList(userId?)`
-
-Array of referral objects:
-
-```js
-let list = Libs.refLib.getRefList()
-// [{ id, username, first_name, last_name, date }, ...]
-```
-
-### `getAttractedBy()`
-
-Who referred the current user — or `null`.
-
-```js
-let referrer = Libs.refLib.getAttractedBy()
-if (referrer) {
-  Bot.sendMessage(chat.id, "Invited by " + referrer.first_name)
-}
-```
-
-### `getTopList()`
-
-All users' referral counts as an object `{ userId: count, ... }`.
-
-```js
-let leaders = Libs.refLib.getTopList()
-let top = Object.entries(leaders)
-  .sort((a, b) => b[1] - a[1])
-  .slice(0, 10)
-```
-
----
-
-## Method reference
-
-| Method | Parameters | Returns |
-| --- | --- | --- |
-| `track(options)` | event handlers object | `void` |
-| `getLink(botName?, prefix?)` | optional bot name, prefix | referral URL string |
-| `getRefCount(userId?)` | optional user ID | `number` |
-| `getRefList(userId?)` | optional user ID | array of referral objects |
-| `getAttractedBy()` | — | referrer object or `null` |
-| `getTopList()` | — | `{ userId: count }` object |
-
----
-
-## Master script pattern
-
-```js
-// In your @ master script or /start command
-Libs.refLib.track({
-  onAttracted: (referrer) => {
-    Bot.sendMessage(chat.id, "Welcome! Invited by " + referrer.first_name)
+await Libs.refLib.track({
+  onJoin: async ({ referrer, count }) => {
+    let gold = Libs.ResourcesLibv2.userRes("gold")
+    // reward referrer via anotherUserRes
+    let refGold = Libs.ResourcesLibv2.anotherUserRes("gold", referrer.telegramid || referrer.id)
+    await refGold.add(10)
+    if (count % 10 === 0) await refGold.add(50) // milestone bonus
   }
 })
 ```
 
 ---
 
-## Storage
+## Storage keys
 
-refLib uses internal property keys prefixed with `REFLIB_`:
-
-| Key | Scope | Content |
+| Key | Scope | Purpose |
 | --- | --- | --- |
-| `REFLIB_refList` | Per user | Array of referred users |
-| `REFLIB_refsCount` | Per user | Referral count |
-| `REFLIB_attracted_by_user` | Per user | Referrer info |
-| `REFLIB_topList` | Bot-wide | Leaderboard |
-| `REFLIB_refLinkPrefix` | Bot-wide | Registered link prefixes |
+| `rfl:ct` | `db.user` | Referral count (incr) |
+| `rfl:by` | `db.user` | Referrer snapshot |
+| `rfl:ls` | `db.user` | Referral list (push) |
+| `rfl:og` | `db.user` | Organic user flag |
+| `rfl:top` | `db.bot` | Top 50 leaderboard |
+| `rfl:px` | `db.bot` | Registered link prefixes |
+| `rfl:lk:{id}` | `db.bot` | Profile cache |
 
 ---
 
-## Notes
+## Important notes
 
-- Method name is `getLink()` — not `getRefLink()`
-- `track()` must be called for deep-link detection to work
-- Deep links use the `params` global (e.g. `/start user123` → `params` is `"user123"`)
-- A user can only be attributed to one referrer
-- All methods are sync — no `await`
+- Always `await` — every method is async
+- Call `track()` in `/start` (or master script) so `params` is parsed
+- Use `register()` in `/mylink`, not on every message
+- `configure({ prefixes: ["ref"] })` avoids a db read on the hot path
+- `db` rate limit: 10 calls/second per command — attribution uses ~5 calls
+
+[Database overview](../db-instance/index.md)
