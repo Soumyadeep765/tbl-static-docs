@@ -1,10 +1,30 @@
 # Inline Keyboards
 
-Inline buttons sit *inside* the message bubble — not in the keyboard area at the bottom of the screen. Users tap them; Telegram sends a callback query to your bot; you respond with Api.
+Buttons *inside* the message bubble — not the chunky reply keyboard at the bottom of the screen. Users tap them; Telegram sends a callback query; you respond with `Api`.
 
-Reply keyboards (the `Help, About` style from the tutorials) are different. Those send plain text. Inline buttons send structured callback data.
+Reply keyboards (`"Help, About"`) send plain text when tapped. Inline buttons send structured callback data. Different beasts. Don't mix them up at parties.
 
-## A minimal keyboard
+---
+
+## What are inline keyboards?
+
+An `inline_keyboard` is a grid of buttons attached to a message. Two main button types:
+
+| Button type | User sees | Your bot receives |
+| --- | --- | --- |
+| `url` | Opens browser / in-app view | Nothing |
+| `callback_data` | Stays in chat | Callback query update |
+
+Mix them freely in the same keyboard.
+
+!!! tip "New to TBL?"
+    `Bot`, `chat`, and `user` are globals available in every command. Callback handling tutorial: [Handling Callbacks](../getting-started-with-tbl/handling-callbacks.md).
+
+---
+
+## How to use it
+
+### A minimal keyboard
 
 ```js
 Api.sendMessage({
@@ -18,11 +38,11 @@ Api.sendMessage({
 })
 ```
 
-URL buttons open a link. `callback_data` buttons fire a callback query — you'll handle that in a command triggered by the callback.
+URL buttons open a link. `callback_data` buttons fire a callback query — handle that in a command triggered by the callback.
 
-## Layout
+### Layout
 
-Each inner array is a row. Buttons in the same row sit side by side:
+Each inner array is a **row**. Buttons in the same row sit side by side:
 
 ```js
 reply_markup: {
@@ -33,22 +53,39 @@ reply_markup: {
 }
 ```
 
-Two buttons on the first row, one full-width button below.
+Two buttons on the first row, one full-width button below. Tetris for UX designers.
 
-## Answering callbacks
+---
 
-When someone taps a callback button, Telegram expects a response — even if it's just "ok, I got it." Without `answerCallbackQuery`, the client shows a loading spinner on the button.
+## Try it — copy-paste examples
+
+### Yes / No prompt
+
+```js
+Api.sendMessage({
+  text: "Delete your account?",
+  reply_markup: {
+    inline_keyboard: [
+      [{ text: "Yes, delete", callback_data: "confirm_delete" }, { text: "Cancel", callback_data: "cancel" }]
+    ]
+  }
+})
+```
+
+### Answer the callback (dismiss the spinner)
+
+When someone taps a callback button, Telegram expects a response — even if it's just "ok, I got it." Without `answerCallbackQuery`, the client shows a loading spinner forever. Rude.
 
 ```js
 Api.answerCallbackQuery({
-  callback_query_id: update.callback_query.id, // or, request.id 
+  callback_query_id: update.callback_query.id,
   text: "Saved."
 })
 ```
 
 The optional `text` pops a small toast at the top of the chat. Keep it short.
 
-## Updating the message they tapped
+### Update the message they tapped
 
 Often you want to change the message instead of sending a new one:
 
@@ -60,23 +97,27 @@ Api.editMessageText({
 })
 ```
 
-Or swap the keyboard while leaving the text alone — `editMessageReplyMarkup`. [Editing Messages](editing-messages.md) walks through both.
+Or swap the keyboard while leaving text alone — `editMessageReplyMarkup`. [Editing Messages](editing-messages.md) walks through both.
+
+---
 
 ## callback_data limits
 
-Telegram caps `callback_data` at 64 bytes. Don't stash JSON in there. Store an ID or short token, look up the rest in [User storage](../user-instance/basics.md) or [Bot storage](../bot-instance/storing-data.md).
+Telegram caps `callback_data` at **64 bytes**. Don't stash JSON in there. Store an ID or short token, look up the rest in [`db.user`](../db-instance/user.md).
 
-## URL vs callback
+```js
+// Good — short token
+callback_data: "help"
 
-| Button type | User sees | Your bot receives |
-| --- | --- | --- |
-| `url` | Opens browser / in-app view | Nothing |
-| `callback_data` | Stays in chat | Callback query update |
+// Bad — won't fit
+callback_data: JSON.stringify({ userId: 123, action: "delete", reason: "..." })
+```
 
-Mix them freely in the same keyboard.
+---
 
 ## Where to go next
 
+- [Handling Callbacks](../getting-started-with-tbl/handling-callbacks.md) — full callback flow tutorial
 - [Editing Messages](editing-messages.md) — change text and keyboards after send
 - [Callbacks](callbacks.md) — route callback handling through `on_run`
 - [Method Chaining](method-chaining.md) — if you sent the message with `await Api.sendMessage`

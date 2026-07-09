@@ -1,40 +1,97 @@
 # UUID
 
-UUID is used to generate **unique identifiers**.
+IDs so unique, collision odds are basically science fiction.
 
-It is useful for:
+## What is it?
 
-- Unique keys
-- Transaction IDs
-- Session identifiers
-- Request or reference IDs
+**UUID** generates universally unique identifiers — those long `550e8400-e29b-41d4-a716-446655440000` strings you see everywhere. Use them for session IDs, order references, file keys, or anywhere "probably unique" isn't good enough.
 
-UUID functionality is available through the `modules` object.
+Access it as `modules.UUID`.
 
-## Generating a UUID (v4)
+---
+
+## How to use
+
+Generate a random UUID:
 
 ```js
-const id = modules.UUID.uuidv4()
+let id = modules.UUID.uuidv4()
+// "550e8400-e29b-41d4-a716-446655440000"
 ```
 
-This generates a random UUID (version 4).
+Both methods are **synchronous** — no `await` needed.
 
-## Example Output
+---
 
+## Methods
+
+| Method | Description |
+| --- | --- |
+| `uuidv4()` | Random UUID (most common) |
+| `uuidv6()` | Time-ordered UUID (sortable by creation time) |
+
+---
+
+## uuidv4
+
+The standard choice — random, collision-resistant:
+
+```js
+let sessionId = modules.UUID.uuidv4()
+db.user.set("session", sessionId)
 ```
-id → "550e8400-e29b-41d4-a716-446655440000"
+
+---
+
+## uuidv6
+
+Time-ordered — newer IDs sort after older ones lexicographically. Handy for ordered records:
+
+```js
+let recordId = modules.UUID.uuidv6()
+// "018e1234-5678-7890-abcd-ef1234567890"
 ```
 
-Each generated value is globally unique.
+---
+
+## Try it
+
+### Short order reference
+
+[Bot](../bot-instance/index.md) sends to [chat](../globals/chat.md):
+
+```js
+let ref = modules.UUID.uuidv4().slice(0, 8).toUpperCase()
+Bot.sendMessage(chat.id, "Your order reference: #" + ref)
+```
+
+### Unique file key
+
+Tie an upload to [user](../globals/user.md) in [db](../db-instance/index.md):
+
+```js
+let fileKey = modules.UUID.uuidv4() + ".json"
+db.bot.set("uploads/" + fileKey, { user: user.id, data: params })
+Bot.sendMessage(chat.id, "File saved as " + fileKey)
+```
+
+### Ordered event log
+
+```js
+let eventId = modules.UUID.uuidv6()
+db.bot.set("events/" + eventId, {
+  type: "signup",
+  user: user.id,
+  at: Date.now()
+})
+```
+
+---
 
 ## Notes
 
-- UUIDs are collision-resistant
-- Safe to use for identifiers across systems
-- Does not require any configuration
-
-## Official Documentation
-
-[UUID Docs]
-
-[UUID Docs]: https://www.npmjs.com/package/uuid
+- **Sync** — no `await` needed
+- Collision-resistant for practical bot use
+- No configuration required
+- For short random strings (promo codes, PINs), see [randomstring](randomstring.md)
+- Official package: [uuid on npm](https://www.npmjs.com/package/uuid)

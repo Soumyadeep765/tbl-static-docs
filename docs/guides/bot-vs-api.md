@@ -4,11 +4,15 @@ You'll see both `Bot` and `Api` in almost every TBL project. They overlap just e
 
 If you haven't read them yet, start with the [Bot](../bot-instance/index.md) and [Api](../api-instance/index.md) overviews. This page compares them side by side. For built-in context (`user`, `chat`, `update`, …), see [Global Variables](../globals/index.md).
 
+---
+
 ## The short version
 
 **Bot** runs your bot. **Api** talks to Telegram.
 
 When a user taps a button and you want to jump them into a checkout flow, that's `Bot.runCommand()`. When you need to edit the message they tapped, swap the inline keyboard, or answer a callback within Telegram's UI rules, that's `Api`.
+
+---
 
 ## A concrete example
 
@@ -42,16 +46,20 @@ Bot.runCommand("/help")
 
 Bot for navigation. Api for the Telegram interaction around it.
 
+---
+
 ## When Bot is the right call
 
 Reach for **Bot** when you're orchestrating:
 
 - Running another command (`Bot.runCommand`)
 - Sending straightforward messages without touching Telegram's deeper options
-- Reading or writing [bot-level storage](../bot-instance/storing-data.md)
+- Reading or writing [bot-level storage](../bot-instance/bot-properties.md)
 - Listing users who've talked to your bot
 
 Bot methods are shorter because TeleBotHost already knows the context. Less typing, fewer ways to pass a wrong `chat_id`.
+
+---
 
 ## When Api is the right call
 
@@ -64,16 +72,31 @@ Reach for **Api** when Telegram's API is the product:
 
 Api gives you the full parameter set. That power comes with responsibility — you're closer to raw Telegram behavior, including its error codes.
 
+---
+
 ## Case sensitivity
 
 Both objects are case-sensitive. `Bot.runCommand` works. `Bot.runcommand` does not.
 
 The [msg instance](../msg-instance/index.md) has its own naming rules — check that page if you're mixing `msg` methods with Bot and Api in the same command.
 
+---
+
 ## Still not sure?
 
 Ask yourself: *Am I changing what Telegram displays, or what my bot does internally?*
 
-Display → Api. Internal flow → Bot.
+| Question | Answer → Use |
+| --- | --- |
+| Display / UI / callback ack | **Api** |
+| Internal flow / run another command | **Bot** |
 
-Many real commands use both in the same file. That's normal.
+Many real commands use both in the same file. That's normal — not a sign you picked wrong.
+
+---
+
+## See also
+
+- [Bot overview](../bot-instance/index.md)
+- [Api overview](../api-instance/index.md)
+- [msg instance](../msg-instance/index.md)

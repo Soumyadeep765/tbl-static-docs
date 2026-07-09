@@ -1,49 +1,103 @@
-# The `chat` Variable
+# chat
 
-In TBL, `chat` contains **details about the current chat** where the interaction happened.
+Where the conversation is happening — DM, group, or channel.
 
-This can be a **private chat**, **group**, or **channel**.
+## What is it?
 
-## What `chat` Contains
+**`chat`** is an object describing the current chat: private message, group, supergroup, or channel. It tells you *where* to send replies and *what kind* of place you're in.
 
-The `chat` variable is a **JSON object** that describes the chat context.
+Private chats feel like a hallway conversation. Groups feel like a party. Channels feel like a stage. `chat.type` tells you which one you're at.
 
-It may include information such as:
+## When would you use it?
 
-- Chat ID
-- Chat type (private, group, channel)
-- Chat username or title
-- Block status
-- Whether the chat was just created
+You'll use `chat` in almost every command that sends a message:
 
-## Demo Chat Object
+- `Bot.sendMessage(chat.id, ...)` — the most common line in bot history
+- Branch logic by chat type (DM vs group vs channel)
+- Welcome new private chats (`just_created`)
+- Check if you're in a public group (`username`) or a private one
 
-Example structure of the `chat` object:
+Pair with [`user`](user.md) for *who* and `chat` for *where*.
+
+---
+
+## Try it
+
+```js
+// The line you'll write a thousand times
+Bot.sendMessage(chat.id, "Hello from the bot!")
+
+// Different vibes for different chat types
+if (chat.chat_type === "private") {
+  Bot.sendMessage(chat.id, "Thanks for messaging me directly!")
+} else if (chat.chat_type === "supergroup") {
+  Bot.sendMessage(chat.id, "Hello, group!")
+}
+
+// First time in a private chat?
+if (chat.just_created) {
+  Bot.sendMessage(chat.id, "Nice to meet you!")
+}
+```
+
+---
+
+## Fields
+
+### Telegram fields
+
+Standard [Telegram Chat](https://core.telegram.org/bots/api#chat) properties when present:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | `number` | Chat ID |
+| `type` | `string` | `"private"`, `"group"`, `"supergroup"`, or `"channel"` |
+| `title` | `string` | Group or channel title (groups/channels) |
+| `username` | `string` | Public username (if set) |
+| `first_name` | `string` | First name (private chats) |
+
+### Bonus fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `chatid` | `number` | Alias for `id` |
+| `chatId` | `number` | Alias for `id` |
+| `chat_type` | `string` | Alias for `type` |
+| `just_created` | `boolean` | `true` if first interaction (private chats) |
+| `created_at` | `string \| null` | When the chat was first seen (private chats) |
+| `last_interaction` | `string \| null` | Last interaction timestamp (private chats) |
+
+### Example object
 
 ```json
 {
   "id": 5723455420,
-  "first_name": "Soumyadeep ∞",
-  "username": "soumyadeepdas765",
   "type": "private",
+  "first_name": "Alice",
+  "username": "alice_smith",
   "chatid": 5723455420,
   "chatId": 5723455420,
-  "blocked": false,
-  "block_reason": null,
-  "blocked_at": null,
-  "just_created": true
+  "chat_type": "private",
+  "just_created": true,
+  "created_at": "2025-07-07T08:30:00.000Z",
+  "last_interaction": "2025-07-07T08:30:00.000Z"
 }
 ```
 
-## When `chat` Is Available
+---
 
-- For most message-based updates, `chat` is available
-- For some system or webhook updates, it may be `null`
+## When is `chat` available?
 
-## Important Notes
+| Context | Value |
+| --- | --- |
+| Message, callback, or member update | Object with chat fields |
+| Global webhook with no chat context | `null` |
+| Some system-only updates | `null` |
 
-- `chat` is either an **object or null**
-- It is read-only
-- It exists only during the current command execution
+---
 
-The `chat` variable helps your bot understand **where** the interaction is happening.
+## Good to know
+
+- `chat` is either an **object** or **`null`** — check before accessing fields
+- Use `chat.id` when calling [Bot](../bot-instance/index.md) or [Api](../api-instance/index.md)
+- In private chats, `chat.id` often equals [`user`](user.md)`.id — but they're different concepts

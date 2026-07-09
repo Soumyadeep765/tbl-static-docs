@@ -1,37 +1,88 @@
-# Sending Custom HTTP Responses
+# Sending Webhook Responses
 
-In webhook and Webapp commands, you can send a **custom HTTP response** back to the caller using the built-in **`res`** instance.
+Webhooks are HTTP endpoints — callers expect a body, not silence. Use the [`res`](../res-instance/index.md) instance to control exactly what goes back.
 
-This is useful when:
+---
 
-- Building APIs with TBL
-- Returning JSON to external services
-- Acknowledging webhook calls manually
-- Serving HTML or redirect responses
-
-## Using the res Instance
-
-Send a JSON response like this:
+## Quick start
 
 ```js
-res.json({ ok: true })
+res.json({ ok: true, processed: true })
 ```
 
-This immediately sends a response to the caller and ends execution.
+The response is sent immediately and command execution stops. Treat every `res.*()` send call like a `return`.
 
-You can return any valid JSON object depending on your use case.
+---
 
-!!! tip
-    Use `res.json()` when your endpoint acts like an API and the caller expects structured data.
+## Default behavior
 
-## Notes
+If you do not call `res`, the platform returns:
 
-- The **`res`** instance is available in **webhook commands** and **Webapp commands**
-- Once a response is sent, no further output is processed
-- If no custom response is sent, a default **2xx** response is returned
+```json
+{ "status": "success" }
+```
 
-## Full Reference
+with HTTP **200**. Fine for fire-and-forget triggers. Bad for API integrations that parse the response body — use explicit `res.json()` so callers get predictable output.
 
-For all response methods (`json`, `html`, `render`, `redirect`, and more), see the [Response (res) overview](../res-instance.md).
+---
 
-For advanced template rendering, see the [res.render() Guide](../res-instance-advanced.md).
+## Common patterns
+
+### JSON API
+
+```js
+res.status(200).json({
+  status: "success",
+  data: result,
+  timestamp: Date.now()
+})
+```
+
+### HTML page
+
+```js
+res.render("report.html", {
+  data: { rows: reportData }
+})
+```
+
+### Redirect browser
+
+```js
+res.redirect("https://myapp.com/done")
+```
+
+### Error to caller
+
+```js
+if (!options.token) {
+  return res.status(401).json({ error: "Unauthorized" })
+}
+```
+
+---
+
+## Full `res` reference
+
+| Topic | Page |
+| --- | --- |
+| Overview & availability | [res Overview](../res-instance/index.md) |
+| `set()`, `status()` | [Headers & Status](../res-instance/headers-and-status.md) |
+| `json()`, `text()`, `xml()` | [JSON, Text & XML](../res-instance/send-json-text-xml.md) |
+| `html()`, EJS | [HTML & EJS](../res-instance/html-and-ejs.md) |
+| `redirect()` | [Redirects](../res-instance/redirect.md) |
+| `render()` | [res.render()](../res-instance/render.md) |
+| Defaults, HTML protection | [Defaults & Protection](../res-instance/defaults-and-protection.md) |
+
+---
+
+## Webapp responses
+
+The same `res` API applies to [webapp commands](../webapp-instance/index.md). Public web pages do **not** use `res` — see [Public Web](../webapp-instance/public-web.md).
+
+---
+
+## See also
+
+- [Handling Requests](handle-webhook.md)
+- [res Overview](../res-instance/index.md)

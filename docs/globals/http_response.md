@@ -1,88 +1,128 @@
-# The `http_response` Variable
+# http_response
 
-In TBL, `http_response` contains **full information about an HTTP request result**.
+The full receipt from an HTTP request — status, headers, body, and all.
 
-It is **only available inside HTTP callback commands** (commands triggered after an HTTP request completes).
+## What is it?
 
-## When `http_response` Is Available
+**`http_response`** contains the **complete result** of a finished [HTTP](../http-instance/index.md) request. It's only available inside **HTTP callback commands** — the commands that run after a request succeeds or fails.
 
-- Only for HTTP callback commands
-- Not available in normal message-based commands
-- Automatically provided after an HTTP request finishes
+Think of it as the delivery confirmation: what you asked for, what came back, and whether the server was happy about it.
 
-## What `http_response` Contains
+## When would you use it?
 
-The `http_response` variable is an **object** that includes:
+- Read status codes and response bodies from external APIs
+- Check response headers (rate limits, content type)
+- Access cookies from authenticated requests
+- Inspect the original request options (URL, callback routes, [`tbl_options`](tbl_options.md))
 
-- Request options
-- HTTP response data
-- Metadata like timestamps
+For just the body, [`content`](content.md) is a shorter path. For failures, the error callback gets the response as [`error`](error.md).
 
-## Demo `http_response` Object
+---
 
-Example structure of `http_response`:
+## Try it
+
+```js
+// Inside HTTP success callback (/onSuccess)
+if (response.ok && response.isJson) {
+  Bot.sendMessage(user.id, "API says: " + response.data.message)
+}
+
+// Read a rate-limit header
+let remaining = headers["x-ratelimit-remaining"]
+if (remaining && Number(remaining) < 5) {
+  Bot.sendMessage(user.id, "Running low on API quota!")
+}
+
+// Check what you originally requested
+Bot.inspect("Fetched: " + http_response.url)
+```
+
+---
+
+## When is it available?
+
+| Context | `http_response` |
+| --- | --- |
+| HTTP success callback command | Full result object |
+| HTTP error callback command | Full result object (check `response.ok`) |
+| Normal Telegram command | `null` |
+| Webhook command (no HTTP chain) | `null` |
+
+---
+
+## Structure
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `options` | `Object` | Original HTTP request options (`url`, `success`, `error`, `tbl_options`, etc.) |
+| `response` | `Object` | Parsed HTTP response (see below) |
+| `timestamp` | `number` | `Date.now()` when the response was received |
+| `url` | `string` | Request URL |
+
+### `response` sub-object
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `ok` | `boolean` | `true` for HTTP 2xx responses |
+| `status` | `number` | HTTP status code |
+| `statusText` | `string` | HTTP status text |
+| `headers` | `Object` | Response headers |
+| `url` | `string` | Final URL after redirects |
+| `redirected` | `boolean` | Whether a redirect occurred |
+| `redirectCount` | `number` | Number of redirects followed |
+| `content` | `string/Buffer/object` | Raw body — **not set** when `isStream: true` |
+| `data` | `any` | Parsed JSON or body — **not set** when `isStream: true` |
+| `isJson` | `boolean` | Whether body was JSON-parsed — **not set** on streams |
+| `cookies` | `object` | Parsed cookies |
+| `isStream` | `boolean` | `true` when `responseType: "stream"` |
+| `responseType` | `string` | `"auto"`, `"json"`, `"text"`, `"buffer"`, `"arrayBuffer"`, or `"stream"` |
+| `contentType` | `string` | Content-Type header (stream responses) |
+| `stream` | `object` | `read()`, `collect()`, `cancel()`, async iterator — see [Streaming](../http-instance/streaming.md) |
+
+### Example object
 
 ```json
 {
   "options": {
-    "url": "https://webapi.telebothost.com/",
-    "success": "/link"
+    "url": "https://api.example.com/status",
+    "success": "/onSuccess"
   },
   "response": {
     "ok": true,
     "status": 200,
-    "statusText": "",
-    "content": "{\"status\":\"ok\",\"message\":\"API Service Running\"}",
-    "data": {
-      "status": "ok",
-      "message": "API Service Running"
-    },
+    "statusText": "OK",
+    "content": "{\"status\":\"ok\"}",
+    "data": { "status": "ok" },
     "isJson": true,
-    "headers": {
-      "server": "nginx/1.24.0 (Ubuntu)",
-      "content-type": "application/json; charset=utf-8"
-    },
+    "headers": { "content-type": "application/json" },
     "cookies": [],
-    "url": "https://webapi.telebothost.com/",
+    "url": "https://api.example.com/status",
     "redirected": false,
     "redirectCount": 0
   },
-  "timestamp": 1766335656394
+  "timestamp": 1766335656394,
+  "url": "https://api.example.com/status"
 }
 ```
 
-## The `response` Variable
+---
 
-For convenience, TBL also exposes:
+## Convenience aliases
 
-- `response` → same as `http_response.response`
+Shorthand globals available in HTTP callback commands:
 
-This lets you access response details directly without referencing the full object.
+| Global | Same as |
+| --- | --- |
+| `response` | `http_response.response` |
+| `headers` | `http_response.response.headers` |
+| `cookies` | `http_response.response.cookies` |
+| [`content`](content.md) | `http_response.response.content` |
 
-## Commonly Used Response Fields
+---
 
-Inside `response`, you will often use:
+## Good to know
 
-- `response.ok` → request success status
-- `response.status` → HTTP status code
-- `response.content` → raw response body (string)
-- `response.data` → parsed JSON data (if available)
-- `response.isJson` → whether the response was JSON
-
-## Headers and Cookies
-
-Headers and cookies are also exposed directly.
-
-- `headers` → same as `response.headers`
-- `cookies` → same as `response.cookies`
-
-This makes it easier to work with HTTP metadata.
-
-## Important Notes
-
-- `http_response` is read-only
-- It exists only during the callback command execution
-- Structure depends on the HTTP request and response
-- `content` is always a string, even for JSON responses
-
-The `http_response` variable is mainly used for **API integrations**, **external services**, and **data fetching workflows**.
+- `http_response` is read-only and exists only during callback execution
+- Use `response.data` for parsed JSON on non-stream responses
+- For `responseType: "stream"`, read the body via `response.stream` — see [Streaming](../http-instance/streaming.md)
+- Failed requests? See [`error`](error.md) in HTTP error callbacks

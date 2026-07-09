@@ -1,26 +1,170 @@
 # Webapp Methods
 
-## `getUrl(command, { options, params })`
+Generate webapp and public web URLs with `Webapp.getUrl()` (alias: `Webapp.get()`). One method, two URL flavors — sandboxed webapp or static public web.
 
-Generates a global webapp URL for the specified command.
+---
 
-- Use `options` for internal configuration.
-- Use `params` for visible query parameters.
+## What is `getUrl()`?
 
-```javascript
-let dashboardUrl = Webapp.getUrl("dashboard", {
-  options: { theme: "dark", userId: 123 },
+`Webapp.getUrl()` builds a browser-ready URL that hits your bot's webapp route (`/webapp/{bot_id}/{command}`) or, with `public: true`, the public web route (`/public/{bot_id}/{path}`).
+
+| You get | You skip |
+| --- | --- |
+| Correct per-bot URL paths | Hand-building domain + bot_id strings |
+| `options` and `params` encoding | Manual URL encoding |
+| Command validation (when handlers are loaded) | Typos in command names |
+
+---
+
+## `getUrl(command, config)`
+
+### Standard webapp URL
+
+```js
+let url = Webapp.getUrl("dashboard", {
+  options: { theme: "dark" },
   params: { ref: "home", lang: "en" }
 })
+// → https://{domain}/webapp/{bot_id}/dashboard?options=...&ref=home&lang=en
+```
 
-Api.sendMessage({
-  text: `Open the web dashboard: ${dashboardUrl}`
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `command` | string | Command name or alias (required) |
+| `options` | object | JSON config passed to the command |
+| `params` | object | Visible query parameters |
+| `public` | boolean | If `true`, generate a [public web](public-web.md) URL |
+| `publi` | boolean | Typo-tolerant alias for `public` (yes, really) |
+
+### Object form
+
+```js
+Webapp.getUrl({
+  command: "dashboard",
+  options: { theme: "dark" },
+  params: { ref: "home" },
+  public: false
 })
 ```
 
-## URL Design Tips
+---
 
-- Keep command names clear and predictable.
-- Put internal app config in `options`.
-- Put readable query values in `params`.
-- Avoid passing sensitive data in URL params.
+## `options` vs `params`
+
+Two ways to pass data in the URL — pick based on who needs to read it:
+
+| | `options` | `params` |
+| --- | --- | --- |
+| **Encoding** | Single `options={urlEncodedJson}` query key | Standard `key=value` pairs |
+| **Visibility** | One JSON blob in URL | Individual readable parameters |
+| **Use for** | App config, structured settings | Shareable filters, `ref`, `lang` |
+| **In command** | Global [`options`](../globals/options.md) | Global [`params`](../globals/params.md) |
+
+```js
+// URL: .../dashboard?options=%7B%22theme%22%3A%22dark%22%7D&ref=home&lang=en
+
+let theme = options.theme   // "dark"
+let ref = params.ref        // "home"
+```
+
+Never put secrets in either — use [webhooks](../webhook-instance/index.md) for signed flows.
+
+---
+
+## Public web URLs
+
+Set `public: true` to generate a **public web** URL instead of a sandbox webapp URL:
+
+```js
+let landing = Webapp.getUrl("index.html", { public: true })
+// → https://{domain}/public/{bot_id}/index.html
+
+let landing2 = Webapp.getUrl({
+  command: "landing",
+  public: true,
+  params: { utm: "telegram" }
+})
+// → https://{domain}/public/{bot_id}/landing?utm=telegram
+```
+
+Public URLs:
+
+- Do **not** run the TBL sandbox
+- Require the command to have **`is_web = 1`**
+- Serve command source directly (with EJS + HTML injection for HTML)
+- Do **not** provide `res`, `Api`, or `db`
+
+See [Public Web](public-web.md) for the full guide.
+
+---
+
+## Command validation
+
+When `commandHandlers` are available at URL generation time, `getUrl` validates that the command name or alias exists. Unknown commands throw:
+
+```
+Error: Unknown command: {name}
+```
+
+Catch this in development — it saves you from sending broken links to users.
+
+---
+
+## Array params
+
+`params` supports arrays — each value becomes a repeated query key:
+
+```js
+Webapp.getUrl("search", {
+  params: { tag: ["js", "api"] }
+})
+// → ...?tag=js&tag=api
+```
+
+---
+
+## Try it — copy-paste examples
+
+### Send dashboard link in Telegram
+
+```js
+let dashboardUrl = Webapp.getUrl("dashboard", {
+  params: { ref: "bot", lang: "en" }
+})
+
+await Api.sendMessage({
+  chat_id: chat.id,
+  text: "Open dashboard: " + dashboardUrl
+})
+```
+
+### Public landing page link
+
+```js
+let home = Webapp.getUrl("index.html", { public: true })
+```
+
+### API endpoint URL
+
+```js
+let apiUrl = Webapp.getUrl("api/status", {
+  params: { format: "json" }
+})
+```
+
+---
+
+## URL design tips
+
+- Use short, predictable command names (`dashboard`, `api/users`)
+- Put marketing/tracking params in `params` (`ref`, `utm_source`)
+- Put structured config in `options`
+- Use `public: true` only for static `is_web` commands
+
+---
+
+## See also
+
+- [Public Web](public-web.md)
+- [Examples](examples.md)
+- [Webapps overview](index.md)

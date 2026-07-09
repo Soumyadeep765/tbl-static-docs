@@ -1,49 +1,173 @@
 # Bot
 
-`Bot` is TeleBotHost's shortcut for running your bot — not for wrestling with Telegram's API surface.
+Your bot's personal assistant — sends replies, runs other commands, stores settings, and fires off broadcasts. No imports, no setup, just `Bot.` and go.
 
-Where `Api` mirrors Telegram method-for-method, `Bot` wraps the things bot authors do every day: send a quick reply, jump to another command, store a setting, pull a list of users. Less boilerplate, fewer parameters you can get wrong.
+Where [`Api`](../api-instance/index.md) speaks Telegram's language method-for-method, `Bot` speaks *bot author* language: sensible defaults, less boilerplate, and the current chat filled in for you.
 
-It's there in every command, same as `Api`. Just call it.
+---
 
-## What people actually use it for
+## What is Bot?
 
-**Moving between commands.** A survey bot finishes step three and needs step four:
+**Bot** is TeleBotHost's high-level toolkit for running your bot day to day — replying to users, chaining commands, managing bot-wide settings, listing users, and launching broadcasts.
+
+| You get | You skip |
+| --- | --- |
+| Auto-targeted sends (`Bot.sendMessage`) | Passing `chat_id` every time |
+| Command chaining (`Bot.runCommand`) | Manual routing logic |
+| Bot-wide storage (via [`db.bot`](../db-instance/bot.md)) | Rolling your own persistence |
+
+`Bot` is available in every command alongside `Api` — no import or setup required.
+
+---
+
+## How to use it
+
+Drop this in any command's **Logic** field:
 
 ```js
-Bot.runCommand("/step4")
+Bot.sendMessage("Welcome!")
+Bot.runCommand("/menu")
 ```
 
-Pass data along with the second argument — it shows up as [`options`](../globals/options.md) in the target command.
+Three things worth knowing upfront:
 
-**Simple sends.** When you don't need inline keyboards or edit-in-place:
+1. **`Bot` is already there** — you never import or initialize it.
+2. **Most send methods target the current chat** — the conversation where the command fired.
+3. **`Bot.run` / `Bot.runCommand` return a Promise** — use `await` when you need to wait for completion.
+
+!!! tip "New to TBL?"
+    `chat`, `user`, and `params` are globals available in every command. Quick intro: [Learning TBL](../learning-tbl.md). For Telegram read operations (`getChat`, `getMe`, etc.), use [`Api`](../api-instance/index.md).
+
+---
+
+## Bot or Api?
+
+Both live in every command. Pick the right tool before you reach for the keyboard:
+
+| Task | Use |
+| --- | --- |
+| Send a quick text reply | `Bot.sendMessage` |
+| Run another command with data | `Bot.runCommand` / `Bot.run` |
+| Store bot-wide settings | [`db.bot`](../db-instance/bot.md) |
+| List users who interacted | `Bot.getUsers` |
+| Mass-message all users | `Bot.broadcast` |
+| Inline buttons, edit messages, reactions | [`Api`](../api-instance/index.md) |
+| Raw Telegram API access | [`Api`](../api-instance/index.md) |
+
+See the [Bot vs Api guide](../guides/bot-vs-api.md) for side-by-side examples.
+
+---
+
+## Try it — copy-paste examples
+
+Start simple. Each example only introduces what it needs.
+
+### Send a welcome message
+
+No setup — just text:
 
 ```js
-Bot.sendMessage("Your code is 48291. It expires in 10 minutes.")
+Bot.sendMessage("Hey " + user.first_name + "! Type /menu to get started.")
 ```
 
-**Bot-wide storage.** Settings that apply to the whole bot, not one user — feature flags, API keys you've stored, cached totals. See [Storing Data](storing-data.md).
+### Run another command
 
-**User lists.** Who's used the bot, filtered by chat type or premium status. [Listing Users](listing-users.md).
+Hand off to `/menu` with optional data:
 
-## Case sensitivity
+```js
+Bot.runCommand("/menu", { params: "from_start" })
+```
 
-Methods are case-sensitive. `Bot.runCommand` yes, `Bot.runcommand` no.
+### Store a bot-wide setting
 
-## Bot and Api together
+Use [`db.bot`](../db-instance/bot.md) — the modern async storage API:
 
-Common pattern: Api handles the Telegram UI (edit the menu message, answer the callback), Bot handles what happens next (run the command that processes the order).
+```js
+await db.bot.set("maintenance", false)
+let mode = await db.bot.get("maintenance", false)
+```
 
-After you read the [Api overview](../api-instance/index.md), the [Bot vs Api guide](../guides/bot-vs-api.md) walks through when to use each.
+### Debug output
+
+Format and send debug info to the current chat:
+
+```js
+Bot.inspect(user, chat, params)
+```
+
+---
+
+## Method categories
+
+### Command flow
+
+| Method | Description |
+| --- | --- |
+| `Bot.runCommand(cmd, options?)` | Run a command by name |
+| `Bot.run(params)` | Run a command with full control (chat, user, options) |
+| `Bot.read(cmd)` | Get a command's source code as a string |
+| `Bot.readCommand(cmd)` | Get full command definition (code, keyboard, aliases, etc.) |
+
+### Sending output
+
+| Method | Description |
+| --- | --- |
+| `Bot.sendMessage(text, options?)` | Send text to the current chat |
+| `Bot.sendKeyboard(text, keyboard, options?)` | Send text with a reply keyboard |
+| `Bot.sendPhoto` / `sendDocument` / `sendAudio` / `sendVideo` / `sendVoice` | Send media to the current chat |
+| `Bot.inspect(...values)` | Format and send debug output to the current chat |
+
+### Bot-wide properties (deprecated)
+
+| Method | Aliases | Description |
+| --- | --- | --- |
+| `Bot.set(key, value, type?, ttl?)` | `setProp`, `setProperty` | Set a bot property — **deprecated**, 1 MB limit |
+| `Bot.get(key)` | `getProp`, `getProperty` | Get a bot property — **deprecated** |
+| `Bot.del(key)` | `delProp`, `delProperty` | Delete a bot property — **deprecated** |
+| `Bot.getAll()` | `getAllProp`, `getAllProperty` | Get all properties — **deprecated** |
+| `Bot.delAll()` | `delAllProp`, `delAllProperty` | Delete all properties — **deprecated** |
+| `Bot.has(key)` | `hasProp` | Check if a key exists — **deprecated** |
+| `Bot.count()` | `countProps` | Number of stored keys — **deprecated** |
+| `Bot.getNames()` | `getPropNames` | List of all keys — **deprecated** |
+
+!!! warning "Use `db.bot` instead"
+    `Bot.set` / `Bot.get` are deprecated with a **1 MB per-bot limit**. Use [`db.bot`](../db-instance/bot.md) for all new storage — see [Bot Properties](bot-properties.md).
+
+### User management
+
+| Method | Description |
+| --- | --- |
+| `Bot.getUsers(filters?)` | Query user/chat IDs with filters (async) |
+
+### Broadcasting
+
+| Method | Description |
+| --- | --- |
+| `Bot.broadcast(params)` | Start a distributed broadcast job |
+| `Bot.stopBroadcast(broadcastId)` | Stop a running broadcast |
+| `Bot.getBroadcastStats(broadcastId)` | Get job statistics |
+| `Bot.listBroadcasts(status?)` | List broadcast jobs for this bot |
+
+---
+
+## Important notes
+
+- Method names are **case-sensitive** — `Bot.runCommand` works, `Bot.runcommand` does not
+- Most send methods target the **current chat** automatically
+- `Bot.run` / `Bot.runCommand` return a Promise with `{ success: true }` — use `await` when you need to wait for completion
+- Command chains are limited to **6** nested `Bot.run` calls per execution
+- `Bot` property methods are **not available** in webhook/webapp context
+- For Telegram read operations (`getChat`, `getMe`, etc.), use [`Api`](../api-instance/index.md)
+
+---
 
 ## Pages in this section
 
 | Page | Covers |
 | --- | --- |
-| [Running Commands](running-commands.md) | `runCommand`, passing options |
-| [Reading Commands](reading-commands.md) | Inspect another command's code or config |
-| [Sending Messages](sending-messages.md) | Text, keyboards, media via Bot |
-| [Storing Data](storing-data.md) | Key-value storage at bot level |
-| [Listing Users](listing-users.md) | Query users who've interacted |
-
-If you're sending inline buttons or editing messages after send, you'll still need [Api](../api-instance/index.md) for that part.
+| [Running Commands](running-commands.md) | `runCommand`, `Bot.run`, options, chain limits |
+| [Reading Commands](reading-commands.md) | `read`, `readCommand` |
+| [Sending Messages](sending-messages.md) | Text, keyboards, media, `inspect` |
+| [Bot Properties (Deprecated)](bot-properties.md) | Legacy `Bot.set` / `Bot.get` — use `db.bot` instead |
+| [Listing Users](listing-users.md) | `getUsers` filters and pagination |
+| [Broadcasting](broadcasting.md) | Distributed mass messaging |

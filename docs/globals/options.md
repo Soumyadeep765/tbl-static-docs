@@ -1,38 +1,82 @@
-# The `options` Variable
+# options
 
-In TBL, `options` contains **custom data passed between commands** or **data returned from API callbacks**.
+A backpack for passing data between commands — or carrying API results home.
 
-It helps share context without using global state.
+## What is it?
 
-## How `options` Is Used
+**`options`** carries **context passed between commands** or **results returned from API calls**. It's how you hand off a `{ step: 2, name: "Alice" }` object from `/start` to `/onboard`, or read the JSON response after an [Api](../api-instance/index.md) call finishes.
 
-The `options` variable is commonly used in two cases:
+Think of it as a note you slip to the next command: "Here's what you need to know."
 
-- When chaining or triggering another command
-- When receiving the result of a Telegram API call
+## When would you use it?
 
-## Custom Data Example
+| Scenario | What `options` holds |
+| --- | --- |
+| Chaining commands with `Bot.run` | The object you passed as the second argument |
+| API method callback | Full Telegram API JSON response (`{ ok, result, ... }`) |
+| Webhook command | Merged webhook options and HTTP request metadata |
 
-When passing custom data between commands, `options` may look like this:
+For **your own custom data** through HTTP or API callbacks specifically, see [`tbl_options`](tbl_options.md) — it's the dedicated lane for that.
 
-```json
-{
-  "name": "Alice",
-  "step": 2
+---
+
+## Try it — chaining commands
+
+```js
+// In /start — pass data forward
+Bot.run("/onboard", { step: 1, name: user.first_name })
+
+// In /onboard — read what /start sent
+let step = options.step    // 1
+let name = options.name    // user's first name
+Bot.sendMessage(chat.id, "Step " + step + " for " + name)
+```
+
+More on chaining: [Running Commands](../bot-instance/running-commands.md).
+
+---
+
+## Try it — API callbacks
+
+When a command runs as the callback of an [Api](../api-instance/index.md) call, `options` contains the Telegram API response:
+
+```js
+if (options.ok) {
+  let messageId = options.result.message_id
+  Bot.sendMessage(chat.id, "Message sent! ID: " + messageId)
+} else {
+  Bot.sendMessage(chat.id, "API call failed.")
 }
 ```
 
-This is useful for multi-step flows and internal state tracking.
-
-## API Callback Example
-
-When `options` comes from a Telegram API response, it may contain result data:
+Example response shape:
 
 ```json
 {
   "ok": true,
-  "result": { }
+  "result": {
+    "message_id": 42,
+    "chat": { "id": 123 },
+    "text": "Hello!"
+  }
 }
 ```
 
-The `options` variable is mainly used for **advanced flows and integrations**.
+---
+
+## `options` vs `tbl_options`
+
+| Variable | Purpose |
+| --- | --- |
+| `options` | General context — `Bot.run` payloads, API results, webhook merge |
+| [`tbl_options`](tbl_options.md) | Your custom data passed via `tbl_options` in HTTP/API callback options |
+
+Rule of thumb: API gave you a result? That's `options`. You packed your own lunch? That's `tbl_options`.
+
+---
+
+## Good to know
+
+- `options` is `null` when nothing was passed — check before reading properties
+- Exists only during command execution
+- For **long-lived state** (user scores, settings), use [`db.user`](../db-instance/user.md) or [`db.bot`](../db-instance/bot.md) — `options` doesn't survive between unrelated commands

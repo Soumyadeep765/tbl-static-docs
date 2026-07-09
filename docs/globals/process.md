@@ -1,49 +1,122 @@
-# The `process` Object
+# process
 
-In TBL, `process` provides **runtime information** about the current execution environment.
+Your bot's runtime toolbox — secrets, uptime, and environment config.
 
-It is mainly used to **access environment variables** that you configure from the bot dashboard.
+## What is it?
 
-## Accessing Environment Variables
+**`process`** gives you **runtime information** about the current command execution. Its star feature is **`process.env`** — a key-value map of environment variables you configure in the bot dashboard. No hard-coded API keys. No secrets in your command scripts. Just `process.env.MY_KEY` and you're set.
 
-Environment variables are available inside:
+There's also `process.uptime` for checking how long the bot has been running, and `env` — a shorthand alias because typing `process.env` gets old fast.
 
-- `process.env`
+## When would you use it?
 
-These values come directly from the bot’s **Environment (ENV) settings** in the dashboard.
+- Read API keys, URLs, and config from dashboard ENV settings
+- Check feature flags (`env.DEBUG === "true"`)
+- Gate messages based on bot uptime
+- Access any secret that shouldn't live in command logic
 
-For example, if you set an env key named `API_KEY`, you can access it using:
+This is where JWT secrets, API tokens, and webhook URLs belong. Not in your Logic field. Your future self will thank you.
 
-process.env.API_KEY
+!!! tip "New to ENV vars?"
+    Set them in your bot dashboard under **Environment (ENV) settings**. Only variables you configure there are exposed — platform server secrets never reach your scripts.
 
-## Demo `process` Object
+---
 
-Example structure of the `process` object:
+## Try it — environment variables
+
+```js
+// Read a dashboard env variable
+let apiUrl = process.env.API_URL
+
+// Shorthand alias — same object
+let debug = env.DEBUG === "true"
+
+// Guard against missing config
+let apiKey = process.env.MY_API_KEY
+if (!apiKey) {
+  return Bot.sendMessage(chat.id, "API key not configured.")
+}
+```
+
+Used with [JWT](../modules/jwt.md), [ethers](../modules/ethers.md), and any external API:
+
+```js
+let token = modules.JWT.sign(
+  { uid: user.id },
+  process.env.JWT_SECRET,
+  { expiresIn: "7d" }
+)
+```
+
+---
+
+## Try it — bot uptime
+
+`process.uptime` shows how long the bot has been running since its last start. Values reset when the bot is stopped and restarted.
+
+```js
+if (process.uptime.days >= 1) {
+  Bot.sendMessage(user.id,
+    "Bot has been online for " + process.uptime.days + " day(s)!"
+  )
+}
+```
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `days` | `number` | Full days since the bot started |
+| `hours` | `number` | Remaining hours (0–23) |
+| `minutes` | `number` | Remaining minutes (0–59) |
+
+When the bot is stopped or has no start timestamp, all values are `0`.
+
+---
+
+## Fields
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `env` | `Object` | Key-value map of dashboard environment variables (all values are strings) |
+| `pid` | `string` | Internal execution identifier for the current bot session |
+| `MESSAGE` | `string` | Static hint text about accessing env vars |
+| `uptime` | `Object` | Bot uptime since last start (`days`, `hours`, `minutes`) |
+
+### Example object
 
 ```json
 {
   "env": {
-    "22": "Ok",
-    "Test": "true",
-    "Yest3": "Ok"
+    "API_URL": "https://api.example.com",
+    "DEBUG": "true"
   },
-  "pid": 652434,
-  "MESSAGE": "For getting Env just use process.env.YOUR_ENV_NAME"
+  "pid": "421234567890",
+  "MESSAGE": "Use process.env.KEY to access env vars",
+  "uptime": {
+    "days": 2,
+    "hours": 5,
+    "minutes": 30
+  }
 }
 ```
 
-## What `process` Contains
+---
 
-Common properties include:
+## The `env` alias
 
-- `process.env` → all configured environment variables
-- `process.pid` → current execution process ID
-- Additional runtime metadata
+`env` is the same object as `process.env`. Use whichever reads more naturally:
 
-## Important Notes
+```js
+let key = process.env.MY_KEY   // explicit
+let key = env.MY_KEY           // shorthand
+```
 
-- `process` is read-only
-- Environment values are always strings
-- Values exist only during command execution
+Both work. Both are strings. Both are read-only.
 
-The `process` object is the correct and safe way to store **secrets, keys, and configuration** for your bot.
+---
+
+## Good to know
+
+- `process` is read-only and exists only during command execution
+- Environment values are always **strings** — convert numbers or booleans in your logic (`Number(env.PORT)`, `env.DEBUG === "true"`)
+- Never hard-code secrets in commands — dashboard ENV is the right place
+- Overview of all globals: [Global Variables](index.md)

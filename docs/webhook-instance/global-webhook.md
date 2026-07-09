@@ -1,65 +1,113 @@
 # Global Webhooks
 
-Global webhooks execute commands **without any user context**.
+Signed URLs that run commands **without binding a Telegram user**. `user` and `chat` are `null`; the `User` instance is not available.
 
-They are designed for system-level or public actions where no specific user or chat is involved.
+Think of them as system-level triggers — cron jobs, monitoring hooks, account-wide reads, and backend integrations that don't act on behalf of one person.
 
-In global webhooks:
+---
 
-- `user` is `null`
-- `chat` is `null`
-- The command runs at the **account level**
+## What you get (and don't)
 
-These are ideal for dashboards, public pages, cron jobs, or backend services.
+| In the command | Available? |
+| --- | --- |
+| `bot`, `owner`, `plan`, `db`, `HTTP`, `modules` | ✓ |
+| `user`, `chat`, `User` | `null` |
+| `request`, `params`, `options`, `res` | ✓ |
+| `msg` | `null` |
 
-## Generate a Global Webhook URL
+!!! warning "No default chat"
+    Without `user` or `chat`, you must pass `chat_id` explicitly to `Api.sendMessage()` and friends.
 
-### getGlobalUrl(command, { options, params, redirect })
+---
 
-Creates a **globally accessible webhook URL**.
+## `getGlobalUrl(command, { options, redirect, params, expiresIn })`
 
-This URL does not require user authentication and can be triggered by any external source.
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `command` | string | Command name or alias |
+| `options` | object | Signed data passed to the command |
+| `redirect` | string | Optional HTTPS URL — prefetched into [`content`](../globals/content.md) |
+| `params` | object | Extra query parameters |
+| `expiresIn` | number | Optional seconds until URL expires |
 
-- `command` → command to execute
-- `options` → custom data passed to the command
-- `params` → extra query parameters
-- `redirect` → optional URL to redirect after execution
-
-Example:
+### Example — cron stats job
 
 ```js
-let statsUrl = Webhook.getGlobalUrl("getStats", {
+let statsUrl = Webhook.getGlobalUrl("aggregateStats", {
   options: { days: 30 },
-  redirect: "https://telebothost.com",
-  params: { ref: "home" }
-})
-
-Api.sendMessage({
-  text: `View global statistics: ${statsUrl}`
+  redirect: "https://api.example.com/metrics.json",
+  params: { ref: "cron" },
+  expiresIn: 300
 })
 ```
 
-## How Global Webhooks Behave
+---
 
-- Commands run **without user or chat data**
-- Useful for account-wide logic
-- Suitable for read-only or system actions
-- Safe for public or automated triggers
+## What the URL looks like
 
-!!! warning
-    Since global webhooks have no user context,
-    avoid using them for actions that modify user data.
+```
+https://{domain}/webhook/{bot_id}
+  ?command=aggregateStats
+  &options=%7B%22days%22%3A30%7D
+  &sig=d4e5f6...
+  &expires=1710000300
+  &ref=cron
+```
 
-## Execution & Response
+Note: there is **no** `user` parameter. The signature is computed with an empty user segment.
 
-- Global webhook execution returns a **2xx HTTP response** by default
-- Redirects are handled automatically if `redirect` is provided
-- You can manually control responses using the **[res]** instance
+---
 
-## Notes
+## Inside the command
 
-- Global webhooks are secure and signed
-- Parameters and options are protected
-- Best used for dashboards, analytics, and automation
+Design for `user` being `null`:
 
-[res]: ../res-instance.md
+```js
+let total = await db.bot.get("total_users") || 0
+
+// content may hold prefetched redirect body
+let external = content || {}
+
+res.json({
+  ok: true,
+  total_users: total,
+  external_keys: Object.keys(external)
+})
+```
+
+---
+
+## Sending Telegram messages
+
+No `chat`? Store an admin chat ID in bot storage, or pass one you know:
+
+```js
+let adminChat = await db.bot.get("admin_chat_id")
+if (adminChat) {
+  await Api.sendMessage({
+    chat_id: adminChat,
+    text: "Daily stats job completed."
+  })
+}
+```
+
+---
+
+## Global vs user webhook — quick picker
+
+| Scenario | Use |
+| --- | --- |
+| Action for one logged-in user | [User webhook](user-webhook.md) |
+| Nightly stats aggregation | Global webhook |
+| User-specific payment callback | User webhook with `getUrlFor` |
+| Signed public API, no user data | Global webhook |
+| Unsigned browser-facing API | [Webapp](../webapp-instance/index.md) |
+| Static landing page | [Public web](../webapp-instance/public-web.md) |
+
+---
+
+## See also
+
+- [Webhook Types](webhook-types.md)
+- [Handling Requests](handle-webhook.md)
+- [Limits & Security](limits-and-security.md)

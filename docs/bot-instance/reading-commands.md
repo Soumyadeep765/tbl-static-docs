@@ -1,62 +1,73 @@
-# Reading Commands and Their Code
+# Reading Commands
 
-TBL allows you to **read existing commands programmatically** using the Bot instance.
+Ever wish you could peek at another command's source code without leaving the dashboard? **`Bot.read`** and **`Bot.readCommand`** let your bot inspect its own commands at runtime — perfect for admin panels, documentation bots, and "what does `/secret` actually do?" debugging sessions.
 
-This is useful for:
+Read-only, safe, and slightly meta. Your bot reading itself. Very introspective.
 
-- Debugging command logic
-- Building admin or moderation tools
-- Showing command previews
-- Creating documentation bots
-- Auditing or inspecting commands safely
+---
 
-## Reading Command Code Only
+## What is reading commands?
 
-The `Bot.read()` method returns **only the raw source code** of a command.
+Two methods, two levels of detail:
 
-It does not include command settings like answer, keyboard, aliases, or reply behavior.
+| Method | Returns | Best for |
+| --- | --- | --- |
+| `Bot.read("/start")` | Raw source code (string) | Code previews, AI analysis, debugging logic |
+| `Bot.readCommand("/start")` | Full definition (object) | Admin panels, config audits, command editors |
 
-The returned value is a **plain string**.
+Neither method **executes** anything — you're just looking. Like reading a recipe without turning on the oven.
 
-### Example
+!!! tip "New to TBL?"
+    `Bot`, `chat`, and `user` are globals available in every command. Quick intro: [Learning TBL](../learning-tbl.md).
+
+---
+
+## How to use it
+
+### Read source code only — `Bot.read`
+
+Returns the command's **Logic field** as a plain string. No keyboard, aliases, or `need_reply` settings:
 
 ```js
-// Read the raw code of a command
 let code = Bot.read("/start")
+// Returns something like: "Bot.sendMessage('Welcome!')"
 
-// it returns a String
+Bot.sendMessage("That command is " + code.length + " characters long.")
 ```
 
-Use this when you only care about **how the command works internally**.
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `commandName` | `string` | Command name (e.g. `"/start"`) |
 
-!!! tip
-    `Bot.read()` is ideal for code previews, AI analysis, or debugging logic issues.
+**Returns:** `string` — the command's source code.
 
-## Reading Full Command Object
+### Read full definition — `Bot.readCommand`
 
-The `Bot.readCommand()` method returns the **entire command definition**.
-
-This includes:
-
-- The command code
-- Answer text
-- Keyboard configuration
-- Aliases
-- need_reply flag
-- Other command settings
-
-### Example
+Returns **everything** — code plus dashboard settings:
 
 ```js
-// Read full command structure
 let cmd = Bot.readCommand("/start")
+
+Bot.sendMessage("Keyboard: " + (cmd.keyboard || "none"))
+Bot.sendMessage("Aliases: " + cmd.aliases.join(", ") || "none")
 ```
 
-### Example Response
+**Returns:** `object` with fields such as:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `code` | `string` | Source code from the Logic field |
+| `answer` | `string \| null` | Auto-reply text |
+| `keyboard` | `string \| null` | Reply keyboard config |
+| `aliases` | `array` | Command aliases |
+| `allow_only_group` | `boolean` | Restrict to groups |
+| `need_reply` | `boolean` | Wait for user reply before running |
+
+Example response:
 
 ```json
 {
-  "code": "const {random} = require(\"/send\");\n\nconst x = random(1, 100);\nBot.sendMessage(\"Random: \" + x);",
+  "code": "Bot.sendMessage('Welcome!')",
   "answer": null,
   "keyboard": null,
   "aliases": [],
@@ -65,15 +76,46 @@ let cmd = Bot.readCommand("/start")
 }
 ```
 
-Use this when you need **both the logic and the configuration** of a command.
+---
 
-!!! info
-    `Bot.readCommand()` is commonly used in admin panels, editors, and bot management systems.
+## Try it — copy-paste examples
 
-## Important Notes
+### Code length checker (admin tool)
 
-- Both methods are read-only
-- The target command must exist
-- Missing commands will throw an error
-- Errors can be handled using the `!` command
-- Returned data never executes automatically
+```js
+let code = Bot.read("/help")
+Bot.sendMessage("/help logic: " + code.length + " chars")
+```
+
+### List commands that use reply keyboards
+
+```js
+// Assume you have a list of command names from your admin panel
+let cmd = Bot.readCommand("/menu")
+if (cmd.keyboard) {
+  Bot.sendMessage("/menu has a reply keyboard configured.")
+}
+```
+
+### Safe read with error handling
+
+Both methods throw if the command name is missing, not a string, or doesn't exist (with suggestions for similar names):
+
+```js
+try {
+  let code = Bot.read("/nonexistent")
+} catch (e) {
+  Bot.sendMessage("That command doesn't exist.")
+}
+```
+
+Errors can also be caught by your `!` error handler.
+
+---
+
+## Important notes
+
+- **Read-only** — returned data never runs. You're inspecting, not executing.
+- The target command must exist in your bot's command list.
+- Great for in-bot documentation, moderation tools, or "show me the code" admin features.
+- Restrict these commands to admins — exposing source code to everyone is rarely a good idea.

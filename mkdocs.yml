@@ -146,7 +146,15 @@ nav:
 
   - Tutorials:
       - Overview: tutorials/index.md
-      - Command Structure: getting-started-with-tbl/command-structure.md
+      - Command Flow: getting-started-with-tbl/index.md
+      - Command Fields: getting-started-with-tbl/command-fields.md
+      - Matching & Priority: getting-started-with-tbl/matching-order.md
+      - Execution Flow: getting-started-with-tbl/execution-flow.md
+      - Special Commands: getting-started-with-tbl/special-commands.md
+      - Dynamic Handlers: getting-started-with-tbl/dynamic-commands.md
+      - Markdown & Formatting: getting-started-with-tbl/markdown-and-formatting.md
+      - Public Web Commands: getting-started-with-tbl/public-web-commands.md
+      - Handling Callbacks: getting-started-with-tbl/handling-callbacks.md
       - Your First Bot: getting-started-with-tbl/first-hello-bot.md
       - Adding a Keyboard: getting-started-with-tbl/adding-keyboard.md
       - Using Aliases: getting-started-with-tbl/adding-aliases.md
@@ -155,6 +163,9 @@ nav:
 
   - Guides:
       - Overview: guides/index.md
+      - Handling Callbacks: getting-started-with-tbl/handling-callbacks.md
+      - Markdown & Formatting: getting-started-with-tbl/markdown-and-formatting.md
+      - Public Web Commands: getting-started-with-tbl/public-web-commands.md
 
   - Global Variables:
       - Overview: globals/index.md
@@ -181,8 +192,9 @@ nav:
       - Running Commands: bot-instance/running-commands.md
       - Reading Commands: bot-instance/reading-commands.md
       - Sending Messages: bot-instance/sending-messages.md
-      - Storing Data: bot-instance/storing-data.md
+      - Bot Properties (Deprecated): bot-instance/bot-properties.md
       - Listing Users: bot-instance/listing-users.md
+      - Broadcasting: bot-instance/broadcasting.md
 
   - Api:
       - Overview: api-instance/index.md
@@ -193,6 +205,7 @@ nav:
       - Async Requests: api-instance/async-requests.md
       - Callbacks (on_run): api-instance/callbacks.md
       - Method Chaining: api-instance/method-chaining.md
+      - Bot Admin Methods: api-instance/bot-admin-methods.md
       - Dynamic Methods: api-instance/dynamic-methods.md
       - Tips and Limitations: api-instance/tips-and-limitations.md
 
@@ -201,71 +214,94 @@ nav:
   - HTTP:
       - Overview: http-instance/index.md
       - Making Requests: http-instance/making-requests.md
+      - Request Options: http-instance/request-options.md
+      - HTTP Proxies: http-instance/proxies.md
+      - Cloudflare Worker Proxy: http-instance/cf-proxy.md
+      - Responses: http-instance/responses.md
+      - Streaming: http-instance/streaming.md
       - Fallback Commands: http-instance/fallback-commands.md
+      - Limits & Timeouts: http-instance/limits.md
 
-  - User Storage:
+  - Database (db):
+      - Overview: db-instance/index.md
+      - Bot Storage (db.bot): db-instance/bot.md
+      - User Storage (db.user): db-instance/user.md
+      - Global Storage (db.global): db-instance/global.md
+      - Unified Methods: db-instance/unified-methods.md
+      - Advanced Operations: db-instance/advanced-operations.md
+      - Analytics & Stats: db-instance/analytics.md
+
+  - User Storage (Deprecated):
       - Overview: user-instance/index.md
       - Basics: user-instance/basics.md
-      - Advanced Usage: user-instance/advanced-use.md
+      - Advanced & Migration: user-instance/advanced-use.md
 
-  - Global Storage:
+  - Global Storage (Removed):
       - Overview: global-instance/index.md
       - Basics: global-instance/basics.md
       - Storage Monitoring: global-instance/storage-monitor.md
 
   - msg:
       - Overview: msg-instance/index.md
-      - Using msg: msg-instance/use-msg.md
-      - The msg Object: msg-instance/msg-obj.md
+      - Replying: msg-instance/replying.md
+      - Editing: msg-instance/editing.md
+      - Actions: msg-instance/actions.md
+      - Message Data: msg-instance/message-data.md
 
   - Webhooks:
       - Overview: webhook-instance/index.md
       - Webhook Types: webhook-instance/webhook-types.md
       - User-Based Webhooks: webhook-instance/user-webhook.md
       - Global Webhooks: webhook-instance/global-webhook.md
-      - Handling Webhooks: webhook-instance/handle-webhook.md
+      - Handling Requests: webhook-instance/handle-webhook.md
+      - Limits & Security: webhook-instance/limits-and-security.md
       - Sending Responses: webhook-instance/sending-webhook-response.md
 
   - Webapps:
       - Overview: webapp-instance/index.md
       - Webapp Methods: webapp-instance/webapp-methods.md
+      - Public Web: webapp-instance/public-web.md
       - Examples: webapp-instance/examples.md
       - Best Practices: webapp-instance/best-practices.md
 
   - HTTP Responses (res):
-      - Overview: res-instance.md
-      - Method Reference: webapp-instance/response-methods.md
-      - res.render() Guide: res-instance-advanced.md
-      - Template Rendering: webapp-instance/render-details.md
+      - Overview: res-instance/index.md
+      - Headers & Status: res-instance/headers-and-status.md
+      - JSON, Text & XML: res-instance/send-json-text-xml.md
+      - HTML & EJS: res-instance/html-and-ejs.md
+      - Redirects: res-instance/redirect.md
+      - res.render(): res-instance/render.md
+      - Defaults & Protection: res-instance/defaults-and-protection.md
 
   - Modules:
       - Overview: modules/index.md
-      - jwt: modules/jwt.md
+      - JWT: modules/jwt.md
       - bcrypt: modules/bcrypt.md
       - crypto: modules/crypto.md
       - ParseCSV: modules/parse-csv.md
       - ParseYML: modules/parse-yml.md
       - UUID: modules/uuid.md
-      - moment: modules/moment.md
+      - dayjs: modules/dayjs.md
       - lodash: modules/lodash.md
       - uaParser: modules/uaparser.md
       - randomstring: modules/randomstring.md
       - validator: modules/validator.md
-      - chance: modules/chance.md
-      - math: modules/math.md
       - qs: modules/qs.md
       - cheerio: modules/cheerio.md
-      - dayjs: modules/dayjs.md
       - zod: modules/zod.md
-      - shortid: modules/shortid.md
       - deepmerge: modules/deepmerge.md
       - humanizeDuration: modules/humanize-duration.md
+      - md2html: modules/md2html.md
+      - ethers: modules/ethers.md
+      - marketHub: modules/market-hub.md
 
   - TBL Libraries:
       - Overview: libs/index.md
       - ResourcesLib: libs/resourceslib.md
-      - dateTimeFormat: libs/date-time-format.md
-      - MCL (Membership Checker): libs/mcl.md
-      - random: libs/random.md
       - refLib: libs/reflib.md
+      - translate: libs/translate.md
+      - cooldown: libs/cooldown.md
+      - MCL (Membership Checker): libs/mcl.md
+      - dateTimeFormat: libs/date-time-format.md
+      - random: libs/random.md
       - tgutil: libs/tgutil.md

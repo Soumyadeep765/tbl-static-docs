@@ -1,28 +1,89 @@
-# The `update_type` Variable
+# update_type
 
-In TBL, `update_type` is a **string** that tells you **what kind of Telegram update** triggered the command.
+A plain string that tells you *what just happened* — no detective work required.
 
-It helps you understand the context of the incoming update.
+## What is it?
 
-## Example Values
+**`update_type`** is a string naming the kind of Telegram update that triggered your command. Instead of poking through the entire [`update`](update.md) object asking "was it a message? a button? a poll?", you get a clean label like `"message"` or `"callback_query"`.
 
-Some common values of `update_type` include:
+It's the difference between reading a novel and reading the chapter title. Sometimes you need the novel. Often the title is enough.
+
+## When would you use it?
+
+Use `update_type` whenever your command handles **more than one kind of event** and you need to branch:
+
+- Echo text messages but ignore photos
+- Route callback buttons to different logic
+- Detect webhook traffic vs normal Telegram updates
+- Skip processing for update types your command doesn't care about
+
+Pair it with [`request`](request.md) — `update_type` tells you *what*, `request` gives you the *details*.
+
+---
+
+## Try it
+
+```js
+if (update_type === "message") {
+  Bot.sendMessage(chat.id, "You wrote: " + message)
+}
+
+if (update_type === "callback_query") {
+  Bot.sendMessage(request.from.id, "Button pressed: " + request.data)
+}
+
+if (update_type === "web_request") {
+  res.send({ status: "ok" })
+}
+```
+
+---
+
+## Common values
+
+### Messages
 
 - `message`
-- `chat_member`
+- `edited_message`
 - `channel_post`
-- `poll`
-- `message_reaction`
-- And more...
+- `edited_channel_post`
+- `business_message`
+- `edited_business_message`
 
-The value depends on the type of update received from Telegram.
+### Interactive
 
-## Important Notes
+- `callback_query` — inline keyboard button taps ([Handling Callbacks](../getting-started-with-tbl/handling-callbacks.md))
+- `inline_query`
+- `chosen_inline_result`
 
-- `update_type` is read-only
-- It exists only during command execution
-- It matches Telegram update type names
+### Members and chats
 
-## Learn More
+- `chat_member`
+- `my_chat_member`
+- `chat_join_request`
+- `chat_boost`
+- `removed_chat_boost`
 
-For a full list of Telegram update types, see the [Telegram Bot API Update object](https://core.telegram.org/bots/api#update).
+### Everything else
+
+- `poll`, `poll_answer`
+- `message_reaction`, `message_reaction_count`
+- `shipping_query`, `pre_checkout_query`
+- `purchased_paid_media`
+- `business_connection`, `deleted_business_messages`
+- `managed_bot`
+- `guest_message`
+
+### HTTP-triggered
+
+- `web_request` — command fired via [Webhook](../webhook-instance/index.md) or [Webapp](../webapp-instance/index.md)
+
+If the type can't be determined, the value is `"unknown"`. The universe is mysterious sometimes.
+
+---
+
+## Good to know
+
+- `update_type` is read-only and exists only during command execution
+- Values match [Telegram update type names](https://core.telegram.org/bots/api#update) where applicable
+- For quick text-only checks, [`message`](message.md) is even simpler — but only works for text messages

@@ -1,44 +1,97 @@
 # Webhook Types
 
-The Webhook instance supports two types of webhook execution, depending on how the webhook is created and used.
+Two flavors of signed webhook, one URL pattern. Both hit `/webhook/{bot_id}` — the difference is whether a Telegram user rides along for the trip.
 
-## User-Based Webhook
+---
 
-A **user-based webhook** executes a command **in the context of a specific user**.
+## What are the two types?
 
-In this type:
+| | User webhook | Global webhook |
+| --- | --- | --- |
+| **Who it's for** | One specific Telegram user | Nobody in particular |
+| **`user` in URL** | `?user={telegramUserId}` | Omitted |
+| **`user` / `chat` in command** | Loaded and enriched | `null` |
+| **`User` instance** | Available | `null` |
+| **`update.webhook`** | `true` | `false` |
+| **`update.web`** | `false` | `true` |
 
-- `user` is available
-- `chat` is available
-- The command behaves like a normal user-triggered command
+Both require a valid signature. Both respect depth limits. Both run your command in the full sandbox.
 
-This is useful when:
+---
 
-- A web action should act on behalf of a user
-- You need access to user-specific or chat-specific data
-- The webhook is linked to a logged-in user or session
+## User-based webhook
 
-User-based webhooks allow full interaction with user and chat data.
+A **user webhook** runs a command **as a specific Telegram user** — the same `user`, `chat`, and `User` you'd get from a normal message.
 
-## Global Webhook
+**Reach for this when:**
 
-A **global webhook** is **not tied to any user**.
+- A website action should run on behalf of a logged-in user
+- You need `user`, `chat`, or per-user `db.user` data
+- The link is personalized (upgrade flow, sync, account settings)
 
-In this type:
+**Generate with:**
 
-- `user` is `null`
-- `chat` is `null`
-- The command runs at a global level
+```js
+Webhook.getUrl("myCommand")           // current user
+Webhook.getUrlFor({ user_id: 123, command: "myCommand" })
+```
 
-This is useful when:
+Full guide: [User-Based Webhooks](user-webhook.md)
 
-- The webhook is triggered by a system or service
-- No user context is required
-- You want to perform background or account-level actions
+---
 
+## Global webhook
 
-## Notes
+A **global webhook** runs a command **without any user context**. `user` and `chat` are `null`; the `User` instance is not available.
 
-- Both webhook types are secure and signed
-- Both trigger normal TBL commands
-- The difference is only the availability of `user` and `chat`
+**Reach for this when:**
+
+- Cron jobs or backend services trigger bot logic
+- Public read-only APIs (still signed, but no user)
+- Account-level operations that do not target one user
+
+**Generate with:**
+
+```js
+Webhook.getGlobalUrl("getStats", { options: { days: 30 } })
+```
+
+!!! warning "No default chat"
+    In global webhooks, `Api.sendMessage()` and `Bot` helpers need an explicit `chat_id` — there is no default user chat to fall back on.
+
+Full guide: [Global Webhooks](global-webhook.md)
+
+---
+
+## Still not sure?
+
+| Scenario | Pick |
+| --- | --- |
+| "Sync this user's game progress" | User webhook |
+| "Run nightly stats for the whole bot" | Global webhook |
+| "Payment callback for user #123" | User webhook via `getUrlFor` |
+| "Signed API, no user data needed" | Global webhook |
+| "Anyone can hit this from a browser" | [Webapp](../webapp-instance/index.md) (unsigned) |
+| "Static landing page" | [Public web](../webapp-instance/public-web.md) |
+
+---
+
+## Not the same as Webapp or Public Web
+
+Webhooks always run signed and sandboxed. Webapps and public web are a different story:
+
+| | Webhook (both types) | Webapp | Public web |
+| --- | --- | --- | --- |
+| Signed | Yes | No | No |
+| Runs sandbox | Yes | Yes | No |
+| `res` | Yes | Yes | No |
+
+Webapps and public web: [Webapps](../webapp-instance/index.md).
+
+---
+
+## See also
+
+- [User-Based Webhooks](user-webhook.md)
+- [Global Webhooks](global-webhook.md)
+- [Limits & Security](limits-and-security.md)

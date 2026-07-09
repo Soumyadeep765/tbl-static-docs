@@ -1,39 +1,152 @@
 # refLib
 
-refLib provides tools for **creating and tracking referral systems**.
+Referral engine — build invite links, track who brought whom, maintain a leaderboard. Uses async [`db.user`](../db-instance/user.md) and [`db.bot`](../db-instance/bot.md). **All methods need `await`.**
 
-It is useful for invite programs, growth tracking, and reward-based user onboarding.
+---
 
-refLib is available through the `Libs` instance.
+## What is it?
 
-## Create a Referral Link
+`Libs.refLib` handles the full referral lifecycle:
 
-Generate a referral link for the bot.
+1. User shares `https://t.me/YourBot?start=ref123456`
+2. New user opens link → `/start ref123456`
+3. `track()` parses `params`, attributes the referral, updates counts
+4. Leaderboard cache updates automatically
+
+| Feature | Implementation |
+| --- | --- |
+| Referral count | `db.user.incr` (atomic) |
+| Referral list | `db.user.push` (append-only) |
+| Leaderboard | Bounded top-50 cache on `db.bot` |
+| Profile cache | `db.bot` on `register()` |
+
+!!! warning "Storage keys changed"
+    v1 used `REFLIB_*` (deprecated `Bot`/`User` properties). v1.0.0 uses `rfl:*` keys on async `db`. Data does not auto-migrate.
+
+---
+
+## How to use it
+
+**Step 1** — Track in `/start`:
 
 ```js
-let refLink = Libs.refLib.getRefLink(bot.name)
+let result = await Libs.refLib.track({
+  prefixes: ["ref", "vip"],
+  onJoin: async ({ referrer, count }) => {
+    Bot.sendMessage(chat.id, "Welcome! Referred by " + referrer.first_name)
+    Api.sendMessage({
+      chat_id: referrer.id,
+      text: user.first_name + " joined! You now have " + count + " referrals."
+    })
+  },
+  onSelf: async () => Bot.sendMessage(chat.id, "That's your own link!"),
+  onRepeat: async () => Bot.sendMessage(chat.id, "Already registered."),
+  onOrganic: async () => {} // normal /start, no code
+})
 ```
 
-This creates a unique referral link that can be shared with others.
+`result.type` is `"join"` | `"self"` | `"repeat"` | `"organic"`.
 
-## Count User Referrals
-
-Get the number of users referred by a specific user.
+**Step 2** — Give users their link (in `/mylink`):
 
 ```js
-let count = Libs.refLib.getRefCount(user.id)
+let url = await Libs.refLib.register({ prefix: "ref" })
+Bot.sendMessage(chat.id, "Share: " + url)
 ```
 
-This returns the total referral count for that user.
+`register()` caches profile + saves prefix. `link()` builds the URL string with zero db I/O.
 
-## Notes
+---
 
-- Referral tracking is handled automatically
-- Works across user sessions
-- Useful for reward or invite-based systems
+## Core methods
 
-## Full Documentation
+| Method | Returns | Description |
+| --- | --- | --- |
+| `track(handlers)` | `{ type, ... }` | Process current update + fire events |
+| `configure({ prefixes })` | void | Set default link prefixes (skip db read) |
+| `link({ bot, prefix })` | string | Build URL (sync, no db) |
+| `register({ prefix, bot })` | string | Cache profile + register prefix + return URL |
+| `count(userId?)` | number | Referral count |
+| `referrer()` | object\|null | Who referred current user |
+| `isReferred()` | boolean | Has a referrer |
+| `list(userId?, { limit })` | array | Referral list |
+| `leaderboard(top?)` | array | `[{ userId, count, rank }]` |
+| `rank(userId?)` | number | Leaderboard rank (0 = unranked) |
+| `stats(userId?)` | object | Dashboard bundle (one mget) |
+| `addCount(userId, amount?)` | number | Manual increment (admin/rewards) |
 
-[refLib Documentation]
+### Legacy aliases (still work)
 
-[refLib Documentation]: https://github.com/telebothost/tbl-libs/blob/main/Lib-Docs/refLib.md
+| Old | New |
+| --- | --- |
+| `getLink()` | `register()` |
+| `getRefCount()` | `count()` |
+| `getAttractedBy()` | `referrer()` |
+| `getRefList()` | `list()` |
+| `getTopList()` | `leaderboardMap()` |
+| `onAttracted` | `onJoin` |
+| `onTouchOwnLink` | `onSelf` |
+| `onAlreadyAttracted` | `onRepeat` |
+
+---
+
+## Examples
+
+### /mylink command
+
+```js
+let s = await Libs.refLib.stats()
+Bot.sendMessage(chat.id,
+  "Referrals: " + s.count + "\n" +
+  "Rank: " + (s.rank || "unranked") + "\n" +
+  "Link: " + s.link
+)
+```
+
+### Leaderboard
+
+```js
+let top = await Libs.refLib.leaderboard(10)
+let text = top.map(r => r.rank + ". User " + r.userId + ": " + r.count).join("\n")
+Bot.sendMessage(chat.id, "Top referrers:\n" + text)
+```
+
+### Reward on join
+
+```js
+await Libs.refLib.track({
+  onJoin: async ({ referrer, count }) => {
+    let gold = Libs.ResourcesLibv2.userRes("gold")
+    // reward referrer via anotherUserRes
+    let refGold = Libs.ResourcesLibv2.anotherUserRes("gold", referrer.telegramid || referrer.id)
+    await refGold.add(10)
+    if (count % 10 === 0) await refGold.add(50) // milestone bonus
+  }
+})
+```
+
+---
+
+## Storage keys
+
+| Key | Scope | Purpose |
+| --- | --- | --- |
+| `rfl:ct` | `db.user` | Referral count (incr) |
+| `rfl:by` | `db.user` | Referrer snapshot |
+| `rfl:ls` | `db.user` | Referral list (push) |
+| `rfl:og` | `db.user` | Organic user flag |
+| `rfl:top` | `db.bot` | Top 50 leaderboard |
+| `rfl:px` | `db.bot` | Registered link prefixes |
+| `rfl:lk:{id}` | `db.bot` | Profile cache |
+
+---
+
+## Important notes
+
+- Always `await` — every method is async
+- Call `track()` in `/start` (or master script) so `params` is parsed
+- Use `register()` in `/mylink`, not on every message
+- `configure({ prefixes: ["ref"] })` avoids a db read on the hot path
+- `db` rate limit: 10 calls/second per command — attribution uses ~5 calls
+
+[Database overview](../db-instance/index.md)

@@ -1,194 +1,167 @@
-# Sending Messages and Media with Bot
+# Sending Messages
 
-These Bot methods send messages or media to the **current chat**.
+The bread and butter of every bot: **sending stuff to the chat**. `Bot` gives you shorthand methods for text, keyboards, and media — all auto-targeted to the **current chat**. No `chat_id` required. Less typing, more chatting.
 
-- All messages go to the current chat by default
-- Using `await` is optional
-- If awaited, the Telegram API response is returned
-- Only **some methods** support [chained] actions
+For inline buttons, message edits, and other Telegram power moves, see [`Api`](../api-instance/index.md). `Bot` is your fast lane for everyday output.
 
-## Sending Text Messages
+---
 
-### Simple Text
+## What can Bot send?
+
+| Method | What it sends |
+| --- | --- |
+| `Bot.sendMessage` | Formatted text |
+| `Bot.sendKeyboard` | Text + reply keyboard (bottom of screen) |
+| `Bot.sendPhoto` / `sendDocument` / etc. | Media files |
+| `Bot.inspect` | Debug output (dev only) |
+
+All send methods use the **current chat** from command context. Method names are case-sensitive — `Bot.sendMessage` works, `Bot.sendmessage` does not. The universe is cruel but consistent.
+
+!!! tip "New to TBL?"
+    `Bot`, `chat`, and `user` are globals available in every command. Quick intro: [Learning TBL](../learning-tbl.md).
+
+---
+
+## How to use it
+
+### Text messages
+
+Simplest possible send:
 
 ```js
-Bot.sendMessage("Hello user!")
+Bot.sendMessage("Hello!")
 ```
 
-### Object Format
+Defaults to `parse_mode: "Markdown"`. Keep formatting simple — unclosed `*` or `_` markers are the #1 reason messages fail to send.
+
+Object format works too:
 
 ```js
-Bot.sendMessage({ text: "Hello user!" })
+Bot.sendMessage({ text: "Hello!" })
 ```
 
-### With Formatting
+Custom parse mode or no formatting at all:
 
 ```js
-let res = await Bot.sendMessage(
-  "Hello friend",
-  { parse_mode: "HTML" }
-)
+await Bot.sendMessage("Hello friend", { parse_mode: "HTML" })
+
+// Literal asterisks — no Markdown interpretation
+Bot.sendMessage("Price: $5 * 2", { parse_mode: undefined })
 ```
 
-## Sending Keyboards
+### Reply keyboards
 
-### String Format
-
-```js
-Bot.sendKeyboard("Choose an option:", "Yes,No")
-```
-
-### Object Format
+Comma-separated button labels at the bottom of the screen:
 
 ```js
+// String format
+Bot.sendKeyboard("Choose an option:", "Yes,No,Maybe")
+
+// Object format
 Bot.sendKeyboard({
   text: "Choose an option:",
-  keyboard: "Yes,No"
+  keyboard: "Yes,No,Maybe"
 })
 ```
 
-## Sending Media
+For **inline buttons** (tappable buttons *inside* the message bubble), use [`Api.sendMessage`](../api-instance/inline-keyboards.md) with `reply_markup` instead.
 
-All media methods support **string** and **object** formats.
+### Media
 
-### Photo
+String (URL or path) or object with options:
 
 ```js
 Bot.sendPhoto("photo.jpg")
+Bot.sendPhoto({ photo: "photo.jpg", caption: "Nice shot!" })
 
-Bot.sendPhoto({
-  photo: "photo.jpg",
-  caption: "Nice view!"
-})
+Bot.sendDocument("file.pdf")
+Bot.sendVideo({ video: "video.mp4", caption: "Watch this" })
 ```
 
-### Document
+| Method | String example | Object example |
+| --- | --- | --- |
+| `Bot.sendPhoto` | `Bot.sendPhoto("photo.jpg")` | `Bot.sendPhoto({ photo: "photo.jpg", caption: "Nice!" })` |
+| `Bot.sendDocument` | `Bot.sendDocument("file.pdf")` | `Bot.sendDocument({ document: "file.pdf", caption: "Your file" })` |
+| `Bot.sendAudio` | `Bot.sendAudio("music.mp3")` | `Bot.sendAudio({ audio: "music.mp3", caption: "Listen" })` |
+| `Bot.sendVideo` | `Bot.sendVideo("video.mp4")` | `Bot.sendVideo({ video: "video.mp4", caption: "Watch" })` |
+| `Bot.sendVoice` | `Bot.sendVoice("voice.ogg")` | `Bot.sendVoice({ voice: "voice.ogg", caption: "Voice note" })` |
+
+Captions default to Markdown when provided.
+
+---
+
+## Try it — copy-paste examples
+
+### Welcome message
 
 ```js
-Bot.sendDocument("file.pdf", "Here is your pdf")
-
-Bot.sendDocument({
-  document: "file.pdf",
-  caption: "Here is your file"
-})
+Bot.sendMessage("*Welcome!* Type /help for commands.")
 ```
 
-### Audio
+### Quick menu with reply keyboard
 
 ```js
-Bot.sendAudio("music.mp3")
-
-Bot.sendAudio({
-  audio: "music.mp3",
-  caption: "Here is your music"
-})
+Bot.sendKeyboard("What would you like?", "Shop,Support,About")
 ```
 
-### Video
+### Send then edit (with await)
+
+`await` is optional — but when you use it, send methods return a **chainable object**:
 
 ```js
-Bot.sendVideo("video.mp4")
-
-Bot.sendVideo({
-  video: "video.mp4",
-  caption: "Watch this"
-})
+let sent = await Bot.sendMessage("Working on it...")
+await sent.editText("Done!")
+await sent.delete()
 ```
 
-### Voice
+See [Method Chaining](../api-instance/method-chaining.md) for all chained methods.
+
+### Debug with `Bot.inspect`
+
+Formats values and sends them to the current chat. `console.log` routes here in command Logic fields:
 
 ```js
-Bot.sendVoice("voice.ogg")
-
-Bot.sendVoice({
-  voice: "voice.ogg",
-  caption: "Voice note"
-})
+Bot.inspect(user)
+Bot.inspect("Step:", 2, "Result:", someArray)
 ```
 
-## Using Chained Methods (Limited Support)
+| Behavior | Detail |
+| --- | --- |
+| Input | One or more values (strings as-is, objects formatted) |
+| Output | Plain-text message (no Markdown) |
 
-Only **specific Bot methods** return a response that supports **[chained] methods**  
-(when used with `await`).
+!!! warning "Development only"
+    Don't send `Bot.inspect` output to end users in production — it may expose internal data.
 
-Example:
+---
 
-```js
-let data = await Bot.sendMessage("Pinned message")
+## What's not on Bot?
 
-data.pin()
-```
+Telegram **read/query** methods aren't on `Bot`:
 
-!!! note
-    Not all Bot methods support chaining.
-    Chaining works only when the method returns a Telegram message object.
+- `getChat`, `getMe`, `getUserProfilePhotos`, etc.
 
-## Debugging with Bot.inspect()
+Use the [`Api` instance](../api-instance/index.md) for those. `Bot` is for **sending output** and **controlling bot flow**.
 
-`Bot.inspect()` sends **inspect data to the current chat**.
+---
 
-It is mainly used for **debugging** and **checking values quickly**.
+## Method reference
 
-### Inspect Any Data
+| Method | Parameters | Description |
+| --- | --- | --- |
+| `sendMessage(text, options?)` | Text string or `{ text, ...options }` | Send formatted text |
+| `sendKeyboard(text, keyboard?, options?)` | Text + comma-separated buttons | Send with reply keyboard |
+| `sendPhoto(photo, options?)` | URL/path or `{ photo, caption?, ... }` | Send photo |
+| `sendDocument(doc, options?)` | URL/path or `{ document, caption?, ... }` | Send document |
+| `sendAudio(audio, options?)` | URL/path or `{ audio, caption?, ... }` | Send audio |
+| `sendVideo(video, options?)` | URL/path or `{ video, caption?, ... }` | Send video |
+| `sendVoice(voice, options?)` | URL/path or `{ voice, caption?, ... }` | Send voice message |
+| `inspect(...values)` | One or more values | Debug output to chat |
 
-```js
-Bot.inspect({ user: "Alice", id: 123 })
-```
+---
 
-### Inspect Multiple Values
+## Important notes
 
-```js
-Bot.inspect(
-  "User data:",
-  user,
-  { id: 123 },
-  someArray
-)
-```
-
-The inspected data is formatted and sent as a message in the chat.
-
-!!! tip
-    Use `Bot.inspect()` only during development.
-    Avoid using it in production bots for users.
-
-## Available Bot Methods
-
-Only the following Bot methods are available for sending output:
-
-- `Bot.sendMessage`
-- `Bot.sendKeyboard`
-- `Bot.sendDocument`
-- `Bot.sendPhoto`
-- `Bot.sendAudio`
-- `Bot.sendVideo`
-- `Bot.sendVoice`
-- `Bot.inspect`
-
-These methods are intentionally limited and focused on output and flow control.
-
-## Not Available in Bot
-
-Methods that **read or query Telegram data**, such as:
-
-- `getChat`
-- `getMe`
-- `getUserProfilePhotos`
-- or similar Telegram API read methods
-
-are **not available** in the Bot instance.
-
-!!! info
-    The Bot instance is designed for sending responses and controlling bot behavior,
-    not for querying Telegram data.
-
-## Important Notes
-
-- All Bot send methods use the current chat
-- `await` is optional
-- Only limited methods support chained actions
-- `Bot.inspect()` sends output to chat
-- Method names are case-sensitive
-- Errors can be handled using the `!` command
-
-[chained]: ../api-instance/method-chaining.md
+- All send methods target the **current chat** — no `chat_id` needed
+- Errors from Telegram are logged; use `await` and check `res.ok` when failures matter
+- For inline keyboards, message edits, and rich messages, use [`Api`](../api-instance/index.md)
