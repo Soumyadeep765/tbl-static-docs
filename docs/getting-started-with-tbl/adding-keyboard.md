@@ -1,153 +1,84 @@
 # Adding a Keyboard to Your Bot
 
-Typing commands is fine for developers. Everyone else? They'd rather tap a button. **Reply keyboards** put buttons below the chat input — tap one, and Telegram sends that label as a normal message.
+Typing out commands is fine for developers, but regular users would much rather tap buttons. **Reply keyboards** put buttons right below the message input box. When a user taps a button, Telegram sends that text as a message automatically.
 
-Let's upgrade your `/start` command from [Your First Bot](first-hello-bot.md) into a tiny menu bot.
-
----
-
-## What we're building
-
-We'll update `/start` to:
-
-- Send a welcome message
-- Show **Help** and **About** buttons
-- Respond when users tap those buttons
-
-No Logic required yet — just Answer fields and a keyboard layout string.
+In this tutorial, we will upgrade the `/start` command you built in the last step into a mini navigation menu!
 
 ---
 
-## What is a keyboard?
+## What We Are Building
 
-A **reply keyboard** is a set of buttons shown **below** the message input field.
-
-When a user taps a button:
-
-- Telegram sends the button text as a message (e.g. `Help`)
-- TBL treats it like any other text input
-- A matching command responds
-
-No typing. Fewer typos. Happier users.
-
-!!! note "Not inline buttons"
-    Buttons *inside* the message bubble are **inline keyboards** — different feature, built in Logic. See [Handling Callbacks](handling-callbacks.md). This page is about reply keyboards only.
+We will modify `/start` so that:
+1. It sends a message asking the user to choose an option.
+2. It shows two buttons: **Help** and **About**.
+3. We will create two new commands that respond when the user taps those buttons.
 
 ---
 
-## Step 1 — Open the command
+## Step 1: Add Buttons to `/start`
 
-- Dashboard → your bot → **Commands**
-- Find your existing `/start` command
-- Click edit (pencil icon)
+Let's configure the keyboard layout:
+1. Open your bot dashboard and click **Edit** (pencil icon) next to your `/start` command.
+2. Find the **Keyboard** field.
+3. Type the button labels separated by a comma:
+   ```text
+   Help, About
+   ```
+4. Click **Save Command**.
 
----
-
-## Step 2 — Add the keyboard
-
-Update the fields:
-
-**Command:** `/start`
-
-**Answer:**
-
-```
-Hello 👋
-Choose one of the options below to continue.
-```
-
-**Keyboard:** `Help, About`
-
-That creates **two buttons in one row**.
-
-!!! warning
-    A keyboard always requires an **Answer**. Buttons can't be sent without a message — Telegram's rule, not ours.
-
-Field reference: [Command Fields](command-fields.md).
+Now, when someone sends `/start`, they will see **Help** and **About** buttons sitting side-by-side in a single row.
 
 ---
 
-## Keyboard layout basics
+## Keyboard Layout Rules
 
-Keyboards are plain text with simple rules:
-
-- **Same row:** separate buttons with commas → `Help, About`
-- **New row:** line break → `Help\nAbout`
-- **Mix freely:** `Yes, No\nCancel`
-
-| Keyboard value | Result |
-| --- | --- |
-| `Yes,No` | One row, two buttons |
-| `Yes\nNo` | Two rows, one button each |
-| `Yes,No\nBoth` | Row 1: Yes, No — Row 2: Both |
-
-Design menus like you'd sketch them on a napkin.
+Arranging your buttons is super simple. You just type text with these rules:
+*   **Buttons on the same row:** Separate them with a comma `,` (e.g., `Yes, No` ➔ Row 1: `Yes` | `No`)
+*   **Buttons on a new row:** Separate them with a newline `\n` or a line break (e.g., `Yes\nNo` ➔ Row 1: `Yes`, Row 2: `No`)
+*   **Mix it up:** `Yes, No\nCancel` ➔ Row 1: `Yes` | `No`, Row 2: `Cancel`.
 
 ---
 
-## Step 3 — Create the Help command
+## Step 2: Make the Buttons Work
 
-Tapping `Help` sends the text `Help`. TBL needs a command named `Help` to respond.
+Right now, if you tap the **Help** button, Telegram will send the text `Help` to the chat, but nothing will happen because your bot doesn't know what `Help` means yet.
 
-**Command:** `Help`
+Let's create the handler commands:
 
-**Answer:**
+### Create the `Help` Command:
+1. Click **Add Command**.
+2. **Command:** Type `Help` (Note: Capitalization matters! `Help` is not the same as `help`).
+3. **Answer:** Type your help message:
+   ```text
+   Here is what I can do:
+   - Tap About to read more about me.
+   - Send /start to reload the main menu.
+   ```
+4. Save the command.
 
-```
-Here's what I can help you with:
-- Use the buttons to navigate
-- Tap About to learn more about me
-- Send /start anytime to restart
-```
-
-No Logic needed. Case matters — `Help` is not `help`.
-
----
-
-## Step 4 — Create the About command
-
-**Command:** `About`
-
-**Answer:**
-
-```
-I'm a simple Telegram bot built on TeleBotHost.
-I use commands and keyboards to guide users easily.
-```
+### Create the `About` Command:
+1. Click **Add Command**.
+2. **Command:** Type `About`.
+3. **Answer:** Type your description:
+   ```text
+   I am a helpful bot running on TeleBotHost. I'm built entirely on JavaScript!
+   ```
+4. Save the command.
 
 ---
 
-## Why keyboards are useful
+## Step 3: Test It!
 
-Great for:
+1. Open your bot in Telegram and send `/start`. The menu buttons should pop up at the bottom of your screen.
+2. Tap **Help**. Your bot should reply with your help message.
+3. Tap **About**. Your bot should reply with your about description.
 
-- Menus and navigation
-- Guided flows ("Yes / No / Maybe")
-- Reducing "what do I type?" confusion
-
-!!! tip
-    Use keyboards for common actions instead of making users memorize commands. Save `/commands` for power users.
-
-If button text doesn't match your command name exactly, add an [alias](adding-aliases.md).
+If a button doesn't do anything, double-check that the command name in your dashboard matches the button label exactly (character for character!).
 
 ---
 
-## Test it
+## What's Next?
 
-- Open your bot in Telegram
-- Send `/start` — buttons should appear
-- Tap **Help** and **About** — each should reply
+If you have multiple buttons that should lead to the same command (like `Help`, `help`, and `/help`), you don't need to duplicate your code. In the next step, we will look at using **Aliases** to map multiple triggers to a single command.
 
-If a button does nothing, check the command name matches the button label (including capitalization).
-
-Menu complete 🎉
-
----
-
-## What's next
-
-- Add a **Back** button (point it at `/start` via alias or command)
-- Combine keyboards with [Need Reply](handle-need-reply.md) for forms
-- Add **Logic** when static answers aren't enough — [`Bot`](../bot-instance/index.md) sends dynamic replies
-
-Your bot is officially interactive.
+➔ **[Using Aliases](adding-aliases.md)**

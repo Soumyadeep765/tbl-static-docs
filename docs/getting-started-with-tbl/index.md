@@ -1,127 +1,47 @@
 # Command Flow
 
-Every bot is a pile of commands. Telegram sends an update, your bot picks one command, runs it, and calls it a day. No background process, no event loop — just match, run, done.
+Every bot on TeleBotHost is just a collection of **commands**. TBL doesn't keep a server running forever or manage an event loop. Instead, a user sends a message, TBL finds the matching command, runs it, sends the reply, and goes back to sleep.
 
-This section explains how commands are built, matched, and executed — from basic `/start` replies to callbacks, markdown, and public web pages.
-
----
-
-## What is command flow?
-
-Every Telegram bot on TeleBotHost is a collection of **commands**. The platform receives an update, picks one command, runs it, and finishes.
-
-| You get | You skip |
-| --- | --- |
-| Answer + Keyboard without code | Building a web server |
-| Logic when you need it | Event-driven architecture |
-| Special handlers (`@`, `!`, `@@`) | Custom error middleware |
-
-!!! tip "New to TBL?"
-    TBL is **JavaScript** with built-in bot extras — not a separate language. Brand new? Start with [Getting Started](../getting-started.md), then [Your First Bot](first-hello-bot.md). The big picture: [What is TBL?](../about-tbl.md). Quick intro: [Learning TBL](../learning-tbl.md).
+This section covers all the concepts you need to understand how commands match, run, and interact with the Telegram API.
 
 ---
 
-## How an update becomes a response
+## 1. The Basics: Command Structure
 
-```
-Telegram update arrives
-        │
-        ▼
-Run `@` initialization (if defined)
-        │
-        ▼
-Match one command (priority order)
-        │
-        ▼
-Send Answer + Keyboard (if configured)
-        │
-        ▼
-Run Logic code (if any)
-        │
-        ▼
-On error → run `!` handler
-        │
-        ▼
-Run `@@` post-processor (if defined)
-        │
-        ▼
-Done
-```
+Before writing code, you should understand what a command actually is and how the special `@` command lets you share configurations and variables across all your bot commands.
 
-See [Execution Flow](execution-flow.md) for the full lifecycle.
+➔ **[Command Structure](command-structure.md)** — The building block of your bot and sharing variables with `@`.
+
+➔ **[Command Fields](command-fields.md)** — A breakdown of the dashboard editor fields (Answer, Logic, Keyboard, Aliases).
 
 ---
 
-## Try it — your first command
+## 2. Core Mechanics: Execution & Matching
 
-No Logic needed — just an **Answer** field:
+Once you know how to build a command, learn how TBL runs and matches them:
 
-1. Create a command named `/start`
-2. Set **Answer** to: `Welcome! Type /help for commands.`
-3. Save and message your bot `/start`
+➔ **[Execution Flow](execution-flow.md)** — The step-by-step pipeline of code execution, and how to stop execution early using `return` in `@`.
 
-That's command flow in action. Add **Logic** when you need dynamic behavior:
-
-```js
-Bot.sendMessage("Hey " + user.first_name + "! Your chat ID is " + chat.id)
-```
-
-Globals like `user` and `chat`: [Global Variables](../globals/index.md)
+➔ **[Matching & Priority](matching-order.md)** — How TBL decides which command to run when a user sends a message.
 
 ---
 
-## Command surfaces at a glance
+## 3. Special Commands & Advanced Routing
 
-| Surface | Trigger | Answer field | Logic + `res` |
-| --- | --- | --- | --- |
-| Telegram message | User sends text/command | Yes | Yes |
-| Callback query | Inline button tap | Yes (then logic) | Yes |
-| Webhook | Signed HTTP URL | No | Yes + `res` |
-| Webapp | `/webapp/{bot_id}/{cmd}` | No | Yes + `res` |
-| Public web | `/public/{bot_id}/{path}` | N/A — serves command source | **No sandbox** |
+Learn how to handle unexpected inputs and non-text events:
 
----
+➔ **[Special Commands](special-commands.md)** — Pre-defined triggers like `/start`, `@`, `!`, `@@`, and `*`.
 
-## Pages in this section
+➔ **[Wildcard Command (*)](using-wildcard.md)** — Creating a friendly safety net for unmatched user messages.
 
-### Core concepts
-
-| Page | What you'll learn |
-| --- | --- |
-| [Command Fields](command-fields.md) | Answer, Logic, Keyboard, aliases, `need_reply`, `is_web`, `parse_mode` |
-| [Matching & Priority](matching-order.md) | How the platform picks which command runs |
-| [Execution Flow](execution-flow.md) | `@`, `!`, `@@`, answer-before-logic, sessions |
-| [Special Commands](special-commands.md) | `/start`, `@`, `!`, `@@`, `*` |
-| [Dynamic Handlers](dynamic-commands.md) | `/handle_{update_type}`, inline query, channel |
-
-### Formatting & web
-
-| Page | What you'll learn |
-| --- | --- |
-| [Markdown & Formatting](markdown-and-formatting.md) | Answer markdown, `parse_mode`, `modules.md2html` |
-| [Public Web Commands](public-web-commands.md) | `is_web` flag, static pages per bot |
-
-### Interactions
-
-| Page | What you'll learn |
-| --- | --- |
-| [Handling Callbacks](handling-callbacks.md) | Inline buttons, `callback_query`, editing messages |
-| [Handling User Input](handle-need-reply.md) | `need_reply` sessions |
-| [Using Aliases](adding-aliases.md) | Multiple triggers for one command |
-| [Wildcard (*)](using-wildcard.md) | Catch-all for unknown input |
-
-### Hands-on tutorials
-
-| Page | What you'll build |
-| --- | --- |
-| [Your First Bot](first-hello-bot.md) | `/start` with an answer |
-| [Adding a Keyboard](adding-keyboard.md) | Reply keyboard menu |
-| [Command Structure](command-structure.md) | Short overview + links |
+➔ **[Dynamic Handlers](dynamic-commands.md)** — Routing background updates, channel events, and inline queries.
 
 ---
 
-## Read first
+## 4. Presentation & Web Pages
 
-New to TeleBotHost? Start with [Getting Started](../getting-started.md), then [Your First Bot](first-hello-bot.md).
+Make your bot look professional and host public web pages:
 
-Want the big picture? [What is TBL?](../about-tbl.md) explains the command-driven model.
+➔ **[Markdown & Formatting](markdown-and-formatting.md)** — Styling your replies with bold, italic, and pre-formatted text.
+
+➔ **[Public Web Commands](public-web-commands.md)** — Serving static HTML, CSS, and client-side JavaScript pages directly from your bot.

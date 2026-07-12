@@ -1,75 +1,67 @@
 # Your First Bot
 
-Let's get something working on Telegram in the next few minutes. No Logic, no databases, no "what's a callback query?" — just a bot that says hello when someone sends `/start`.
+Let's get something working on Telegram in the next few minutes. No JavaScript logic, no databases, no complex structures—just a bot that says hello when someone sends `/start`.
 
-If you can fill in two fields and click Save, you can build a bot. Spoiler: that's literally all we're doing.
-
----
-
-## What you're building
-
-A single command: user sends `/start`, bot replies with a welcome message. That's it. Everything else in this section builds on top of this.
+Spoiler: If you can fill in two fields in a dashboard and click "Save", you can build a bot. That is literally all we are doing here!
 
 ---
 
-## Open the command editor
+## Step 1: Open the Command Editor
 
-Dashboard → your bot → **Commands** → **Add Command**.
-
-Everything your bot does lives here. One command = one row in this list.
-
----
-
-## Fill in two fields
-
-**Command:** `/start`
-
-**Answer:**
-
-```
-Hello 👋
-Welcome to my first TBL bot!
-```
-
-Save it. Launch the bot from the dashboard if you haven't already. Congratulations — you're a bot developer now. (Technically.)
+First, navigate to your bot project in the dashboard:
+1. Open the [TeleBotHost Console](https://console.telebothost.com/).
+2. Click on your bot from the dashboard list.
+3. Open the **Commands** tab.
+4. Click **Add Command**.
 
 ---
 
-## What happens when someone types `/start`
+## Step 2: Fill in the Fields
 
-Telegram delivers the update. TBL matches `/start`, sends the **Answer**, and stops. The answer goes out *before* any Logic runs — so for simple replies you often don't need a Logic field at all.
+You will see a form with several fields. For now, we only care about two:
 
-Pipeline details when you're curious: [Execution Flow](execution-flow.md).
+1. **Command:** Type `/start` (This is the message users send when they first interact with your bot).
+2. **Answer:** Type your greeting message, for example:
+   ```text
+   Hello there! 👋 Welcome to my first bot.
+   ```
 
----
-
-## Formatting the answer
-
-The Answer field accepts [Telegram Markdown](markdown-and-formatting.md) by default. Bold, italic, line breaks — nice for welcome text.
-
-```
-*Welcome!*
-Choose an option below.
-```
-
-Start plain. Add formatting once the message sends reliably. Broken asterisks are harder to debug than plain text.
+Click **Save Command** at the bottom of the form.
 
 ---
 
-## Test it
+## Step 3: Turn It On!
 
-Open your bot in Telegram, send `/start`. You should see the hello message right away.
-
-**Nothing comes back?**
-
-- Check the bot is **launched** in the dashboard
-- Confirm you're messaging the correct `@username`
-- Wait a few seconds and try again — sometimes Telegram is slow, not you
+Before testing, make sure your bot is online:
+1. Look at the top right of your bot's management panel.
+2. If it says **Offline**, click the **Launch Bot** button.
+3. Wait a second until the status indicator turns green (**Online**).
 
 ---
 
-## What's next
+## Step 4: Test Your Bot!
 
-[Adding a Keyboard](adding-keyboard.md) — give users buttons so they don't have to type commands.
+Let's see it in action:
+1. Open Telegram on your phone or computer.
+2. Search for your bot's username (the one you set up with `@BotFather`).
+3. Open the chat and click the **Start** button at the bottom (or type `/start` manually and send it).
+4. Boom! Your bot will reply instantly with your greeting.
 
-Or read [Command Flow](index.md) for the full structured guide when you're ready to go deeper.
+🎉 **You are officially a bot creator!** 
+
+---
+
+## How does this work under the hood?
+
+When someone sends `/start` to your bot:
+1. Telegram sends the message data (called an **update**) to TeleBotHost.
+2. TeleBotHost searches your command list, finds the `/start` command, and immediately sends the text in your **Answer** field back to the chat.
+3. The flow ends. Simple and fast!
+
+---
+
+## What's Next?
+
+Tapping buttons is way cooler than typing commands. In the next step, we'll add reply buttons below the chat input!
+
+➔ **[Adding a Keyboard](adding-keyboard.md)**

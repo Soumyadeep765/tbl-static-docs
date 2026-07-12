@@ -1,158 +1,68 @@
 # Execution Flow
 
-TBL matched a command. Now what? Execution follows a **fixed pipeline** every time — same order, same rules. Understanding it saves you from duplicate messages, mystery double-replies, and "why didn't my logic run?" moments.
+Every time a user interacts with your bot, TBL executes your commands in a **fixed, predictable pipeline**. Understanding how this pipeline works will help you avoid bugs, duplicate messages, and state leakage.
 
 ---
 
-## Full pipeline
+## The Execution Pipeline
+
+Here is the exact step-by-step path an update takes from start to finish:
 
 ```
-┌─────────────────────────────────────┐
-│  1. Update received                 │
-└─────────────────┬───────────────────┘
-                  ▼
-┌─────────────────────────────────────┐
-│  2. `@` initialization (always)     │
-│     Skips answer/keyboard side      │
-│     effects — logic only            │
-└─────────────────┬───────────────────┘
-                  ▼
-┌─────────────────────────────────────┐
-│  3. Matched command                 │
-│     a. Group-only check             │
-│     b. Need Reply? → send Answer,   │
-│        start session, STOP          │
-│     c. Send Answer + Keyboard       │
-│     d. Run Logic                    │
-└─────────────────┬───────────────────┘
-                  ▼
-         ┌────────┴────────┐
-         │ Runtime error?  │
-         └────────┬────────┘
-              yes  │  no
-                  ▼
-┌─────────────────────────────────────┐
-│  4. `!` error handler (on error)    │
-│     Sends its Answer, runs Logic    │
-└─────────────────┬───────────────────┘
-                  ▼
-┌─────────────────────────────────────┐
-│  5. `@@` post-processor (always)    │
-│     Skips answer side effects       │
-└─────────────────┬───────────────────┘
-                  ▼
-              Complete
+Update Received 
+   │
+   ▼
+1. Run `@` initialization (Code only — always runs first)
+   │
+   ▼
+2. Run Matched Command (e.g. `/start` or `Help`)
+   │  a. Send Answer and Keyboard (if configured)
+   │  b. Run Logic code (if any)
+   │
+   ▼ (if an error occurs in Logic)
+3. Run `!` error handler (if defined)
+   │  a. Send Answer
+   │  b. Run Logic
+   │
+   ▼
+4. Run `@@` post-processor (Code only — always runs last)
+   │
+   ▼
+Done!
 ```
-
-Special commands (`@`, `!`, `@@`) are covered in [Special Commands](special-commands.md). Matching happens *before* step 3 — see [Matching & Priority](matching-order.md).
 
 ---
 
-## Answer before Logic
+## What is skipped on `@` and `@@`?
 
-For normal Telegram commands, the **Answer** (and **Keyboard**) goes out **first**, then **Logic** runs.
+`@` and `@@` are special helper hooks. To prevent spamming your users with unwanted messages:
+*   **No Auto-Replies:** TBL **always skips** the automatic sending of `Answer` and `Keyboard` fields for `@` and `@@`. 
+*   **Pure Logic Hooks:** Only the **Logic** fields of `@` and `@@` are executed. They are designed for background setup (like authorization, database caching) and cleanup (like metrics, logging).
 
+---
+
+## Early Termination: Skipping Code with `return` in `@`
+
+Because TBL packages the `@` (init), your main command, and the `@@` (post-processor) code into a single, top-level asynchronous function block, you can use a top-level `return;` statement inside `@` to exit the entire execution instantly!
+
+If you trigger a `return;` inside `@`:
+1. The execution stops immediately.
+2. The matched command's Answer is **not** sent, and its Logic is **not** executed.
+3. The `@@` post-processor is **not** run.
+
+### Example: Authorization gate in `@`
 ```js
-// Answer field: "Loading..."
-// Logic:
-await HTTP.get("https://api.example.com/data")
-Bot.sendMessage(chat.id, "Done!")
-```
-
-The user sees "Loading..." immediately, then "Done!" when logic finishes. No waiting for your API call to show *something*.
-
-!!! tip
-    Put static text in **Answer**. Put dynamic work in **Logic**. [`Bot`](../bot-instance/index.md) is for messages Logic sends on its own.
-
----
-
-## Special command behavior
-
-These run automatically — you don't trigger them manually:
-
-| Command | When | Answer sent? | Logic runs? |
-| --- | --- | --- | --- |
-| `@` | Before every command | No | Yes |
-| Matched command | Per update | Yes (unless Need Reply blocks logic) | Yes |
-| `!` | On runtime error | Yes | Yes |
-| `@@` | After every command | No | Yes |
-| `*` | No other match | Yes | Yes |
-
-`@` and `@@` skip the automatic Answer/keyboard send — setup and cleanup logic only. No accidental double messages.
-
----
-
-## Need Reply flow
-
-**Need Reply** breaks the normal "Answer then Logic" rhythm on the first visit:
-
-1. Answer (+ keyboard) is sent
-2. A session is stored for this user
-3. **Logic does not run yet**
-4. User's next message triggers the **same command's Logic**
-5. That message is available as [`message`](../globals/message.md) / [`params`](../globals/params.md)
-
-Send a different valid command (e.g. `/start`) and the session cancels — the new command runs normally.
-
-See [Handling User Input](handle-need-reply.md).
-
----
-
-## Callback query flow
-
-Inline button taps send a **callback query**. TBL treats `callback_query.data` as command input — same matching rules as message text.
-
-1. Match command from `callback_data` (command name + optional params)
-2. Send Answer if configured
-3. Run Logic
-
-Always call [`Api.answerCallbackQuery()`](../api-instance/index.md) in Logic to dismiss Telegram's loading spinner. Users hate spinners that never stop.
-
-See [Handling Callbacks](handling-callbacks.md). Callback globals: [`update`](../globals/update.md), [`request`](../globals/request.md).
-
----
-
-## Webhook & webapp flow
-
-HTTP-triggered commands **skip** the Answer field. Only **Logic** runs, using [`res`](../res-instance/index.md) for output.
-
-Public web commands **skip the sandbox entirely** — command source is served as static content. No Logic, no [`Bot`](../bot-instance/index.md), no database.
-
-| Surface | Answer | Logic | `res` |
-| --- | --- | --- | --- |
-| Telegram / callback | Yes | Yes | No |
-| Webhook / webapp | No | Yes | Yes |
-| Public web | No | No | No |
-
----
-
-## Error handling
-
-If Logic throws an error:
-
-1. Platform may send a default error message to the user
-2. `!` command runs (if defined) — its Answer and Logic execute
-3. `@@` still runs afterward
-
-Use `!` to log errors or send a friendly fallback:
-
-```js
-// ! command Logic
-Bot.sendMessage(chat.id, "Something went wrong. Try /start again.")
+// Inside the Logic field of your `@` command:
+if (user.id !== 123456789) {
+  Bot.sendMessage(chat.id, "Access denied. You are not the admin.");
+  return; // Exits the entire execution block immediately!
+}
 ```
 
 ---
 
-## Chained commands
+## Next Steps in Command Flow
 
-[`Bot.run("otherCommand")`](../bot-instance/running-commands.md) triggers another command inside the same execution. Chain depth is limited (max **6** for Telegram commands).
+Want to see how TBL decides which command to run? Let's check out how command matching and priority work:
 
-Webhooks have a separate depth limit. Don't go infinite — Telegram users have patience limits too.
-
----
-
-## See also
-
-- [Matching & Priority](matching-order.md) — how we get to step 3
-- [Special Commands](special-commands.md) — `@`, `!`, `@@`, `*`
-- [Command Fields](command-fields.md) — what Answer and Logic actually are
+➔ **[Matching & Priority](matching-order.md)**

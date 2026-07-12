@@ -1,108 +1,63 @@
 # Using the Wildcard (*) Command
 
-Most bots have named commands — `/start`, `Help`, settings, whatever. But users don't read manuals. They send `hi`, `??`, or `/randomthing`. The **wildcard command (`*`)** catches everything else.
+No matter how many keyboards, buttons, and help menus you build, users will still send unexpected messages like `hello`, `who are you?`, or typos like `/sttart`. 
 
-One command. Every unmatched message. Your bot's polite "I didn't get that."
-
----
-
-## What is the `*` command?
-
-The **`*`** command is a **catch-all**. It runs when:
-
-- No command name matches
-- No alias matches
-- Nothing more specific wins
-
-In plain terms: **if nothing else fits, `*` runs.**
-
-It's priority #4 in matching — [Matching & Priority](matching-order.md). Named commands always beat it.
+By default, sending an unknown command results in the bot ignoring it or showing a raw system message. The **wildcard command (`*`)** acts as a safety net to catch any messages that don't match your existing commands.
 
 ---
 
-## What we're building
+## How the Wildcard Works
 
-A bot that always replies to unknown input — same friendly fallback every time. No Logic required for the simplest version.
+The `*` command is a catch-all trigger. 
 
----
-
-## Step 1 — Create the command
-
-Dashboard → **Commands** → **Add Command**
-
-**Command:** `*`
-
-**Answer:** `Hello 👋 I reply to everything you send!`
-
-Save. Done. (For this demo, make it your only command — or pair it with `/start` below.)
-
-Special command details: [Special Commands](special-commands.md).
+1. A user sends a message.
+2. TBL searches all your defined commands and aliases.
+3. If no command or alias matches, TBL runs your `*` command.
 
 ---
 
-## How the `*` command works
+## Step 1: Create the Wildcard Command
 
-When a user sends a message:
-
-1. TBL checks all defined command names and aliases
-2. If nothing matches → `*` is selected
-3. Answer is sent (Logic runs too, if you add it)
-
-Works for normal text, unknown slash commands, random keyboard mash — anything that didn't match something specific.
-
----
-
-## Example behavior
-
-**Only `*` defined:**
-
-| User sends | Result |
-| --- | --- |
-| `Hi` | `*` runs |
-| `/test` | `*` runs |
-| `🎉` | `*` runs (if no other match) |
-
-Same answer every time.
-
-**`*` plus `/start`:**
-
-| User sends | Result |
-| --- | --- |
-| `/start` | `/start` runs |
-| Anything else | `*` runs |
-
-That's the usual pattern: real commands for real actions, `*` for the rest.
+Let's build a polite "I didn't get that" responder:
+1. Open your bot dashboard and click **Add Command**.
+2. **Command:** Type `*` (just a single asterisk).
+3. **Answer:** Type your fallback response:
+   ```text
+   Hmm, I didn't quite catch that. 🤔 
+   Type /start or use the buttons below to navigate!
+   ```
+4. **Keyboard:** (Optional) Add your main menu buttons (e.g. `Help, About`) to help them get back on track.
+5. Click **Save Command**.
 
 ---
 
-## Good use cases
+## Step 2: Test It!
 
-- Default "I didn't understand" reply
-- Point users to `/start` or your menu
-- Maintenance mode message
-- Channel/update fallback when no dynamic handler exists
-
-!!! warning
-    Don't put your **main** bot logic in `*`. It's a safety net, not the star of the show. Important flows deserve named commands.
+1. Open Telegram and message your bot.
+2. Send a valid command, like `/start`. Your `/start` greeting should run normally.
+3. Now send something completely random, like `hello bot!`.
+4. Your bot will execute the `*` command and reply: "Hmm, I didn't quite catch that..." along with your menu buttons.
 
 ---
 
-## Test it
+## Best Practices for Wildcards
 
-- Open your bot in Telegram
-- Send random text
-- Bot should reply with your fallback
-
-If `/start` still works separately, even better — you've got proper routing.
-
-Wildcard working 🎉
+*   **Don't put core features in `*`**: The wildcard is meant as a friendly safety net or a router. Don't write your main bot logic here. Keep that in specific, named commands.
+*   **Give clear navigation**: When the wildcard triggers, always tell the user how to get back to the main menu (like suggesting `/start` or showing reply keyboard buttons).
+*   **Case Sensitivity Safety**: If you want to catch simple words like `help` without aliases, `*` will catch them. You can use JavaScript `if` conditions in the `*` command's Logic to inspect the input text (using the global `message` variable) and route it accordingly.
 
 ---
 
-## What's next
+## Congratulations!
 
-- Combine with [aliases](adding-aliases.md) so common phrases hit named commands first
-- Add Logic to `*` for smarter fallbacks (keyword hints, fuzzy help)
-- [Dynamic Handlers](dynamic-commands.md) for update types text matching can't catch
+You have completed the TBL Hands-on Tutorial Series. You now know how to:
+1. Create commands and static responses.
+2. Build reply menus.
+3. Map multiple buttons to single commands using Aliases.
+4. Capture user text input step-by-step.
+5. Build inline buttons and callback handlers.
+6. Catch unknown messages with a wildcard handler.
 
-You now have a bot that never leaves users talking into the void.
+To understand how these pieces execute in sequence, check out the Concept Guides:
+
+➔ **[Execution Flow](execution-flow.md)**

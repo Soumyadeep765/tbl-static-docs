@@ -1,127 +1,61 @@
 # Handling User Input with Need Reply
 
-Commands that fire and forget are great until you need to *ask* something — a name, a number, a yes/no. **Need Reply** pauses the command, waits for the user's next message, then runs Logic with that input.
+Fire-and-forget commands are great, but eventually you will want to ask your user for information—like a username, email, phone number, or age. 
 
-It's a mini conversation in two steps. No wizard framework required.
-
----
-
-## What is Need Reply?
-
-**Need Reply** tells the bot: send the Answer, then **wait** for the user's next message before running Logic.
-
-| Step | What happens |
-| --- | --- |
-| 1 | User triggers the command |
-| 2 | Bot sends Answer (and keyboard if set) |
-| 3 | Bot **waits** — Logic does **not** run yet |
-| 4 | User sends their next message |
-| 5 | Logic runs with that message as input |
-
-Useful for names, values, choices — any single piece of user text.
-
-Full pipeline: [Execution Flow](execution-flow.md#need-reply-flow).
+With the **Need Reply** setting, you can pause your command, wait for the user to type their response, and then run JavaScript logic on the input they sent.
 
 ---
 
-## Simple example — ask for a name
+## How Need Reply Works
 
-**Command:** `/input`
+Instead of running your code immediately, a Need Reply command works like a two-step conversation:
 
-**Answer:** `Tell me your name 🙂`
-
-**Need Reply:** enabled
-
-**Logic:**
-
-```js
-Bot.sendMessage(chat.id, "Your name is " + message)
-```
-
-[`Bot`](../bot-instance/index.md) sends the reply. [`message`](../globals/message.md) holds the text the user just sent — plain string, not the full Telegram object.
+1. **Step 1:** User triggers the command. The bot sends the **Answer** text (e.g., "What is your name?") and **pauses**.
+2. **Step 2:** The user types their answer (e.g., "Alice") and sends it.
+3. **Step 3:** The command wakes up and runs your JavaScript **Logic** field. The text they typed is automatically saved in the global variable `message`.
 
 ---
 
-## How this works (step by step)
+## Step 1: Create the Command
 
-1. User sends `/input`
-2. Bot replies: "Tell me your name"
-3. Need Reply is on → bot **waits**
-4. User sends `Alice`
-5. Logic runs: "Your name is Alice"
-
-**Important:** that next message is treated as **input**, not a new command — unless it matches another valid command name.
-
----
-
-## What `message` means here
-
-For this beginner flow:
-
-- [`message`](../globals/message.md) is the **text** the user sent
-- Photos, stickers, voice → `message` is `null` (handle that in advanced bots)
-- Keeps things simple while you're learning
-
-Text after the command name lives in [`params`](../globals/params.md) — different variable, different job.
+Let's build a name-prompting command:
+1. Open your dashboard and click **Add Command**.
+2. **Command:** Type `/askname`.
+3. **Answer:** Type the question:
+   ```text
+   Please type your name below! (Or send /start to cancel)
+   ```
+4. **Need Reply:** Toggle this setting **ON** (enabled).
+5. **Logic:** Paste this standard JavaScript code:
+   ```js
+   Bot.sendMessage(chat.id, "Nice to meet you, " + message + "!");
+   ```
+6. Click **Save Command**.
 
 ---
 
-## How to cancel Need Reply
+## Step 2: Test It!
 
-Users change their mind. Let them escape by sending **any valid existing command**:
-
-- `/start`
-- `Help`
-- `About`
-
-The waiting state clears. Need Reply cancels. Normal matching resumes.
-
-!!! info
-    You don't need special "cancel" Logic — valid commands cancel automatically. Consider mentioning `/start` in your Answer so users know the escape hatch.
+1. Open Telegram and send `/askname` to your bot.
+2. The bot will send "Please type your name below!" and wait.
+3. Type your name (e.g. `Sam`) and hit send.
+4. The bot will run your logic and reply: "Nice to meet you, Sam!"
 
 ---
 
-## Why the cancel matters
+## The Escape Hatch: Canceling Input Mode
 
-Without it:
+What if a user changes their mind and doesn't want to enter their name? They shouldn't get stuck forever.
 
-- Users feel **stuck** in input mode
-- Other commands **stop working** until they reply or cancel
-- The bot feels **broken**
+If a user is in a "Need Reply" waiting state and they send **any valid existing command** (like `/start` or `Help`), TBL will automatically cancel the input mode and run that command instead.
 
-One line in your Answer — *"Send /start anytime to cancel"* — saves support headaches.
-
----
-
-## Good practices
-
-- **Explain** what input you expect in the Answer
-- Keep flows **short** — one question at a time
-- Mention **/start** or menu buttons as cancel options
-- **Reply immediately** after receiving input
-- Avoid chaining many Need Reply steps in a row (use Logic + `db.user` for wizards)
-
-!!! warning
-    Leaving users in a reply-waiting state without clear instructions blocks normal bot usage. Always tell them what to send — and how to bail out.
-
-More detail: [handle-need-reply matching](matching-order.md#need-reply-override).
+!!! safety "Beginner Tip"
+    Always tell your users how to cancel in your Answer field! Add a quick line like: *(send /start to cancel)*. It prevents users from feeling stuck or thinking your bot is broken.
 
 ---
 
-## Test cancel behavior
+## What's Next?
 
-1. Send `/input`
-2. Instead of a name, send `/start`
-3. Bot should cancel input mode and run `/start` normally
+Now that you can capture user text, let's look at **Inline Keyboards**—buttons that sit directly inside message bubbles and execute actions behind the scenes without sending chat spam!
 
-Works? Your Need Reply setup is solid.
-
----
-
-## What's next
-
-- Store answers in `db.user` for multi-step flows
-- Combine with [keyboards](adding-keyboard.md) for guided choices
-- [Handling Callbacks](handling-callbacks.md) when buttons live inside messages
-
-Foundation for wizards, forms, and anything that asks before it acts.
+➔ **[Handling Callbacks](handling-callbacks.md)**

@@ -1,96 +1,68 @@
 # Using Aliases in Your Bot
 
-One command, one trigger name — sounds tidy until your keyboard button says `Help`, your users type `help`, and someone tries `/h`. **Aliases** let one command answer to multiple names without duplicating Logic.
+Having one command trigger name is clean, but users don't always do what you expect. If your keyboard button says `Help`, your users might type `/help`, `/h`, or `help` in lowercase.
 
-Same behavior every time. Less copy-paste. Fewer "why didn't that work?" moments.
-
----
-
-## What is an alias?
-
-An **alias** is an alternative trigger for a command you already have.
-
-| | |
-| --- | --- |
-| **One command** | Single Answer + Logic |
-| **Many triggers** | Main name + aliases |
-| **Same behavior** | Every alias runs the same command |
-
-TBL checks the command name first, then aliases — [Matching & Priority](matching-order.md).
+Instead of copying and pasting the exact same answer and logic into four different commands, you can use **Aliases** to map all of these triggers to a single command.
 
 ---
 
-## Why aliases are useful
+## What is an Alias?
 
-- Match **keyboard button text** exactly
-- Support shorthand (`/h` for Help)
-- Catch common typos or case variations (if you add each variant)
-- Improve UX **without** extra Logic
-
-Aliases are configuration, not code. Free flexibility.
-
----
-
-## Adding aliases to a command
-
-Open a command in the editor. Fill the **Aliases** field:
+An alias is just an alternative trigger word for an existing command. 
 
 ```
-help, HELP, /h
+/help (Main Command)
+  ├── help (Alias)
+  ├── HELP (Alias)
+  └── /h   (Alias)
 ```
 
-Each value is a separate trigger for the **same** command.
-
-!!! note "Case-sensitive"
-    `Help`, `help`, and `HELP` are three different triggers. Add each variation you want to support — the universe is cruel but consistent.
-
-Field details: [Command Fields](command-fields.md).
+No matter which one the user types, the exact same command runs.
 
 ---
 
-## Aliases and keyboards
+## Step 1: Open Your Command
 
-This is the most common use case.
-
-Your keyboard button says `Help`. Your command might be named `help_menu` internally. Add alias **`Help`** (exact button text) and taps just work.
-
-!!! tip
-    Always add an alias that **exactly** matches each keyboard button label. See [Adding a Keyboard](adding-keyboard.md).
+Let's add aliases to the `Help` command we built in the last step:
+1. Open your bot dashboard and click **Commands**.
+2. Find your `Help` command and click **Edit** (pencil icon).
 
 ---
 
-## Best practices
+## Step 2: Add Aliases
 
-- Keep aliases **short and clear**
-- Match keyboard labels **character for character**
-- Avoid the **same alias on two commands** — only one can win, and it might not be the one you expect
-- Fewer well-chosen aliases beat a laundry list of random words
-
----
-
-## Common mistakes
-
-| Mistake | What happens |
-| --- | --- |
-| Same alias on two commands | Unpredictable matching — pick one owner |
-| Button says `Help`, alias says `help` | Tap does nothing — case mismatch |
-| Alias on wrong command | Wrong response — double-check the editor |
+1. Locate the **Aliases** field in the form.
+2. Type the aliases you want to support, separated by commas:
+   ```text
+   help, HELP, /h
+   ```
+3. Click **Save Command**.
 
 ---
 
-## Test your aliases
+## Why are Aliases Awesome?
 
-- Open your bot in Telegram
-- Type each alias manually
-- Tap keyboard buttons
-- Confirm they all hit the **same** response
-
-All paths lead to one command? You're set.
+*   **Keyboard matching:** If your menu button text says `ℹ️ About Us`, you can name your command `about_us` internally, and simply add `ℹ️ About Us` as an alias.
+*   **Catching Typos & Shorthands:** You can map shorthand forms (like `/h` for help, or `/q` for quit) to make life easier for power users.
+*   **Case Sensitivity:** TBL commands are case-sensitive. If your command name is `Help`, typing `help` in lowercase won't work unless you add it as an alias.
 
 ---
 
-## What's next
+## Test It!
 
-- [Handling User Input](handle-need-reply.md) — pause and wait for replies
-- [Using the Wildcard](using-wildcard.md) — catch what aliases don't cover
-- [Command Flow](index.md) — full matching rules
+1. Open Telegram and search for your bot.
+2. Send the shorthand command `/h`.
+3. Send the lowercase word `help`.
+4. Send the capital word `HELP`.
+
+If the bot responds with the same help message for all of them, your aliases are working perfectly!
+
+---
+
+## What's Next?
+
+So far, our commands are "one-way"—the bot sends an answer and immediately stops. What if you need to ask the user a question (like "What is your name?") and wait for their answer before running code?
+
+In the next step, we will use **Need Reply** to handle user input step-by-step.
+
+➔ **[Handling User Input](handle-need-reply.md)**

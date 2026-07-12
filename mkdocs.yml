@@ -146,20 +146,26 @@ nav:
 
   - Tutorials:
       - Overview: tutorials/index.md
-      - Command Flow: getting-started-with-tbl/index.md
-      - Command Fields: getting-started-with-tbl/command-fields.md
-      - Matching & Priority: getting-started-with-tbl/matching-order.md
-      - Execution Flow: getting-started-with-tbl/execution-flow.md
-      - Special Commands: getting-started-with-tbl/special-commands.md
-      - Dynamic Handlers: getting-started-with-tbl/dynamic-commands.md
-      - Markdown & Formatting: getting-started-with-tbl/markdown-and-formatting.md
-      - Public Web Commands: getting-started-with-tbl/public-web-commands.md
-      - Handling Callbacks: getting-started-with-tbl/handling-callbacks.md
-      - Your First Bot: getting-started-with-tbl/first-hello-bot.md
-      - Adding a Keyboard: getting-started-with-tbl/adding-keyboard.md
-      - Using Aliases: getting-started-with-tbl/adding-aliases.md
-      - Handling User Input: getting-started-with-tbl/handle-need-reply.md
-      - Wildcard Command (*): getting-started-with-tbl/using-wildcard.md
+      - Lesson 1 - Your First Bot: getting-started-with-tbl/first-hello-bot.md
+      - Lesson 2 - Adding a Keyboard: getting-started-with-tbl/adding-keyboard.md
+      - Lesson 3 - Using Aliases: getting-started-with-tbl/adding-aliases.md
+      - Lesson 4 - Handling User Input: getting-started-with-tbl/handle-need-reply.md
+      - Lesson 5 - Handling Callbacks: getting-started-with-tbl/handling-callbacks.md
+      - Lesson 6 - Wildcard Command (*): getting-started-with-tbl/using-wildcard.md
+
+  - Command Flow:
+      - Overview: getting-started-with-tbl/index.md
+      - Core Mechanics:
+          - Command Structure: getting-started-with-tbl/command-structure.md
+          - Command Fields: getting-started-with-tbl/command-fields.md
+          - Execution Flow: getting-started-with-tbl/execution-flow.md
+          - Matching & Priority: getting-started-with-tbl/matching-order.md
+      - Advanced Routing:
+          - Special Commands: getting-started-with-tbl/special-commands.md
+          - Dynamic Handlers: getting-started-with-tbl/dynamic-commands.md
+      - Presentation & Web:
+          - Markdown & Formatting: getting-started-with-tbl/markdown-and-formatting.md
+          - Public Web Commands: getting-started-with-tbl/public-web-commands.md
 
   - Guides:
       - Overview: guides/index.md

@@ -1,68 +1,79 @@
 # Command Structure in TBL
 
-Every TeleBotHost bot is a collection of **commands**. Not routes, not controllers, not event listeners — commands. Telegram sends an update, TBL matches **exactly one**, runs it, and finishes.
+On TeleBotHost, your entire bot is built out of **commands**. You don't have to write HTTP routers, register event listeners, or keep servers alive. Instead, you define commands in the dashboard. When a user sends a message, TBL matches it to a command, runs it, and finishes.
 
-One update in. One path through your code out. That's the whole model.
+One update in, one execution path out. Simple, stable, and clean.
 
 ---
 
-## The command-driven model
+## What a Command Contains
 
+In the dashboard editor, every command has a few key properties that control its behavior:
+
+| Part | What it does | When to use it |
+| --- | --- | --- |
+| **Command** | The unique trigger name (e.g. `/start`, `Help`, `*`) | Always. This is how TBL matches incoming messages to your code. |
+| **Answer** | A static text message sent automatically to the user | For simple text replies. It is sent *before* any logic runs. |
+| **Keyboard** | Buttons shown below the message input field | To guide users (e.g. `Help, About`). Requires an Answer to be sent. |
+| **Logic** | The JavaScript code executed inside the VM sandbox | For dynamic behaviors (database saves, external API calls). |
+| **Aliases** | Alternative trigger names (e.g. `help, /h`) | To map multiple button taps or typos to a single command. |
+
+---
+
+## How `@` Shares Variables and Configs
+
+The **`@`** command is a special hook that runs automatically **before** any other command on every update. But it is not just for rate limits or auth checks—it is also your global configuration center!
+
+### The Combined Scope
+
+When an update arrives, TBL compiles your code by concatenating your `@` initialization logic, your matched command's logic, and your `@@` post-processor logic **inside a single asynchronous block**:
+
+```js
+(async () => {
+  // 1. @ Initialization logic runs first
+  const adminId = 123456789;
+  const userProfile = await db.user.get("profile");
+
+  // 2. Your matched command logic runs second
+  Bot.sendMessage(chat.id, "Hello, " + userProfile.name);
+
+  // 3. @@ Post-processor logic runs last
+  // ...
+})();
 ```
-User action  →  Telegram update  →  TBL matches command  →  Answer + Logic  →  Done
+
+Because all three sections run inside the **same function scope**, any variables you declare in `@` (using `const`, `let`, or `var`) are **immediately shared and accessible** inside your matched command and your `@@` code!
+
+### Example: Loading Global Configurations
+
+You can load values once in `@` and use them anywhere:
+
+```js
+// 1. Inside the Logic field of your `@` command:
+const config = {
+  maintenance: false,
+  version: "1.2.0"
+};
+
+const userSession = await db.user.get("session") || { steps: 0 };
 ```
 
-No background process humming away. No `while(true)` loop. Each message is a fresh, self-contained run — plus automatic `@` and `@@` wrappers around it ([Special Commands](special-commands.md)).
+```js
+// 2. Inside the Logic field of your `/status` command:
+// You can read `config` and `userSession` directly!
+if (config.maintenance) {
+  Bot.sendMessage(chat.id, "Under maintenance. Back soon!");
+} else {
+  Bot.sendMessage(chat.id, "Version: " + config.version);
+}
+```
+
+This makes sharing settings, cached database records, and utility states across all commands incredibly easy, clean, and completely eliminates redundant code!
 
 ---
 
-## What a command contains
+## Next Steps in Command Flow
 
-Think of a command as a small form with a few parts:
+Now that you know how a command is structured, let's look at the fields you can use in the editor:
 
-| Part | Role |
-| --- | --- |
-| **Name** | What triggers it (`/start`, `Help`, `*`) |
-| **Answer** | Optional auto-reply before logic |
-| **Logic** | Real JavaScript + built-in bot extras for dynamic behavior |
-| **Options** | Keyboard, aliases, need reply, public web, parse mode |
-
-**Answer** is the fast path — static text TBL sends for you. **Logic** is where [`Bot`](../bot-instance/index.md), [`Api`](../api-instance/index.md), `db`, and [globals](../globals/index.md) like [`user`](../globals/user.md) and [`params`](../globals/params.md) come in.
-
-Full field reference: [Command Fields](command-fields.md).
-
----
-
-## Learn part by part
-
-### Flow & matching
-
-1. [Command Flow overview](index.md) — hub for this section
-2. [Matching & Priority](matching-order.md) — which command wins
-3. [Execution Flow](execution-flow.md) — `@`, Answer, Logic, `!`, `@@`
-4. [Special Commands](special-commands.md) — `/start`, `@`, `!`, `@@`, `*`
-5. [Dynamic Handlers](dynamic-commands.md) — `/handle_{update_type}`
-
-### Formatting & surfaces
-
-6. [Markdown & Formatting](markdown-and-formatting.md) — answers and `md2html`
-7. [Public Web Commands](public-web-commands.md) — `is_web` static pages
-
-### User interactions
-
-8. [Handling Callbacks](handling-callbacks.md) — inline buttons
-9. [Handling User Input](handle-need-reply.md) — need reply sessions
-10. [Using Aliases](adding-aliases.md) — multiple triggers
-11. [Wildcard (*)](using-wildcard.md) — catch-all
-
-### Hands-on
-
-12. [Your First Bot](first-hello-bot.md) — **start here** if you haven't built anything yet
-
----
-
-## Where to go next
-
-Built `/start` already? Add [a keyboard](adding-keyboard.md). Need buttons inside messages? [Callbacks](handling-callbacks.md). Want a landing page? [Public web](public-web-commands.md).
-
-The docs are modular — read what you need, skip what you don't.
+➔ **[Command Fields](command-fields.md)**
