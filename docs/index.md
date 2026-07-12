@@ -1,4 +1,4 @@
-# TBL Documentation
+# Welcome to TeleBotHost & TBL
 
 Build Telegram bots in the cloud without managing servers — write commands, hit save, and TeleBotHost runs the rest.
 
@@ -6,57 +6,58 @@ Build Telegram bots in the cloud without managing servers — write commands, hi
 
 ---
 
-## New here?
+## About TeleBotHost
 
-Work through these in order — each step takes about five minutes:
+TeleBotHost is built to make Telegram bot hosting simple, fast, and accessible to everyone — from developers and creators to growing businesses. We provide the smoothest and most reliable platform for running Telegram bots without the hassle of servers, complex configurations, or technical barriers.
 
-1. [Getting Started](getting-started.md) — account, BotFather token, launch your bot  
-2. [Command Flow](getting-started-with-tbl/index.md) — how commands match, run, and respond  
-3. [Your First Bot](getting-started-with-tbl/first-hello-bot.md) — `/start` in five minutes  
-4. [What is TBL?](about-tbl.md) — the command-driven execution model  
+### Our Mission
+We aim to provide the most stable, secure, and developer-friendly environment. By abstracting away infrastructure, we allow you to focus entirely on writing bot logic and delivering excellent user experiences.
 
-!!! tip "New to TBL?"
-    TBL is **JavaScript** with built-in bot extras — `Bot`, `Api`, `user`, `chat`, and more. The fastest on-ramp: [Learning TBL](learning-tbl.md) — globals, instances, and your first Logic field in one page.
+### Our Vision
+We want to make TeleBotHost a free and accessible platform for everyone—where developers, creators, and businesses build, scale, and innovate without limits or cost barriers.
 
 ---
 
-## Command flow (structured guide)
+## What We Provide
 
-| Topic | Page |
-| --- | --- |
-| Command fields (Answer, Logic, keyboard, `is_web`) | [Command Fields](getting-started-with-tbl/command-fields.md) |
-| Matching & priority | [Matching & Priority](getting-started-with-tbl/matching-order.md) |
-| Execution pipeline (`@`, `!`, `@@`) | [Execution Flow](getting-started-with-tbl/execution-flow.md) |
-| Markdown & formatting | [Markdown & Formatting](getting-started-with-tbl/markdown-and-formatting.md) |
-| Public web pages | [Public Web Commands](getting-started-with-tbl/public-web-commands.md) |
-| Inline button callbacks | [Handling Callbacks](getting-started-with-tbl/handling-callbacks.md) |
-
-Full index: [Command Flow overview](getting-started-with-tbl/index.md) · [Tutorials](tutorials/index.md)
+*   **1-Click Deployment:** Write your commands, save, and your bot is instantly live.
+*   **JavaScript with Built-in Extras:** TBL isn't a custom language—it is standard JavaScript with built-in extras (`Bot`, `Api`, `db`, etc.) designed to cut out the difficult configuration, boilerplate, and infrastructure management. Write actions in 5 lines of code instead of 50.
+*   **Sandbox Protection:** All bots execute in safe, isolated sandboxes.
+*   **Built-in Databases:** Store bot settings, user preferences, and global states with zero configuration.
+*   **Webhooks & Webapps:** Tie HTTP endpoints directly to bot commands and serve public web pages or interactive apps.
+*   **Curated Modules:** Pre-installed packages like Lodash, BCrypt, dayjs, JWT, Cheerio, and Zod.
 
 ---
 
-## Reference sections
+## Core Values
 
-**[Global Variables](globals/index.md)** — `user`, `chat`, `update`, `message`, and the rest of the context available in every command.
+!!! info "Reliability"
+    Always-online uptime with fast execution, stable servers, and multi-region redundancy.
 
-**Instances** — the objects you call in command logic:
+!!! success "Simplicity"
+    Designed for both beginners and experts — deploy, test, and scale with ease.
 
-- [Bot](bot-instance/index.md) — flow, storage, simple sends  
-- [Api](api-instance/index.md) — full Telegram Bot API access  
-- [Bot vs Api](guides/bot-vs-api.md) — when to use which  
-- [HTTP](http-instance/index.md) — outbound requests to external services  
-- [db](db-instance/index.md) — bot, user, and global storage  
-- [msg](msg-instance/index.md) — reply, edit, delete on the current message  
-- [Webhooks](webhook-instance/index.md) / [Webapps](webapp-instance/index.md) — HTTP endpoints tied to commands  
-- [Public Web](webapp-instance/public-web.md) — static `is_web` pages per bot  
-- [res](res-instance/index.md) — JSON, HTML, redirects from webhook/webapp commands  
+!!! danger "Security First"
+    All API tokens are fully encrypted, run in isolated sandboxes, and are shielded by DDoS protection.
 
-**[modules](modules/index.md)** and **[Libraries](libs/index.md)** — lodash, jwt, md2html, date helpers, and more.
+!!! note "Performance"
+    Optimized execution engine, custom language enhancements, and a built-in 200ms anti-flooding delay for natural bot interactions.
 
 ---
 
-## Outside these docs
+## Ready to build?
 
-- [TeleBotHost Console](https://console.telebothost.com/)  
-- [First bot tutorial (with screenshots)](https://telebothost.com/tutorials/adding-first-bot)  
-- [Telegram Bot API](https://core.telegram.org/bots/api)
+Follow these steps to get your first bot running in under 5 minutes:
+
+1.  **[Getting Started](getting-started.md)** — Create an account, get a token from `@BotFather`, and launch.
+2.  **[Learning TBL](learning-tbl.md)** — Explore globals, instances, and your first Command field.
+3.  **[Your First Bot](getting-started-with-tbl/first-hello-bot.md)** — Build a `/start` responder step-by-step.
+4.  **[Command Flow](getting-started-with-tbl/index.md)** — Understand how commands match, run, and execute.
+
+---
+
+## Community & Support
+
+*   **Console:** [TeleBotHost Console](https://console.telebothost.com/)
+*   **Community Chat:** [Join the Telegram Channel](https://t.me/update_chat)
+*   **Official Website:** [telebothost.com](https://telebothost.com)

@@ -1,83 +1,66 @@
 # What is TBL?
 
-**TBL (Tele Bot Language)** is **JavaScript with built-in extras** for Telegram bot development — reply to messages, store user data, call APIs, show buttons, gate features behind channel joins.
+Let's clear one thing up first: **TBL (Tele Bot Language) is not a brand new, scary programming language** you have to learn from scratch. It is just standard **JavaScript** dressed up in a superhero costume, pre-loaded with built-in tools specifically made for Telegram bots.
 
-You write real JavaScript in command **Logic** fields. TeleBotHost adds `Bot`, `Api`, `user`, `chat`, `db`, `modules`, and more so you skip the boilerplate and ship faster. It's not for building general websites or CLI tools — it's JavaScript tuned for bots. TeleBotHost handles hosting; you focus on "what should happen when someone sends `/start`," not "how do I keep a Node process alive at 3 AM."
-
-New to the platform? [Getting Started](getting-started.md). Ready to write code? [Learning TBL](learning-tbl.md).
+If you know basic JavaScript (variables, `if` statements, functions), you already know TBL. If you don't know JavaScript yet, don't sweat it—we'll walk you through the basics step-by-step.
 
 ---
 
-## Commands, not event loops
+## The Old Way vs. The TBL Way
 
-Most Node bot frameworks look like this: register listeners, keep a process alive, hope nothing leaks memory. TBL flips that model entirely.
+Usually, building a Telegram bot looks like this:
+1. Rent a server (VPS).
+2. Install Node.js, configure Nginx, and deal with SSL certificates.
+3. Write tons of boilerplate code to connect to the Telegram API.
+4. Pray that the server doesn't crash at 3 AM.
 
-Telegram sends an update. TBL finds the matching **command** and runs it. The command finishes. Nothing stays running in the background waiting for the next message — the next update starts a fresh execution.
+**With TeleBotHost and TBL, you skip all the boring infrastructure stuff.** 
 
 ```
-Update  →  match command  →  send Answer  →  run Logic  →  done
+User texts your bot ➔ TeleBotHost wakes up ➔ Runs your code ➔ Sends reply ➔ Goes back to sleep
 ```
 
-One update, one command, one path through the code. Easier to reason about, harder to accidentally create a zombie process.
+No background processes, no memory leaks, no DevOps guilt. Just a simple request-response loop.
 
 ---
 
-## What a command can do
+## How it works (Step-by-Step)
 
-| Surface | Example |
-| --- | --- |
-| **Telegram reply** | Answer field + Logic → chat message |
-| **Inline buttons** | Logic sends keyboard → [Handling Callbacks](getting-started-with-tbl/handling-callbacks.md) |
-| **Formatted text** | Markdown/HTML answers — [Markdown & Formatting](getting-started-with-tbl/markdown-and-formatting.md) |
-| **Public web page** | `is_web` command → `/public/{bot_id}/index.html` |
-| **HTTP API** | Webhook or webapp command → `res.json()` |
+Here is exactly what happens when someone interacts with your bot:
 
-See [Command Flow](getting-started-with-tbl/index.md) for the full structured guide.
+1. **The Trigger:** A user sends a message to your bot on Telegram (for example, `/start`).
+2. **The Match:** TeleBotHost checks your dashboard, finds the command matching `/start`, and grabs your code.
+3. **The Execution:** The platform runs your JavaScript logic instantly in a secure, isolated sandbox.
+4. **The Response:** Your code sends a message back to the user (like "Hello there!").
+5. **The Clean Up:** The command finishes executing and stops. Nothing stays running in the background waiting for the next message.
 
 ---
 
-## Short-lived executions
+## What's in your toolbox?
 
-Each run is sandboxed and time-bounded. Your command does its work — send messages, read storage, call HTTP — and exits. Under load, many users can trigger commands at once without one long-running script getting tangled.
+When you write code on TeleBotHost, you don't need to run `npm install` or import libraries. Everything you need is already global and ready to use:
 
-You won't find background timers or daemons in TBL by design. If something should happen "later," it's because a new update arrived or you chained work through `on_run` / another command. Patience, delivered via Telegram updates.
-
----
-
-## Async when it helps
-
-Some calls take time — Telegram's API, an external HTTP request, channel membership checks (`await Libs.mcl.quick(...)`). TBL supports `await` where you need the result before continuing. It doesn't push async everywhere; only where waiting actually matters.
-
-Most day-to-day bot code runs synchronously. Add `await` when you're waiting on something external — not "just in case."
+*   **`Bot`**: Your go-to helper. Want to send a simple message? Just use `Bot.sendMessage(chat.id, "Hi!")`.
+*   **`Api`**: The raw Telegram Bot API power. Use this when you want to send inline keyboards, edit existing messages, or upload files.
+*   **`user` & `chat`**: Objects that tell you exactly *who* sent the message and *where* they sent it from.
+*   **`db`**: A built-in database that works out of the box. No setup required. You can save user high scores, settings, or bot states instantly.
+*   **`modules` & `Libs`**: Pre-loaded toolboxes containing useful packages (like Lodash, BCrypt, dayjs, and referral system helpers).
 
 ---
 
-## Built-in toolboxes
+## Why are there limits?
 
-You don't install npm packages. TBL gives you two drawers:
+Since TBL runs in a shared serverless environment, you can't run infinite background loops or install arbitrary npm packages. 
 
-| Toolbox | Best for | Docs |
-| --- | --- | --- |
-| `modules` | JWT, bcrypt, CSV, lodash, ethers | [Modules](modules/index.md) |
-| `Libs` | Referrals, dice rolls, channel gates, game economies | [Libs](libs/index.md) |
-
-Rule of thumb: npm-style utility → `modules`. Telegram-bot glue → `Libs`.
+This might feel limiting if you want to build a general-purpose web server—but for Telegram bots, it's a superpower. It keeps your bot super stable, lightning-fast, and protects it from bugs that would otherwise freeze a raw Node.js server.
 
 ---
 
-## Why the limits exist
+## What to explore next
 
-TBL is JavaScript, but it's not a full Node.js server. You can't install arbitrary npm packages or open raw sockets. That frustrates people who want a general-purpose backend — and protects everyone else from accidental infinite loops, runaway memory, or bots that become impossible to debug.
+Ready to start building? Here are the best steps to follow:
 
-The tradeoff: less freedom than raw Node, faster path to a working bot. For most Telegram bots, that's a fair swap — you get the language you know, plus the extras you actually need.
-
----
-
-## What to read next
-
-- [Command Flow](getting-started-with-tbl/index.md) — fields, matching, execution, callbacks, public web  
-- [Your First Bot](getting-started-with-tbl/first-hello-bot.md) — hands-on `/start`  
-- [Learning TBL](learning-tbl.md) — sync, async, first lines of code  
-- [Global Variables](globals/index.md) — `user`, `chat`, `update`, and runtime context  
-- [Bot](bot-instance/index.md) and [Api](api-instance/index.md) — the two main instances  
-- [Bot vs Api](guides/bot-vs-api.md) — two objects, two jobs
+1. **[Getting Started](getting-started.md)** — Create your bot with `@BotFather` and link it to TeleBotHost.
+2. **[Learning TBL](learning-tbl.md)** — Learn how to write your first lines of logic.
+3. **[Your First Bot](getting-started-with-tbl/first-hello-bot.md)** — Build a step-by-step `/start` responder in 5 minutes.
+4. **[Command Flow](getting-started-with-tbl/index.md)** — Learn how matching and execution work under the hood.

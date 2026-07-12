@@ -1,101 +1,82 @@
 # Learning TBL
 
-**TBL is JavaScript** — not a lookalike, not a dialect. You write real JavaScript in the **Logic** field: variables, `if`, loops, `await`, objects, all of it.
+First things first: **TBL is just JavaScript**. It’s not a dialect, it's not a secret language, and it doesn't have custom syntax you need to memorize. If you drop standard JavaScript into the **Logic** field of a command, it will just work. 
 
-What makes it faster for bot building is what's *already there*: `Bot`, `Api`, `user`, `chat`, `db`, `modules`, and `Libs`. No `npm install`, no Express server, no wiring up a Telegram library before your first `Bot.sendMessage()`.
-
-You write logic inside commands. Telegram sends an update, TBL picks a command, your JavaScript runs, execution ends. That's the whole lifecycle. No event loop babysitting required.
+What makes it fast is that all the annoying setup is already done for you. No importing libraries, no setting up servers, and no setting up database connections. 
 
 ---
 
-## The command lifecycle
+## The Command Lifecycle
 
-Every interaction follows the same path:
+Every time a user interacts with your bot, they trigger a quick, single run of your code:
 
 ```
-Update  →  match command  →  send Answer  →  run Logic  →  done
+User Action ➔ Matches Command ➔ Sends Answer (Optional) ➔ Runs Logic ➔ Finished!
 ```
 
-Special wrappers `@` (before) and `@@` (after) run automatically around other commands. Details: [Execution Flow](getting-started-with-tbl/execution-flow.md).
-
-Think of it like a vending machine: user picks a snack (sends a command), machine dispenses (Answer + Logic), transaction complete. No machine sitting there idle between customers.
+Think of it like a vending machine: a user presses a button (sends a command), the machine drops a snack (sends an answer and runs logic), and the machine goes back to resting. It does not sit there running and consuming power in between customers.
 
 ---
 
-## Sync by default
+## Doing Things Step-by-Step (Sync vs. Async)
 
-Lines run in order. Most `Bot` and `Api` calls work that way out of the box — call it, move on.
-
-When you need a response before continuing — grab a message id, check whether send succeeded, verify channel membership — add `await`:
+By default, your code runs line-by-line, in order:
 
 ```js
-let sent = await Api.sendMessage({ text: "One moment..." })
-await sent.editText("Ready.")
+Bot.sendMessage(chat.id, "Line one");
+Bot.sendMessage(chat.id, "Line two");
 ```
 
-Don't sprinkle `await` on calls where you ignore the result. Async isn't a seasoning — use it when you're actually waiting for something.
-
-Common async cases:
-
-| What | Example |
-| --- | --- |
-| Edit a message you just sent | `await Api.sendMessage(...)` |
-| Check channel membership | `await Libs.mcl.quick(user.id, ["@Channel"])` |
-| Parse CSV / hash password | `await modules.ParseCSV.parse(...)` |
-
----
-
-## Your first line of code
-
-Drop this in a command's **Logic** field:
+However, some actions take time to finish—like fetching data from another website or checking if a user is a member of a channel. When you need to wait for a line to finish before moving to the next one, use `await`:
 
 ```js
-Bot.sendMessage(chat.id, "Hello from TBL!")
+// We wait for the message to send, and store the reference to it
+let sentMessage = await Api.sendMessage({ text: "Checking databases..." });
+
+// Once it's sent, we edit the message text
+await sentMessage.editText("All systems green!");
 ```
 
-Trigger the command on Telegram — you get a reply. For simple text responses, you often only need the **Answer** field — no Logic required. Logic is where things get interesting.
-
-!!! tip "Globals"
-    `chat.id` is where the message goes. `user` is who sent the command. Full list: [Global Variables](globals/index.md).
+Only use `await` when you actually need the result of that line before moving forward. 
 
 ---
 
-## JavaScript extras — already there
+## Writing Your First Lines of Logic
 
-You never write `import` or `require`. On top of standard JavaScript, these bot-building globals are ready on day one:
+To test this out, go to a command in your dashboard (like `/test`), scroll down to the **Logic** field, and paste this line:
 
-| Global | What it is |
-| --- | --- |
-| `Bot` | High-level bot helpers — send messages, run commands, storage |
-| `Api` | Raw Telegram API — keyboards, edits, file uploads |
-| `user` | Who triggered this command |
-| `chat` | Where the message came from |
-| `params` | Text after the command (e.g. `/start promo` → `"promo"`) |
-| `modules` | npm-style utilities — JWT, bcrypt, CSV, etc. |
-| `Libs` | Bot helpers — referrals, random, channel checks |
+```js
+Bot.sendMessage(chat.id, "Hello from the Logic field!");
+```
 
-When to use `Bot` vs `Api`? [Bot vs Api](guides/bot-vs-api.md) — short answer: `Bot` for everyday replies, `Api` when you need full control.
+Save it, open your bot on Telegram, and send `/test`. The bot will respond with your message!
+
+!!! tip "Where did chat.id come from?"
+    `chat.id` is a built-in variable that automatically contains the ID of the chat where the message was sent. You don't have to define it—it's just there!
 
 ---
 
-## Beyond basic replies
+## What's in Your Toolbox?
 
-| Feature | Start here |
-| --- | --- |
-| Formatted answers | [Markdown & Formatting](getting-started-with-tbl/markdown-and-formatting.md) |
-| Reply keyboard menus | [Adding a Keyboard](getting-started-with-tbl/adding-keyboard.md) |
-| Inline button taps | [Handling Callbacks](getting-started-with-tbl/handling-callbacks.md) |
-| Wait for user text | [Handling User Input](getting-started-with-tbl/handle-need-reply.md) |
-| Static web page | [Public Web Commands](getting-started-with-tbl/public-web-commands.md) |
-| HTTP API from command | [Webapps](webapp-instance/index.md) |
+Here are the built-in variables and helper objects that are always available in your commands:
+
+| Variable | What it is | How to use it |
+| --- | --- | --- |
+| `Bot` | High-level bot helper | Great for everyday tasks like sending messages (`Bot.sendMessage()`) |
+| `Api` | The full Telegram API | Use this when you want advanced features like keyboards or editing messages |
+| `user` | The user who triggered the command | `user.username` gets their Telegram username; `user.first_name` gets their name |
+| `chat` | The chat room where it happened | `chat.id` is where you send replies |
+| `params` | Extra text sent after the command | If a user sends `/start promo123`, `params` will be `"promo123"` |
+| `db` | Built-in database | Save and load data easily without setting up external servers |
+| `modules` | Standard utilities | A box of popular tools (like Lodash, BCrypt, dayjs, Cheerio, and Zod) |
+| `Libs` | Custom Telegram helpers | Ready-made tools for things like referral links or channel gates |
 
 ---
 
-## Where to go
+## What to Read Next
 
-- [Command Flow](getting-started-with-tbl/index.md) — structured multi-page guide  
-- [Tutorials](tutorials/index.md) — hands-on lessons in order  
-- [Command Fields](getting-started-with-tbl/command-fields.md) — Answer, Logic, keyboard, `is_web`  
-- [Global Variables](globals/index.md) — `user`, `chat`, `update`  
-- [Bot](bot-instance/index.md) and [Api](api-instance/index.md) — main instances  
-- [Modules](modules/index.md) and [Libs](libs/index.md) — built-in toolboxes
+Ready to go deeper? Check these out:
+
+*   **[Command Flow](getting-started-with-tbl/index.md)** — A detailed guide on how matching, execution, and keyboards work.
+*   **[Your First Bot](getting-started-with-tbl/first-hello-bot.md)** — A complete, step-by-step tutorial for building a bot command.
+*   **[Global Variables Reference](globals/index.md)** — The full list of everything you can use in your code.

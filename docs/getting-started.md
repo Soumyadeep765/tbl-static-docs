@@ -1,109 +1,82 @@
 # Getting Started
 
-You want a Telegram bot. You don't want to rent a VPS, configure nginx, or explain to your friends why your "hello world" needs Docker. Good news — that's exactly what **TeleBotHost** is for.
+So, you want to build a Telegram bot. But you probably *don't* want to rent a virtual server, figure out SSL certificates, or explain to your friends why a simple "hello world" bot needs a database and Docker setup. 
 
-This guide gets you from zero to a live bot in a few minutes. No prior coding required for the first command (though we'll nudge you toward Logic soon enough).
+Good news: you don't have to. That is exactly why **TeleBotHost** exists.
 
----
-
-## What you're building
-
-A bot on Telegram that responds when users send commands — hosted and run by TeleBotHost. You write behavior in the dashboard; the platform handles the rest.
-
-Ready? Let's go.
+This guide will take you from absolute zero to a live, working bot in under five minutes. No coding required for your very first command.
 
 ---
 
-## 1. Open TeleBotHost
+## 1. Create a Bot on Telegram
 
-Head to the [TeleBotHost console](https://console.telebothost.com/).
+Before TeleBotHost can run your bot, we need to register it with Telegram. We do this using Telegram’s official bot manager: **@BotFather**. Yes, the name is a Godfather reference.
 
-That's home base — where you add bots, write commands, and hit **Launch Bot**.
-
----
-
-## 2. Log in or sign up
-
-- Log in to your existing account, or
-- Create a new account if you're new
-
-After logging in, you'll see the dashboard. This is where the magic (and the Logic fields) live.
+1. Open Telegram and search for [@BotFather](https://t.me/BotFather). (Make sure it has the blue verification checkmark!)
+2. Click **Start** and send the command `/newbot`.
+3. Give your bot a friendly **display name** (e.g., `My Cool Support Assistant`).
+4. Choose a unique **username** that ends with the word `bot` (e.g., `super_helper_xyz_bot`).
+5. BotFather will send you a message with an **API Token** (a long string of letters and numbers). 
+6. **Copy that token** and keep it secret. Treat it like a password!
 
 ---
 
-## 3. Create a Telegram bot
+## 2. Connect Your Bot to TeleBotHost
 
-Telegram bots are registered with [@BotFather](https://t.me/BotFather) — Telegram's official bot manager. Yes, the name is on the nose.
+Now, let's give your bot a brain:
 
-1. Open Telegram
-2. Search for [@BotFather](https://t.me/BotFather)
-3. Send `/newbot`
-4. Pick a display name and a username (must end in `bot`, e.g. `MyCoolHelperBot`)
-5. Copy the **bot token** BotFather gives you — you'll paste this into TeleBotHost
+1. Open the [TeleBotHost Console](https://console.telebothost.com/).
+2. Log in or create a quick free account.
+3. On your dashboard, click **Add Bot**.
+4. Paste the **API Token** you copied from BotFather.
+5. Click **Create**.
 
-Keep that token secret. Anyone with it can control your bot. Treat it like a password, not a tweet.
-
----
-
-## 4. Add the bot on TeleBotHost
-
-1. Open the TeleBotHost dashboard
-2. Click **Add Bot**
-3. Paste your bot token
-4. Click **Create**
-
-Your bot appears in the bot list. It exists — it just isn't running yet.
+Your bot is now registered in your dashboard!
 
 ---
 
-## 5. Open the bot panel
+## 3. Add Your First Command
 
-Click your bot in the dashboard to open its management panel.
+Let's teach your bot how to say hello:
 
-From here you can:
-
-- Add and edit **commands**
-- Write TBL code in the **Logic** field
-- Set **Answer**, **Keyboard**, aliases, **public web**, and parse mode
-- Start or stop the bot
-
-Think of each command as a mini program that runs when a user triggers it.
-
----
-
-## 6. Start the bot
-
-Click **Launch Bot**.
-
-Your bot is now online and ready to respond on Telegram. Go say hi — it won't judge you for talking to a bot at 2 AM.
+1. Click on your new bot in the dashboard to open its panel.
+2. Go to the **Commands** section and click **Add Command**.
+3. In the **Command** field, type `/start` (this is the button users click when they first open your bot).
+4. In the **Answer** field, type what you want the bot to reply with:
+   ```text
+   Hello! Welcome to my first Telegram bot. Send me /start to see this message again!
+   ```
+5. Click **Save Command**.
 
 ---
 
-## 7. Add your first command
+## 4. Turn the Bot On!
 
-1. Open the **Commands** section
-2. Add a command such as `/start`
-3. Fill in the **Answer** field (e.g. `Hello! Welcome to my bot.`)
-4. Save the command
+Your command is saved, but the bot is still sleeping:
 
-Test it: open Telegram, find your bot, send `/start`. If you get your welcome message, you're officially a bot developer. Frame the screenshot.
-
-!!! tip "Formatting"
-    The Answer field supports [Markdown](getting-started-with-tbl/markdown-and-formatting.md) by default — try `*bold*` and `_italic_`.
+1. Look at the top right of your bot's panel in the dashboard.
+2. Click **Launch Bot** (or click the start button).
+3. The status will change to show your bot is **Online**.
 
 ---
 
-## What's next?
+## 5. Test It!
 
-You've got a live bot. Now make it interesting:
+Now for the best part:
 
-| Step | Page |
-| --- | --- |
-| Understand command flow | [Command Flow overview](getting-started-with-tbl/index.md) |
-| Hands-on tutorial | [Your First Bot](getting-started-with-tbl/first-hello-bot.md) |
-| Add buttons | [Adding a Keyboard](getting-started-with-tbl/adding-keyboard.md) |
-| Inline button taps | [Handling Callbacks](getting-started-with-tbl/handling-callbacks.md) |
-| Static web page | [Public Web Commands](getting-started-with-tbl/public-web-commands.md) |
-| How TBL works | [What is TBL?](about-tbl.md) |
-| Write your first Logic | [Learning TBL](learning-tbl.md) |
-| Screenshots walkthrough | [Official tutorial](https://telebothost.com/tutorials/adding-first-bot) |
+1. Open Telegram.
+2. Search for your bot's username (e.g., `@super_helper_xyz_bot`) and open the chat.
+3. Click the **Start** button at the bottom (or send `/start`).
+4. Watch your bot respond instantly with the text you set up!
+
+Congratulations, you are officially a bot developer. Take a screenshot, show your friends, or just celebrate.
+
+---
+
+## What's Next?
+
+Now that your bot is alive, let's make it smart:
+
+*   **[Learning TBL](learning-tbl.md)** — Take your first steps into writing simple JavaScript logic to make your bot interactive.
+*   **[Your First Bot Tutorial](getting-started-with-tbl/first-hello-bot.md)** — A hands-on walkthrough to build a `/hello` command with some custom logic.
+*   **[Adding Keyboards](getting-started-with-tbl/adding-keyboard.md)** — Give your users nice buttons to click instead of typing commands.
