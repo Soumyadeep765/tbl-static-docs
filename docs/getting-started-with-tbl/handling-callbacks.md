@@ -39,6 +39,7 @@ When a user taps the "Apple" button, Telegram fires `pick_apple`. TBL treats thi
 Let's create two new commands to handle these button taps:
 
 ### Create the `pick_apple` command:
+
 1. Click **Add Command**.
 2. **Command:** Type `pick_apple` (matches `callback_data`).
 3. **Logic:** Paste this code:
@@ -59,6 +60,7 @@ Let's create two new commands to handle these button taps:
 4. Save the command.
 
 ### Create the `pick_banana` command:
+
 1. Click **Add Command**.
 2. **Command:** Type `pick_banana`.
 3. **Logic:** Paste this code:
@@ -85,6 +87,7 @@ When a user clicks an inline button, Telegram shows a loading spinner on that bu
 
 ### Rule 2: Message variables change in callbacks
 Because callbacks aren't standard text messages, the global variable `message` is `null`. Instead, use `update.callback_query` to fetch context:
+
 *   `update.callback_query.id` ➔ Required to answer the callback query.
 *   `update.callback_query.data` ➔ The button's `callback_data` payload.
 *   `update.callback_query.message.message_id` ➔ The ID of the message bubble the buttons are attached to (required to edit the message).

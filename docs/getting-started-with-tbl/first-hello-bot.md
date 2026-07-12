@@ -9,6 +9,7 @@ Spoiler: If you can fill in two fields in a dashboard and click "Save", you can 
 ## Step 1: Open the Command Editor
 
 First, navigate to your bot project in the dashboard:
+
 1. Open the [TeleBotHost Console](https://console.telebothost.com/).
 2. Click on your bot from the dashboard list.
 3. Open the **Commands** tab.
@@ -33,6 +34,7 @@ Click **Save Command** at the bottom of the form.
 ## Step 3: Turn It On!
 
 Before testing, make sure your bot is online:
+
 1. Look at the top right of your bot's management panel.
 2. If it says **Offline**, click the **Launch Bot** button.
 3. Wait a second until the status indicator turns green (**Online**).
@@ -42,6 +44,7 @@ Before testing, make sure your bot is online:
 ## Step 4: Test Your Bot!
 
 Let's see it in action:
+
 1. Open Telegram on your phone or computer.
 2. Search for your bot's username (the one you set up with `@BotFather`).
 3. Open the chat and click the **Start** button at the bottom (or type `/start` manually and send it).
@@ -54,6 +57,7 @@ Let's see it in action:
 ## How does this work under the hood?
 
 When someone sends `/start` to your bot:
+
 1. Telegram sends the message data (called an **update**) to TeleBotHost.
 2. TeleBotHost searches your command list, finds the `/start` command, and immediately sends the text in your **Answer** field back to the chat.
 3. The flow ends. Simple and fast!

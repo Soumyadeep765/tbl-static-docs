@@ -24,6 +24,7 @@ No matter which one the user types, the exact same command runs.
 ## Step 1: Open Your Command
 
 Let's add aliases to the `Help` command we built in the last step:
+
 1. Open your bot dashboard and click **Commands**.
 2. Find your `Help` command and click **Edit** (pencil icon).
 

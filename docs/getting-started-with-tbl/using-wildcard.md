@@ -19,6 +19,7 @@ The `*` command is a catch-all trigger.
 ## Step 1: Create the Wildcard Command
 
 Let's build a polite "I didn't get that" responder:
+
 1. Open your bot dashboard and click **Add Command**.
 2. **Command:** Type `*` (just a single asterisk).
 3. **Answer:** Type your fallback response:
@@ -51,6 +52,7 @@ Let's build a polite "I didn't get that" responder:
 ## Congratulations!
 
 You have completed the TBL Hands-on Tutorial Series. You now know how to:
+
 1. Create commands and static responses.
 2. Build reply menus.
 3. Map multiple buttons to single commands using Aliases.

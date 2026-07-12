@@ -9,6 +9,7 @@ In this tutorial, we will upgrade the `/start` command you built in the last ste
 ## What We Are Building
 
 We will modify `/start` so that:
+
 1. It sends a message asking the user to choose an option.
 2. It shows two buttons: **Help** and **About**.
 3. We will create two new commands that respond when the user taps those buttons.
@@ -18,6 +19,7 @@ We will modify `/start` so that:
 ## Step 1: Add Buttons to `/start`
 
 Let's configure the keyboard layout:
+
 1. Open your bot dashboard and click **Edit** (pencil icon) next to your `/start` command.
 2. Find the **Keyboard** field.
 3. Type the button labels separated by a comma:
@@ -33,6 +35,7 @@ Now, when someone sends `/start`, they will see **Help** and **About** buttons s
 ## Keyboard Layout Rules
 
 Arranging your buttons is super simple. You just type text with these rules:
+
 *   **Buttons on the same row:** Separate them with a comma `,` (e.g., `Yes, No` ➔ Row 1: `Yes` | `No`)
 *   **Buttons on a new row:** Separate them with a newline `\n` or a line break (e.g., `Yes\nNo` ➔ Row 1: `Yes`, Row 2: `No`)
 *   **Mix it up:** `Yes, No\nCancel` ➔ Row 1: `Yes` | `No`, Row 2: `Cancel`.
@@ -46,6 +49,7 @@ Right now, if you tap the **Help** button, Telegram will send the text `Help` to
 Let's create the handler commands:
 
 ### Create the `Help` Command:
+
 1. Click **Add Command**.
 2. **Command:** Type `Help` (Note: Capitalization matters! `Help` is not the same as `help`).
 3. **Answer:** Type your help message:
@@ -57,6 +61,7 @@ Let's create the handler commands:
 4. Save the command.
 
 ### Create the `About` Command:
+
 1. Click **Add Command**.
 2. **Command:** Type `About`.
 3. **Answer:** Type your description:

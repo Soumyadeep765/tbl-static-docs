@@ -9,6 +9,7 @@ If you know basic JavaScript (variables, `if` statements, functions), you alread
 ## The Old Way vs. The TBL Way
 
 Usually, building a Telegram bot looks like this:
+
 1. Rent a server (VPS).
 2. Install Node.js, configure Nginx, and deal with SSL certificates.
 3. Write tons of boilerplate code to connect to the Telegram API.
