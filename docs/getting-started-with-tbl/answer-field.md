@@ -146,7 +146,6 @@ Values replaced in placeholders (`{{...}}`) are automatically escaped based on t
 - **Markdown Mode**: Escapes special characters `_`, `*`, `[`, `]`, `` ` ``, and `\`.
 - **MarkdownV2 Mode**: Escapes all V2 markdown characters (`_`, `*`, `[`, `]`, `(`, `)`, `~`, `` ` ``, `>`, `#`, `+`, `-`, `=`, `|`, `{`, `}`, `.`, `!`, `\`).
 
----
 
 ### Graceful Syntax Error Fallback
 If you accidentally write a typo or syntactically invalid code in JS-like mode, the engine won't crash your bot. It logs the issue to the database and falls back to treating the text as plain text, still safely interpolating any valid variable placeholders.
