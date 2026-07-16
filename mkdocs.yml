@@ -305,6 +305,7 @@ nav:
   - TBL Libraries:
       - Overview: libs/index.md
       - ResourcesLib: libs/resourceslib.md
+      - ResourcesLibv2: libs/resourceslibv2.md
       - refLib: libs/reflib.md
       - translate: libs/translate.md
       - cooldown: libs/cooldown.md

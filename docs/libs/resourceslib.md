@@ -1,141 +1,119 @@
-# ResourcesLib (v2)
+# ResourcesLib (deprecated)
 
-Economy engine — coins, XP, health, passive growth, transfers. Uses async [`db.bot`](../db-instance/bot.md). Access as **`Libs.ResourcesLibv2`**. **All resource methods need `await`.**
+**Legacy sync economy library.** Uses deprecated `Bot.getProperty` / `Bot.setProperty`.
+
+**File:** `Libs/ResourcesLib.js` · **Access:** `Libs.ResourcesLib.*` · **Sync** · **DEPRECATED**
+
+**Use instead:** [`ResourcesLibv2`](ResourcesLibv2.md) (`Libs.ResourcesLibv2`) with async `db.bot`.
 
 ---
 
-## What is it?
+## Why deprecated?
 
-`Libs.ResourcesLibv2` manages persistent numeric resources scoped to a user, chat, or your whole bot. Passive growth over time included.
-
-| Scope | Factory | Key pattern |
+| Issue | Legacy `ResourcesLib` | Modern `ResourcesLibv2` |
 | --- | --- | --- |
-| User | `userRes("gold")` | `ResourcesLib_user_{id}_gold` |
-| Chat | `chatRes("points")` | `ResourcesLib_chat_{id}_points` |
-| Global | `globalRes("pool")` | `ResourcesLib_global_global_pool` |
-| Other user | `anotherUserRes("gold", id)` | Same as user scope |
+| Storage | `Bot.getProperty` / `Bot.setProperty` | `db.bot` async API |
+| Atomic updates | Read-modify-write (race risk) | `incr` / `decr` atomic |
+| Async | Sync only | Proper `await` |
+| New features | — | `peek`, `preview`, `stats`, `spendAll`, `tryRemove`, etc. |
 
-!!! info "Same keys as v1"
-    Storage keys match legacy `ResourcesLib_*` format but live on async `db.bot` instead of deprecated `Bot.getProperty`.
+`ResourcesLibv2` uses the **same storage keys** (`ResourcesLib_user_{id}_{name}`) — balances can carry over when you migrate call sites to `await`.
 
 ---
 
-## How to use it
+## Migration checklist
+
+1. Replace `Libs.ResourcesLib` → `Libs.ResourcesLibv2`
+2. Add `await` to every resource method call
+3. Test balances still read correctly (keys unchanged)
+4. Remove `ResourcesLib.js` from your bot once fully migrated
 
 ```js
+// Before (deprecated)
+let gold = Libs.ResourcesLib.userRes("gold")
+gold.add(10)
+Bot.sendMessage("Gold: " + gold.value())
+
+// After (v2)
 let gold = Libs.ResourcesLibv2.userRes("gold")
-await gold.add(50)
-let balance = await gold.value()
-Bot.sendMessage("Gold: " + balance)
+await gold.add(10)
+Bot.sendMessage("Gold: " + await gold.value())
 ```
 
 ---
 
-## Resource methods
+## Legacy API (sync)
+
+If you must maintain old code temporarily, the sync API mirrors v2 conceptually:
+
+### Factories
+
+```js
+Libs.ResourcesLib.userRes("gold")
+Libs.ResourcesLib.chatRes("points")
+Libs.ResourcesLib.globalRes("pool")
+Libs.ResourcesLib.anotherUserRes("gold", telegramId)
+Libs.ResourcesLib.anotherChatRes("points", chatId)
+Libs.ResourcesLib.growthFor(resource)
+```
+
+### Resource methods (all sync — no await)
 
 | Method | Description |
 | --- | --- |
-| `value()` | Current value (applies growth) |
-| `peek()` | Raw stored value (fast, no growth) |
-| `preview()` | Simulated value after growth (no write) |
-| `set(n)` | Set value |
-| `add(n)` | Add (uses `db.bot.incr`) |
-| `have(n)` | Has enough? |
-| `remove(n)` | Remove if enough (throws if not) |
-| `removeAnyway(n)` | Force remove |
-| `spend(n)` | Returns true/false |
-| `tryRemove(n)` | `{ ok, removed, balance }` |
-| `reset()` | Set to 0 |
-| `ensureAtLeast(min)` | Floor value |
-| `fillTo(target)` | Add until target |
-| `setClamped(n, min, max)` | Set within bounds |
-| `format({ suffix, compact })` | `"1.2K gold"` |
-| `stats()` | Dashboard bundle (one mget) |
-| `transferTo(other, n)` | Transfer between resources |
-| `exchangeTo(other, { remove_amount, add_amount })` | Different rates |
+| `value()` | Current balance (applies growth) |
+| `add(amount)` | Add |
+| `set(amount)` | Set |
+| `have(amount)` | Balance ≥ amount? |
+| `remove(amount)` | Subtract — throws if insufficient |
+| `removeAnyway(amount)` | Subtract regardless |
+| `transferTo(other, amount)` | Transfer same resource type |
+| `exchangeTo(other, options)` | Trade different amounts |
 
----
-
-## Growth
+### Growth (passive income)
 
 ```js
-let gold = Libs.ResourcesLibv2.userRes("gold")
-let g = Libs.ResourcesLibv2.growthFor(gold)
+let gold = Libs.ResourcesLib.userRes("gold")
+let g = Libs.ResourcesLib.growthFor(gold)
 
-await g.add({ value: 1, interval: 60, max: 1000 })           // +1 per minute
-await g.addPercent({ percent: 5, interval: 300 })             // +5% of base
-await g.addCompoundInterest({ percent: 2, interval: 3600 })   // compound
-
-await g.stop()
-await g.resume()
-let pending = await g.previewGain()
-```
-
-Growth keys: `{propName}_growth` on `db.bot`.
-
----
-
-## Module helpers
-
-```js
-// Load multiple resources in one mget
-let bag = await Libs.ResourcesLibv2.loadAll([gold, wood, energy], { withGrowth: true })
-
-// Crafting — check all, deduct in parallel
-let craft = await Libs.ResourcesLibv2.spendAll([
-  { res: gold, amount: 50 },
-  { res: wood, amount: 10 }
-])
-if (!craft.ok) Bot.sendMessage("Need " + craft.need + " " + craft.missing)
+g.add({ value: 1, interval: 60 })           // +1 per minute
+g.addPercent({ percent: 5, interval: 3600 }) // +5% per hour
+g.stop() / g.resume()
 ```
 
 ---
 
-## Examples
+## Storage keys
 
-### Shop purchase
+Same as v2:
+
+```
+ResourcesLib_user_{telegramId}_{resourceName}
+ResourcesLib_user_{telegramId}_{resourceName}_growth
+ResourcesLib_chat_{chatId}_{resourceName}
+ResourcesLib_global_global_{resourceName}
+```
+
+Legacy data in `Bot` properties and new data in `db.bot` are **separate stores** — you need a one-time migration script to copy values if switching storage backends.
+
+---
+
+## Full legacy example
 
 ```js
-let gold = Libs.ResourcesLibv2.userRes("gold")
-if (await gold.spend(30)) {
-  Bot.sendMessage("Purchased! Balance: " + await gold.peek())
-} else {
-  Bot.sendMessage("Not enough gold.")
+// Old style — still works but deprecated
+let gold = Libs.ResourcesLib.userRes("gold")
+gold.add(100)
+
+if (gold.have(50)) {
+  gold.remove(50)
+  Bot.sendMessage("Purchased! Balance: " + gold.value())
 }
 ```
 
-### Transfer between users
-
-```js
-let myGold = Libs.ResourcesLibv2.userRes("gold")
-let theirGold = Libs.ResourcesLibv2.anotherUserRes("gold", friendId)
-await myGold.transferTo(theirGold, 20)
-```
-
-### Player HUD
-
-```js
-let s = await gold.stats()
-Bot.sendMessage(await gold.format({ suffix: "gold", compact: true }) +
-  "\nPending: +" + s.pending +
-  "\nNext tick: " + Math.ceil(s.growth?.nextTickIn || 0) + "s"
-)
-```
-
 ---
 
-## Legacy `Libs.ResourcesLib`
+## Notes
 
-The original sync `Libs.ResourcesLib` used deprecated `Bot.getProperty`. It is **deprecated**. Migrate to `Libs.ResourcesLibv2` and add `await` to every resource call.
-
-```js
-// Old (deprecated)
-gold.add(10)
-gold.value()
-
-// New
-await gold.add(10)
-await gold.value()
-```
-
-[Database overview](../db-instance/index.md) · [Advanced ops (incr/push)](../db-instance/advanced-operations.md)
+- Do not start new bots on `ResourcesLib` — use `ResourcesLibv2`.
+- See [ResourcesLibv2.md](ResourcesLibv2.md) for complete modern documentation with examples.

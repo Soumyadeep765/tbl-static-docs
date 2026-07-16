@@ -1,72 +1,35 @@
 # dateTimeFormat
 
-Dates in JavaScript are powerful and also a little cursed. **`Libs.dateTimeFormat`** handles the boring parts — formatting, arithmetic, comparisons, Unix timestamps — so you can focus on bot logic instead of googling "javascript date add 7 days" for the fifteenth time.
+Date/time formatting, arithmetic, localization, relative time, and Unix timestamps.
 
-All methods are **synchronous**. No `await`.
-
----
-
-## What is it?
-
-`Libs.dateTimeFormat` formats dates, adds/subtracts time, compares dates, and converts to/from Unix timestamps. Think of it as your bot's calendar assistant — minus the passive-aggressive meeting reminders.
-
-Access: `Libs.dateTimeFormat.<method>()`
+**File:** `Libs/dateTimeFormat.js` · **Access:** `Libs.dateTimeFormat.*` · **Sync** — no `await` · v1.0.0
 
 ---
 
-## How to use it
+## What problem does it solve?
 
-The quickest win — today's date as an ISO string:
+Bots constantly deal with dates:
+
+- "Your subscription expires on July 7, 2025"
+- "Event starts in 3 days"
+- "Last seen 2 hours ago"
+- Countdown timers and expiry checks
+
+JavaScript `Date` is powerful but awkward. `dateTimeFormat` gives you masks, presets, locales, and helpers without reaching for external libraries.
+
+---
+
+## Quick start
 
 ```js
 let today = Libs.dateTimeFormat.getCurrentDate("isoDate")
-Bot.sendMessage("Today: " + today)
-```
+// "2025-07-07"
 
-Need a date seven days from now?
-
-```js
 let nextWeek = Libs.dateTimeFormat.addDays(new Date(), 7)
-Bot.sendMessage("Event date: " + Libs.dateTimeFormat.format(nextWeek, "isoDate"))
-```
+Bot.sendMessage("Event: " + Libs.dateTimeFormat.format(nextWeek, "fullDate"))
 
-All methods return immediately — **no `await` needed**.
-
----
-
-## Try it — beginner examples
-
-### Countdown to an event
-
-```js
-let eventDate = Libs.dateTimeFormat.addDays(new Date(), 7)
-let diff = Libs.dateTimeFormat.getTimeDifference(new Date(), eventDate)
-
-Bot.sendMessage("Event in " + diff.days + " days, " + (diff.hours % 24) + " hours"
-)
-```
-
-### Subscription expiry check
-
-```js
-let expiry = Libs.dateTimeFormat.addTime(new Date(), { months: 1 })
-
-if (new Date() > expiry) {
-  Bot.sendMessage("Subscription expired.")
-} else {
-  let left = Libs.dateTimeFormat.getTimeDifference(new Date(), expiry)
-  Bot.sendMessage("Active — " + left.days + " days left.")
-}
-```
-
-### Display a join date
-
-```js
-let formatted = Libs.dateTimeFormat.format(
-  user.joined_at,
-  "dddd, mmmm d 'at' h:MM TT"
-)
-Bot.sendMessage("You joined on " + formatted)
+let ago = Libs.dateTimeFormat.toRelativeTime(user.last_seen)
+// "2 hours ago"
 ```
 
 ---
@@ -75,53 +38,49 @@ Bot.sendMessage("You joined on " + formatted)
 
 ### `format(date, mask?, utc?, locale?)`
 
-Format any date with a mask string or named preset.
+| Param | Default | Description |
+| --- | --- | --- |
+| `date` | — | `Date` or parseable string |
+| `mask` | `"default"` | Pattern or preset name |
+| `utc` | `false` | Use UTC |
+| `locale` | `"en"` | Locale code |
 
 ```js
 Libs.dateTimeFormat.format(new Date(), "yyyy-mm-dd HH:MM:ss")
 // "2025-07-07 14:30:45"
 
-Libs.dateTimeFormat.format(new Date(), "fullDate")
-// "Monday, July 7, 2025"
+Libs.dateTimeFormat.format(new Date(), "fullDate", false, "hi")
+// Hindi weekday/month names
 ```
-
-| Parameter | Default | Description |
-| --- | --- | --- |
-| `date` | — | `Date` object or parseable string |
-| `mask` | `"default"` | Format pattern or preset name |
-| `utc` | `false` | Use UTC |
-| `locale` | `"en"` | Locale code |
-
-### Named mask presets
-
-| Preset | Output example |
-| --- | --- |
-| `"default"` | `Mon Jul 07 2025 14:30:45` |
-| `"shortDate"` | `7/7/25` |
-| `"mediumDate"` | `Jul 7, 2025` |
-| `"longDate"` | `July 7, 2025` |
-| `"fullDate"` | `Monday, July 7, 2025` |
-| `"shortTime"` | `2:30 PM` |
-| `"mediumTime"` | `2:30:45 PM` |
-| `"longTime"` | `2:30:45 PM EST` |
-| `"isoDate"` | `2025-07-07` |
-| `"isoTime"` | `14:30:45` |
-| `"isoDateTime"` | `2025-07-07T14:30:45` |
-| `"isoUtcDateTime"` | UTC ISO with `Z` suffix |
-| `"custom"` | `2025-07-07 14:30:45 EST` |
 
 ### `getCurrentDate(mask?, utc?, locale?)`
 
-Shorthand for formatting `new Date()`:
+Shorthand for `format(new Date(), ...)`.
 
 ```js
-Libs.dateTimeFormat.getCurrentDate("isoDate")     // "2025-07-07"
-Libs.dateTimeFormat.getCurrentDate("mediumTime")  // "2:30:45 PM"
+Libs.dateTimeFormat.getCurrentDate("isoDate")      // "2025-07-07"
+Libs.dateTimeFormat.getCurrentDate("mediumTime") // "2:30:45 PM"
 ```
 
----
+### Named mask presets
 
-## Format tokens
+| Preset | Example output |
+| --- | --- |
+| `default` | `Mon Jul 07 2025 14:30:45` |
+| `shortDate` | `7/7/25` |
+| `mediumDate` | `Jul 7, 2025` |
+| `longDate` | `July 7, 2025` |
+| `fullDate` | `Monday, July 7, 2025` |
+| `shortTime` | `2:30 PM` |
+| `mediumTime` | `2:30:45 PM` |
+| `longTime` | `2:30:45 PM EST` |
+| `isoDate` | `2025-07-07` |
+| `isoTime` | `14:30:45` |
+| `isoDateTime` | `2025-07-07T14:30:45` |
+| `isoUtcDateTime` | UTC with `Z` |
+| `custom` | `2025-07-07 14:30:45 EST` |
+
+### Format tokens
 
 | Token | Output | Example |
 | --- | --- | --- |
@@ -150,10 +109,10 @@ Libs.dateTimeFormat.getCurrentDate("mediumTime")  // "2:30:45 PM"
 
 | Method | Description |
 | --- | --- |
-| `addDays(date, days)` | Add days — returns new `Date` |
+| `addDays(date, days)` | Add days → new `Date` |
 | `subtractDays(date, days)` | Subtract days |
 | `addTime(date, { years, months, days, hours, minutes, seconds })` | Add multiple units |
-| `subtractTime(date, { years, months, days, hours, minutes, seconds })` | Subtract multiple units |
+| `subtractTime(date, units)` | Subtract multiple units |
 
 ```js
 let tomorrow = Libs.dateTimeFormat.addDays(new Date(), 1)
@@ -176,35 +135,30 @@ let cooldownEnd = Libs.dateTimeFormat.addTime(new Date(), {
 
 ### `getTimeDifference(date1, date2)`
 
-Returns an object with the difference from `date1` to `date2`:
+Returns `{ milliseconds, seconds, minutes, hours, days }` from `date1` to `date2`.
 
 ```js
 let diff = Libs.dateTimeFormat.getTimeDifference("2025-01-01", "2025-02-01")
-// { milliseconds, seconds, minutes, hours, days }
 // days: 31
 ```
 
 ### `isValidDate(date)`
 
 ```js
-Libs.dateTimeFormat.isValidDate("2025-07-07")  // true
-Libs.dateTimeFormat.isValidDate("not-a-date")  // false
+if (!Libs.dateTimeFormat.isValidDate(userInput)) {
+  return Bot.sendMessage("Invalid date format.")
+}
 ```
 
-Always validate user-provided date strings before formatting — invalid dates in `format()` throw `SyntaxError: invalid date`.
+Invalid dates in `format()` throw `SyntaxError: invalid date`.
 
 ### `getTimeZoneOffset(date?)`
 
-Returns timezone offset in minutes (e.g. `-300` for EST).
+Returns offset in minutes (e.g. `-300` for EST).
 
 ---
 
 ## Unix timestamps
-
-| Method | Description |
-| --- | --- |
-| `toUnixTimestamp(date)` | Date → Unix seconds |
-| `fromUnixTimestamp(timestamp)` | Unix seconds → `Date` |
 
 ```js
 let ts = Libs.dateTimeFormat.toUnixTimestamp(new Date())  // 1751895045
@@ -215,18 +169,16 @@ let date = Libs.dateTimeFormat.fromUnixTimestamp(ts)
 
 ## Localization
 
-Built-in locales: **`en`** (English) and **`hi`** (Hindi). Pass `locale` to `format()` and `getCurrentDate()`.
+Built-in locales: **`en`** (English), **`hi`** (Hindi).
 
-### `registerLocale(localeCode, localeData)`
-
-Add or update a locale at runtime. Returns the library object (chainable).
+### `registerLocale(localeCode, { dayNames, monthNames })`
 
 | Field | Requirement |
 | --- | --- |
-| `dayNames` | Exactly 7 short day names (Sun–Sat) |
-| `monthNames` | Exactly 12 short month names (Jan–Dec) |
+| `dayNames` | Exactly 7 short names (Sun–Sat) |
+| `monthNames` | Exactly 12 short names (Jan–Dec) |
 
-Full weekday and month names (`dddd`, `mmmm`) are auto-generated from the short names.
+Full names (`dddd`, `mmmm`) auto-generated from short names.
 
 ```js
 Libs.dateTimeFormat.registerLocale("es", {
@@ -235,16 +187,13 @@ Libs.dateTimeFormat.registerLocale("es", {
 })
 
 Libs.dateTimeFormat.format(new Date(), "fullDate", false, "es")
-// "lunes, abril 7, 2025"
 ```
 
-### `getLocale(localeCode)`
+### `getLocale(code)` / `getAvailableLocales()`
 
-Returns locale data object or `null` if not registered.
-
-### `getAvailableLocales()`
-
-Returns an array of registered locale codes (e.g. `["en", "hi", "es"]`).
+```js
+Libs.dateTimeFormat.getAvailableLocales()  // ["en", "hi", "es"]
+```
 
 ---
 
@@ -252,28 +201,64 @@ Returns an array of registered locale codes (e.g. `["en", "hi", "es"]`).
 
 ### `toRelativeTime(date, now?, locale?)`
 
-Human-readable relative time using `Intl.RelativeTimeFormat`. Falls back to English phrases if the locale is unsupported.
+Human-readable relative strings via `Intl.RelativeTimeFormat`. Falls back to English if locale unsupported.
 
 ```js
 Libs.dateTimeFormat.toRelativeTime(new Date(Date.now() - 3600000))
 // "1 hour ago"
 
-Libs.dateTimeFormat.toRelativeTime(new Date(Date.now() + 86400000), new Date(), "hi")
-// Hindi relative string when supported
+Libs.dateTimeFormat.toRelativeTime(new Date(Date.now() + 86400000))
+// "tomorrow" (with numeric: 'auto')
 ```
 
-| Parameter | Default | Description |
-| --- | --- | --- |
-| `date` | — | Target date |
-| `now` | `new Date()` | Reference point |
-| `locale` | `"en"` | BCP 47 locale code |
+---
+
+## Full example — subscription expiry
+
+```js
+let signup = new Date()
+let expiry = Libs.dateTimeFormat.addTime(signup, { months: 1 })
+
+if (new Date() > expiry) {
+  Bot.sendMessage("Subscription expired.")
+} else {
+  let diff = Libs.dateTimeFormat.getTimeDifference(new Date(), expiry)
+  Bot.sendMessage(    "Active — expires in " + diff.days + " days (" +
+    Libs.dateTimeFormat.format(expiry, "mediumDate") + ")"
+  )
+}
+```
+
+---
+
+## Full example — event countdown
+
+```js
+let eventDate = Libs.dateTimeFormat.addDays(new Date(), 7)
+let diff = Libs.dateTimeFormat.getTimeDifference(new Date(), eventDate)
+
+Bot.sendMessage(  "Event in " + diff.days + " days, " + (diff.hours % 24) + " hours!\n" +
+  "Date: " + Libs.dateTimeFormat.format(eventDate, "fullDate")
+)
+```
+
+---
+
+## Full example — pair with cooldown
+
+```js
+let until = await Libs.cooldown.until("daily_bonus")
+if (until) {
+  Bot.sendMessage(    "Next bonus: " + Libs.dateTimeFormat.toRelativeTime(until)
+  )
+}
+```
 
 ---
 
 ## Notes
 
-- All methods are **sync** — no `await`
-- Invalid dates in `format()` throw `SyntaxError: invalid date`
-- Use `isValidDate()` before parsing user-provided date strings
-- For UTC-sensitive logic, pass `utc: true` to `format()` / `getCurrentDate()`
-- Use `toRelativeTime()` for "2 hours ago" style UI; use `format()` for fixed calendar dates
+- All methods are **sync**.
+- Validate user input with `isValidDate()` before `format()`.
+- Use `utc: true` for timezone-sensitive server logic.
+- Use `toRelativeTime()` for "X ago" UI; use `format()` for fixed calendar dates.
