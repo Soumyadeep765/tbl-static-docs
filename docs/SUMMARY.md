@@ -73,6 +73,10 @@
     * [Dynamic Methods](api-instance/dynamic-methods.md)
     * [Tips and Limitations](api-instance/tips-and-limitations.md)
 * [Bot vs Api](guides/bot-vs-api.md)
+* TBL
+    * [Overview](tbl-instance/index.md)
+    * [Cloning Bots](tbl-instance/clone.md)
+    * [Transferring Bots](tbl-instance/transfer.md)
 * HTTP
     * [Overview](http-instance/index.md)
     * [Making Requests](http-instance/making-requests.md)
