@@ -54,6 +54,7 @@ Here is a full list of all objects and properties available for reading within y
 
 ### `user`
 Information about the user who triggered the command:
+
 - `user.id`: Telegram ID of the user (number)
 - `user.first_name`: First name (string)
 - `user.last_name`: Last name (string, optional)
@@ -64,6 +65,7 @@ Information about the user who triggered the command:
 
 ### `chat`
 Details about the current chat context:
+
 - `chat.id`: Telegram ID of the chat (number)
 - `chat.type`: The chat type — `"private"`, `"group"`, `"supergroup"`, or `"channel"` (string)
 - `chat.title`: Title of the group or channel (string, optional)
@@ -71,6 +73,7 @@ Details about the current chat context:
 
 ### `bot`
 Details about your bot:
+
 - `bot.id`: Telegram ID of the bot (number)
 - `bot.first_name`: Display name of the bot (string)
 - `bot.username`: Username of the bot (string)
@@ -78,15 +81,18 @@ Details about your bot:
 
 ### `env` & `process.env`
 Dictionary of custom environment variables configured for your bot:
+
 - `{{env.API_KEY}}` or `{{process.env.API_KEY}}`
 
 ### `account` & `owner`
 Details about the bot owner:
+
 - `account.mail` / `owner.mail`: Owner's email address
 - `account.id` / `owner.id`: Owner's database ID
 
 ### `plan`
 Information about the active subscription tier:
+
 - `plan.name`: Pricing plan name (e.g. `"VIP"`, `"Free"`)
 
 ### `message`
@@ -115,13 +121,17 @@ The response metadata for HTTP triggers (such as `http_response.status`).
 You can use `if`, `else if`, and `else` blocks with standard curly braces `{}`.
 
 ### 2. Operators
+
 - **Comparison Operators**: `==` (equals), `!=` (does not equal), `<` (less than), `>` (greater than), `<=` (less or equal), `>=` (greater or equal).
+
 - **Logical Operators**: `&&` (AND), `||` (OR), `!` (NOT).
+
 - **Grouping**: Parentheses `(...)` to prioritize condition evaluations.
 
 ### 3. Literal Values
 The following literal values are recognized:
-- **Strings**: `"hello"`, `'hello'`, `` `hello` ``
+
+- **Strings**: `"hello"`, `'hello'`, or `` `hello` ``
 - **Numbers**: `42`, `-15`, `3.14`
 - **Booleans**: `true`, `false`
 - **Null & Undefined**: `null`, `undefined`
