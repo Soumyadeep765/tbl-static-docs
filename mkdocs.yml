@@ -158,6 +158,7 @@ nav:
       - Core Mechanics:
           - Command Structure: getting-started-with-tbl/command-structure.md
           - Command Fields: getting-started-with-tbl/command-fields.md
+          - Answer Field: getting-started-with-tbl/answer-field.md
           - Execution Flow: getting-started-with-tbl/execution-flow.md
           - Matching & Priority: getting-started-with-tbl/matching-order.md
       - Advanced Routing:
