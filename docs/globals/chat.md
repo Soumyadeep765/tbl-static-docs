@@ -12,7 +12,7 @@ Private chats feel like a hallway conversation. Groups feel like a party. Channe
 
 You'll use `chat` in almost every command that sends a message:
 
-- `Bot.sendMessage(chat.id, ...)` — the most common line in bot history
+- `Bot.sendMessage(...)` — the most common line in bot history
 - Branch logic by chat type (DM vs group vs channel)
 - Welcome new private chats (`just_created`)
 - Check if you're in a public group (`username`) or a private one
@@ -25,18 +25,18 @@ Pair with [`user`](user.md) for *who* and `chat` for *where*.
 
 ```js
 // The line you'll write a thousand times
-Bot.sendMessage(chat.id, "Hello from the bot!")
+Bot.sendMessage("Hello from the bot!")
 
 // Different vibes for different chat types
 if (chat.chat_type === "private") {
-  Bot.sendMessage(chat.id, "Thanks for messaging me directly!")
+  Bot.sendMessage("Thanks for messaging me directly!")
 } else if (chat.chat_type === "supergroup") {
-  Bot.sendMessage(chat.id, "Hello, group!")
+  Bot.sendMessage("Hello, group!")
 }
 
 // First time in a private chat?
 if (chat.just_created) {
-  Bot.sendMessage(chat.id, "Nice to meet you!")
+  Bot.sendMessage("Nice to meet you!")
 }
 ```
 

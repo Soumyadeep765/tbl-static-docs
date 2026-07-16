@@ -65,9 +65,9 @@ let expected = crypto
   .digest("hex")
 
 if (expected === request.headers["x-signature"]) {
-  Bot.sendMessage(chat.id, "Webhook verified. All good.")
+  Bot.sendMessage("Webhook verified. All good.")
 } else {
-  Bot.sendMessage(chat.id, "Signature mismatch. Nice try.")
+  Bot.sendMessage("Signature mismatch. Nice try.")
 }
 ```
 
@@ -79,7 +79,7 @@ if (expected === request.headers["x-signature"]) {
 let token = crypto.randomBytes(16).toString("hex")
 db.user.set("api_token", token)
 
-Bot.sendMessage(chat.id, "Your API token: " + token)
+Bot.sendMessage("Your API token: " + token)
 ```
 
 ---

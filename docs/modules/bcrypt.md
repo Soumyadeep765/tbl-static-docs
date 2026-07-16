@@ -53,7 +53,7 @@ let password = params  // what the user typed after /setpassword
 let hash = await modules.bcrypt.hash(password, 10)
 db.user.set("password_hash", hash)
 
-Bot.sendMessage(chat.id, "Password saved. We never store the plain version.")
+Bot.sendMessage("Password saved. We never store the plain version.")
 ```
 
 ### Check a password on login
@@ -63,15 +63,15 @@ let attempt = params
 let stored = db.user.get("password_hash")
 
 if (!stored) {
-  return Bot.sendMessage(chat.id, "No password set yet. Use /setpassword first.")
+  return Bot.sendMessage("No password set yet. Use /setpassword first.")
 }
 
 let match = await modules.bcrypt.compare(attempt, stored)
 
 if (match) {
-  Bot.sendMessage(chat.id, "Welcome back, " + user.first_name + "!")
+  Bot.sendMessage("Welcome back, " + user.first_name + "!")
 } else {
-  Bot.sendMessage(chat.id, "Wrong password. Try again.")
+  Bot.sendMessage("Wrong password. Try again.")
 }
 ```
 

@@ -34,9 +34,9 @@ let ok = Libs.mcl.quick(user.id, ["@MyChannel"])
 let ok = await Libs.mcl.quick(user.id, ["@MyChannel"])
 
 if (ok) {
-  Bot.sendMessage(chat.id, "Thanks for joining! Here's your reward.")
+  Bot.sendMessage("Thanks for joining! Here's your reward.")
 } else {
-  Bot.sendMessage(chat.id, "Join @MyChannel first, then try again.")
+  Bot.sendMessage("Join @MyChannel first, then try again.")
 }
 ```
 
@@ -57,7 +57,7 @@ TBL doesn't support `.then()` chains — always use `await`.
 if (await Libs.mcl.quick(user.id, ["@Chan1", "@Chan2"])) {
   Bot.run("/premiumFeature")
 } else {
-  Bot.sendMessage(chat.id, "Join our channels first.")
+  Bot.sendMessage("Join our channels first.")
 }
 ```
 
@@ -127,7 +127,7 @@ Main method — returns a detailed result object.
 let result = await Libs.mcl.check(user.id, ["@NewsChannel", "@CommunityGroup"])
 
 if (!result.allJoined) {
-  Bot.sendMessage(chat.id, "Please join: " + result.left.join(", "))
+  Bot.sendMessage("Please join: " + result.left.join(", "))
 }
 ```
 
@@ -141,7 +141,7 @@ Returns `true` or `false` — shortcut for `check().allJoined`.
 if (await Libs.mcl.quick(user.id, ["@Chan1", "@Chan2"])) {
   Bot.run("/premiumFeature")
 } else {
-  Bot.sendMessage(chat.id, "Join our channels first.")
+  Bot.sendMessage("Join our channels first.")
 }
 ```
 

@@ -70,7 +70,7 @@ Rule of thumb: general utility you'd npm install → `modules`. Telegram-bot-spe
 ## A line of TBL
 
 ```js
-Bot.sendMessage(chat.id, "Hi!")
+Bot.sendMessage("Hi!")
 ```
 
 That's real JavaScript calling a built-in extra. One line, no imports, no Telegram library setup. Or skip Logic entirely and put `"Hi!"` in the **Answer** field for the same result. Your call — Logic is where the fun starts.

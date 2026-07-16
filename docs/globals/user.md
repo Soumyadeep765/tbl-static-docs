@@ -16,7 +16,7 @@ Almost always. Typical uses:
 - Check if they're new (`just_created`)
 - Gate premium features (`premium` / `is_premium`)
 - Store or look up per-user data via [`db.user`](../db-instance/user.md)
-- Send a DM with `Bot.sendMessage(user.id, ...)`
+- Send a DM with `Bot.sendMessage(...)`
 
 !!! warning "It can be null"
     `user` is `null` on global webhooks or system updates with no user context. Always check before accessing fields.
@@ -27,20 +27,20 @@ Almost always. Typical uses:
 
 ```js
 if (!user) {
-  return Bot.sendMessage(chat.id, "Couldn't identify who sent this.")
+  return Bot.sendMessage("Couldn't identify who sent this.")
 }
 
 // Greet by name
-Bot.sendMessage(chat.id, "Hello, " + user.first_name + "!")
+Bot.sendMessage("Hello, " + user.first_name + "!")
 
 // Welcome first-timers
 if (user.just_created) {
-  Bot.sendMessage(chat.id, "Welcome! This is your first time here.")
+  Bot.sendMessage("Welcome! This is your first time here.")
 }
 
 // Premium shout-out
 if (user.premium) {
-  Bot.sendMessage(chat.id, "Thanks for being a Telegram Premium user!")
+  Bot.sendMessage("Thanks for being a Telegram Premium user!")
 }
 ```
 

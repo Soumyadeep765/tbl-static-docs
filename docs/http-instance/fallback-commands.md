@@ -59,9 +59,9 @@ When the request succeeds, these globals are available:
 ```js
 // Command: /onSuccess
 if (response.ok && response.isJson) {
-  Bot.sendMessage(chat.id, "Title: " + response.data.title)
+  Bot.sendMessage("Title: " + response.data.title)
 } else {
-  Bot.sendMessage(chat.id, "Response: " + content)
+  Bot.sendMessage("Response: " + content)
 }
 ```
 
@@ -83,11 +83,11 @@ When the request fails (non-2xx), the `error` global contains the **full HTTP re
 ```js
 // Command: /onError
 if (error.status === 404) {
-  Bot.sendMessage(chat.id, "Resource not found.")
+  Bot.sendMessage("Resource not found.")
 } else if (error.status === 408 || error.error?.code === "TIMEOUT") {
-  Bot.sendMessage(chat.id, "Request timed out.")
+  Bot.sendMessage("Request timed out.")
 } else {
-  Bot.sendMessage(chat.id, "Request failed: " + error.status)
+  Bot.sendMessage("Request failed: " + error.status)
 }
 ```
 
@@ -105,7 +105,7 @@ if (error.status === 404) {
 ```js
 // Inline — handle in same command
 let res = await HTTP.get("https://api.example.com/price")
-if (res.ok) Bot.sendMessage(chat.id, "$" + res.data.price)
+if (res.ok) Bot.sendMessage("$" + res.data.price)
 
 // Callback — delegate to another command
 HTTP.get({
@@ -148,18 +148,18 @@ HTTP.get({
   tbl_options: { city: params }
 })
 
-Bot.sendMessage(chat.id, "Fetching weather for " + params + "...")
+Bot.sendMessage("Fetching weather for " + params + "...")
 ```
 
 ```js
 // /showWeather command
 let temp = response.data.temperature
-Bot.sendMessage(chat.id, tbl_options.city + ": " + temp + "°")
+Bot.sendMessage(tbl_options.city + ": " + temp + "°")
 ```
 
 ```js
 // /weatherError command
-Bot.sendMessage(chat.id, "Could not fetch weather (" + error.status + ")")
+Bot.sendMessage("Could not fetch weather (" + error.status + ")")
 ```
 
 ---

@@ -47,7 +47,7 @@ let yaml = modules.ParseYML.stringify({ name: "Alice", age: 25 })
 let raw = db.bot.get("config_yaml") || "theme: dark\nlang: en"
 let config = modules.ParseYML.parse(raw)
 
-Bot.sendMessage(chat.id, "Theme: " + config.theme + ", Language: " + config.lang)
+Bot.sendMessage("Theme: " + config.theme + ", Language: " + config.lang)
 ```
 
 ### Parse user-submitted YAML
@@ -57,9 +57,9 @@ Bot.sendMessage(chat.id, "Theme: " + config.theme + ", Language: " + config.lang
 ```js
 try {
   let data = modules.ParseYML.parse(params)
-  Bot.sendMessage(chat.id, "Parsed " + Object.keys(data).length + " top-level keys.")
+  Bot.sendMessage("Parsed " + Object.keys(data).length + " top-level keys.")
 } catch (err) {
-  Bot.sendMessage(chat.id, "Invalid YAML: " + err.message)
+  Bot.sendMessage("Invalid YAML: " + err.message)
 }
 ```
 
@@ -69,7 +69,7 @@ try {
 let settings = { notifications: true, theme: "dark", lang: "en" }
 let yaml = modules.ParseYML.stringify(settings)
 db.user.set("settings_yaml", yaml)
-Bot.sendMessage(chat.id, "Settings saved.")
+Bot.sendMessage("Settings saved.")
 ```
 
 ---

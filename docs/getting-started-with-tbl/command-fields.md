@@ -72,7 +72,7 @@ This is where the interesting stuff happens:
 ```js
 let count = await db.bot.get("visits") || 0
 await db.bot.set("visits", count + 1)
-Bot.sendMessage(chat.id, "Visit #" + (count + 1))
+Bot.sendMessage("Visit #" + (count + 1))
 ```
 
 [`Bot`](../bot-instance/index.md) is a global — no import needed. [`chat`](../globals/chat.md) and [`user`](../globals/user.md) tell you who's talking. Leave Logic empty for answer-only commands — totally valid.

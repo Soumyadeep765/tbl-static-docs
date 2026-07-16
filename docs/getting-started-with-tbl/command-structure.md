@@ -35,7 +35,7 @@ When an update arrives, TBL compiles your code by concatenating your `@` initial
   const userProfile = await db.user.get("profile");
 
   // 2. Your matched command logic runs second
-  Bot.sendMessage(chat.id, "Hello, " + userProfile.name);
+  Bot.sendMessage("Hello, " + userProfile.name);
 
   // 3. @@ Post-processor logic runs last
   // ...
@@ -62,9 +62,9 @@ const userSession = await db.user.get("session") || { steps: 0 };
 // 2. Inside the Logic field of your `/status` command:
 // You can read `config` and `userSession` directly!
 if (config.maintenance) {
-  Bot.sendMessage(chat.id, "Under maintenance. Back soon!");
+  Bot.sendMessage("Under maintenance. Back soon!");
 } else {
-  Bot.sendMessage(chat.id, "Version: " + config.version);
+  Bot.sendMessage("Version: " + config.version);
 }
 ```
 

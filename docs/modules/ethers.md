@@ -78,7 +78,7 @@ Every async RPC method on wrapped providers counts toward the limit and races ag
 ```js
 let provider = new modules.ethers.JsonRpcProvider(process.env.ETH_RPC)
 let block = await provider.getBlockNumber()
-Bot.sendMessage(chat.id, "Current block: " + block)
+Bot.sendMessage("Current block: " + block)
 ```
 
 ### Read contract
@@ -128,14 +128,14 @@ let signature = await wallet.signMessage("Hello")
 let address = params.trim()
 
 if (!modules.ethers.isAddress(address)) {
-  return Bot.sendMessage(chat.id, "That doesn't look like a valid address.")
+  return Bot.sendMessage("That doesn't look like a valid address.")
 }
 
 let provider = new modules.ethers.JsonRpcProvider(process.env.ETH_RPC)
 let balance = await provider.getBalance(address)
 let eth = modules.ethers.formatEther(balance)
 
-Bot.sendMessage(chat.id, "Balance: " + eth + " ETH")
+Bot.sendMessage("Balance: " + eth + " ETH")
 ```
 
 ### Handle RPC errors gracefully
@@ -144,9 +144,9 @@ Bot.sendMessage(chat.id, "Balance: " + eth + " ETH")
 try {
   let provider = new modules.ethers.JsonRpcProvider(process.env.ETH_RPC)
   let block = await provider.getBlockNumber()
-  Bot.sendMessage(chat.id, "Block: " + block)
+  Bot.sendMessage("Block: " + block)
 } catch (err) {
-  Bot.sendMessage(chat.id, "RPC error: " + err.message)
+  Bot.sendMessage("RPC error: " + err.message)
 }
 ```
 

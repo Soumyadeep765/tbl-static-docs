@@ -71,7 +71,7 @@ let url = Webhook.getUrl("confirmPayment", {
   params: { orderId: "12345" },
   expiresIn: 3600  // URL expires in 1 hour
 })
-Bot.sendMessage(chat.id, "Confirm here: " + url)
+Bot.sendMessage("Confirm here: " + url)
 ```
 
 ### Generate a global (system) webhook

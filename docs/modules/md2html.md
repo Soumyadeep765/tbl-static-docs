@@ -18,7 +18,7 @@ Pass Markdown, get HTML:
 
 ```js
 let html = modules.md2html("**Bold** and *italic* text")
-Bot.sendMessage(chat.id, html, { parse_mode: "HTML" })
+Bot.sendMessage(html, { parse_mode: "HTML" })
 ```
 
 Send the result to [Bot](../bot-instance/index.md) with `parse_mode: "HTML"`. That's the whole pipeline.
@@ -90,7 +90,7 @@ let markdown = [
 ].join("\n")
 
 let html = modules.md2html(markdown)
-Bot.sendMessage(chat.id, html, { parse_mode: "HTML" })
+Bot.sendMessage(html, { parse_mode: "HTML" })
 ```
 
 ### Mix Markdown with user input
@@ -100,7 +100,7 @@ When [user](../globals/user.md) content is involved, escape it first with [Libs.
 ```js
 let userText = Libs.tgutil.escapeText(params, "html")
 let html = modules.md2html("**You wrote:**\n" + userText)
-Bot.sendMessage(chat.id, html, { parse_mode: "HTML" })
+Bot.sendMessage(html, { parse_mode: "HTML" })
 ```
 
 ---

@@ -121,12 +121,12 @@ let cost = 50
 let balance = await db.user.get("credits", 0)
 
 if (balance < cost) {
-  return Bot.sendMessage(chat.id, "Not enough credits.")
+  return Bot.sendMessage("Not enough credits.")
 }
 
 await db.user.decr("credits", cost)
 await db.user.push("purchases", "item_sword")
-Bot.sendMessage(chat.id, "Purchased!")
+Bot.sendMessage("Purchased!")
 ```
 
 ### Tag management
@@ -149,7 +149,7 @@ let highScore = await db.bot.get("high_score", 0)
 
 if (score > highScore) {
   await db.bot.set("high_score", score)
-  Bot.sendMessage(chat.id, "New high score!")
+  Bot.sendMessage("New high score!")
 }
 ```
 

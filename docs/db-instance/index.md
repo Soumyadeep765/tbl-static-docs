@@ -67,7 +67,7 @@ Start simple. Each example only introduces what it needs.
 ```js
 await db.user.set("score", 100)
 let score = await db.user.get("score", 0)
-Bot.sendMessage(chat.id, "Your score: " + score)
+Bot.sendMessage("Your score: " + score)
 ```
 
 ### Bot-wide feature flag
@@ -75,7 +75,7 @@ Bot.sendMessage(chat.id, "Your score: " + score)
 ```js
 let maintenance = await db.bot.get("maintenance", false)
 if (maintenance) {
-  return Bot.sendMessage(chat.id, "Bot is under maintenance. Back soon!")
+  return Bot.sendMessage("Bot is under maintenance. Back soon!")
 }
 ```
 
@@ -92,7 +92,7 @@ await db.bot.set("cache", { price: 42.5 }, { ttl: 3600 })  // 1 hour
 ```js
 let res = await db.bot.set("big_payload", data)
 if (!res.ok) {
-  Bot.sendMessage(chat.id, "Storage full: " + res.message)
+  Bot.sendMessage("Storage full: " + res.message)
 }
 ```
 

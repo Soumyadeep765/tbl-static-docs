@@ -29,7 +29,7 @@ Bot.run("/onboard", { step: 1, name: user.first_name })
 // In /onboard — read what /start sent
 let step = options.step    // 1
 let name = options.name    // user's first name
-Bot.sendMessage(chat.id, "Step " + step + " for " + name)
+Bot.sendMessage("Step " + step + " for " + name)
 ```
 
 More on chaining: [Running Commands](../bot-instance/running-commands.md).
@@ -43,9 +43,9 @@ When a command runs as the callback of an [Api](../api-instance/index.md) call, 
 ```js
 if (options.ok) {
   let messageId = options.result.message_id
-  Bot.sendMessage(chat.id, "Message sent! ID: " + messageId)
+  Bot.sendMessage("Message sent! ID: " + messageId)
 } else {
-  Bot.sendMessage(chat.id, "API call failed.")
+  Bot.sendMessage("API call failed.")
 }
 ```
 

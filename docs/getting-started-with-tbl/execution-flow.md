@@ -55,7 +55,7 @@ If you trigger a `return;` inside `@`:
 ```js
 // Inside the Logic field of your `@` command:
 if (user.id !== 123456789) {
-  Bot.sendMessage(chat.id, "Access denied. You are not the admin.");
+  Bot.sendMessage("Access denied. You are not the admin.");
   return; // Exits the entire execution block immediately!
 }
 ```

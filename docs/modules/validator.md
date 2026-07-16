@@ -58,9 +58,9 @@ See the [full method list](https://github.com/validatorjs/validator.js) for 50+ 
 
 ```js
 if (!modules.validator.isEmail(params)) {
-  return Bot.sendMessage(chat.id, "That doesn't look like an email. Try again.")
+  return Bot.sendMessage("That doesn't look like an email. Try again.")
 }
-Bot.sendMessage(chat.id, "Email accepted. Welcome aboard!")
+Bot.sendMessage("Email accepted. Welcome aboard!")
 ```
 
 ### Validate a URL before fetching
@@ -69,10 +69,10 @@ Bot.sendMessage(chat.id, "Email accepted. Welcome aboard!")
 let url = params.trim()
 
 if (!modules.validator.isURL(url, { require_protocol: true })) {
-  return Bot.sendMessage(chat.id, "Please send a valid URL starting with http:// or https://")
+  return Bot.sendMessage("Please send a valid URL starting with http:// or https://")
 }
 
-Bot.sendMessage(chat.id, "URL looks good. Fetching...")
+Bot.sendMessage("URL looks good. Fetching...")
 ```
 
 ### Check password length
@@ -81,10 +81,10 @@ Bot.sendMessage(chat.id, "URL looks good. Fetching...")
 let password = params
 
 if (!modules.validator.isLength(password, { min: 8, max: 128 })) {
-  return Bot.sendMessage(chat.id, "Password must be 8–128 characters.")
+  return Bot.sendMessage("Password must be 8–128 characters.")
 }
 
-Bot.sendMessage(chat.id, "Password length OK. Now hash it with bcrypt.")
+Bot.sendMessage("Password length OK. Now hash it with bcrypt.")
 ```
 
 ---

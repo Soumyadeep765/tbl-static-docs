@@ -69,9 +69,9 @@ let res = await HTTP.get("https://api.example.com/data")
 let res = await HTTP.get("https://api.example.com/user/1")
 
 if (res.ok && res.isJson) {
-  Bot.sendMessage(chat.id, "Name: " + res.data.name)
+  Bot.sendMessage("Name: " + res.data.name)
 } else if (res.ok) {
-  Bot.sendMessage(chat.id, res.content)
+  Bot.sendMessage(res.content)
 }
 ```
 
@@ -132,7 +132,7 @@ Failures return a structured object — no thrown exceptions for HTTP errors:
 let res = await HTTP.get("https://api.example.com/missing")
 
 if (!res.ok) {
-  Bot.sendMessage(chat.id, "Error " + res.status + ": " + res.error.message)
+  Bot.sendMessage("Error " + res.status + ": " + res.error.message)
 }
 ```
 

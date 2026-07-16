@@ -34,7 +34,7 @@ let debug = env.DEBUG === "true"
 // Guard against missing config
 let apiKey = process.env.MY_API_KEY
 if (!apiKey) {
-  return Bot.sendMessage(chat.id, "API key not configured.")
+  return Bot.sendMessage("API key not configured.")
 }
 ```
 
@@ -56,8 +56,7 @@ let token = modules.JWT.sign(
 
 ```js
 if (process.uptime.days >= 1) {
-  Bot.sendMessage(user.id,
-    "Bot has been online for " + process.uptime.days + " day(s)!"
+  Bot.sendMessage("Bot has been online for " + process.uptime.days + " day(s)!"
   )
 }
 ```

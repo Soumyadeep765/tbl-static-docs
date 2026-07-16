@@ -54,7 +54,7 @@ let code = modules.randomstring.generate({
   readable: true
 }).toUpperCase()
 
-Bot.sendMessage(chat.id, "Your promo code: " + code)
+Bot.sendMessage("Your promo code: " + code)
 ```
 
 ### Create a one-time password
@@ -66,14 +66,14 @@ let otp = modules.randomstring.generate({ length: 6, charset: "numeric" })
 db.user.set("otp", otp)
 db.user.set("otp_expires", Date.now() + 300000)  // 5 minutes
 
-Bot.sendMessage(chat.id, "Your one-time code: " + otp + " (expires in 5 min)")
+Bot.sendMessage("Your one-time code: " + otp + " (expires in 5 min)")
 ```
 
 ### Numeric PIN
 
 ```js
 let pin = modules.randomstring.generate({ length: 4, charset: "numeric" })
-Bot.sendMessage(chat.id, "Your PIN: " + pin)
+Bot.sendMessage("Your PIN: " + pin)
 ```
 
 ---

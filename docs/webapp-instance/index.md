@@ -76,7 +76,7 @@ Start simple. Each example only introduces what it needs.
 
 ```js
 let apiUrl = Webapp.getUrl("getStats", { params: { period: "week" } })
-Bot.sendMessage(chat.id, "Live stats: " + apiUrl)
+Bot.sendMessage("Live stats: " + apiUrl)
 ```
 
 ### Return JSON from a webapp command

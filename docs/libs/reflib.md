@@ -33,14 +33,14 @@ Referral engine — build invite links, track who brought whom, maintain a leade
 let result = await Libs.refLib.track({
   prefixes: ["ref", "vip"],
   onJoin: async ({ referrer, count }) => {
-    Bot.sendMessage(chat.id, "Welcome! Referred by " + referrer.first_name)
+    Bot.sendMessage("Welcome! Referred by " + referrer.first_name)
     Api.sendMessage({
       chat_id: referrer.id,
       text: user.first_name + " joined! You now have " + count + " referrals."
     })
   },
-  onSelf: async () => Bot.sendMessage(chat.id, "That's your own link!"),
-  onRepeat: async () => Bot.sendMessage(chat.id, "Already registered."),
+  onSelf: async () => Bot.sendMessage("That's your own link!"),
+  onRepeat: async () => Bot.sendMessage("Already registered."),
   onOrganic: async () => {} // normal /start, no code
 })
 ```
@@ -51,7 +51,7 @@ let result = await Libs.refLib.track({
 
 ```js
 let url = await Libs.refLib.register({ prefix: "ref" })
-Bot.sendMessage(chat.id, "Share: " + url)
+Bot.sendMessage("Share: " + url)
 ```
 
 `register()` caches profile + saves prefix. `link()` builds the URL string with zero db I/O.
@@ -96,8 +96,7 @@ Bot.sendMessage(chat.id, "Share: " + url)
 
 ```js
 let s = await Libs.refLib.stats()
-Bot.sendMessage(chat.id,
-  "Referrals: " + s.count + "\n" +
+Bot.sendMessage("Referrals: " + s.count + "\n" +
   "Rank: " + (s.rank || "unranked") + "\n" +
   "Link: " + s.link
 )
@@ -108,7 +107,7 @@ Bot.sendMessage(chat.id,
 ```js
 let top = await Libs.refLib.leaderboard(10)
 let text = top.map(r => r.rank + ". User " + r.userId + ": " + r.count).join("\n")
-Bot.sendMessage(chat.id, "Top referrers:\n" + text)
+Bot.sendMessage("Top referrers:\n" + text)
 ```
 
 ### Reward on join

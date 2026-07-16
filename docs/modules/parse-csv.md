@@ -57,7 +57,7 @@ let csv = "id,name,score\n1,Alice,95\n2,Bob,87"
 let rows = await modules.ParseCSV.parse(csv)
 
 for (let row of rows) {
-  Bot.sendMessage(chat.id, row.name + " scored " + row.score)
+  Bot.sendMessage(row.name + " scored " + row.score)
 }
 ```
 
@@ -82,7 +82,7 @@ for (let row of rows) {
   }
 }
 
-Bot.sendMessage(chat.id, "Imported " + imported + " users.")
+Bot.sendMessage("Imported " + imported + " users.")
 ```
 
 ---

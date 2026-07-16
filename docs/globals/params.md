@@ -23,18 +23,18 @@ For structured data (objects with multiple fields), consider [`options`](options
 ```js
 // /greet Alice
 if (params) {
-  Bot.sendMessage(chat.id, "Hello, " + params + "!")
+  Bot.sendMessage("Hello, " + params + "!")
 } else {
-  Bot.sendMessage(chat.id, "Usage: /greet <name>")
+  Bot.sendMessage("Usage: /greet <name>")
 }
 ```
 
 ```js
 // /search something
 if (!params) {
-  return Bot.sendMessage(chat.id, "Usage: /search <query>")
+  return Bot.sendMessage("Usage: /search <query>")
 }
-Bot.sendMessage(chat.id, "Searching for: " + params)
+Bot.sendMessage("Searching for: " + params)
 ```
 
 ---
@@ -74,7 +74,7 @@ let action = args[0]
 let value = args[1]
 
 if (!action) {
-  return Bot.sendMessage(chat.id, "Usage: /do <action> <value>")
+  return Bot.sendMessage("Usage: /do <action> <value>")
 }
 ```
 

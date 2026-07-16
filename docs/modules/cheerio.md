@@ -50,7 +50,7 @@ let html = params
 let $ = modules.cheerio.load(html)
 
 let title = $("title").text() || "No title found"
-Bot.sendMessage(chat.id, "Page title: " + title)
+Bot.sendMessage("Page title: " + title)
 ```
 
 ### List all links
@@ -64,7 +64,7 @@ $("a").each((i, el) => {
   if (href) links.push(href)
 })
 
-Bot.sendMessage(chat.id, "Found " + links.length + " links:\n" + links.slice(0, 10).join("\n"))
+Bot.sendMessage("Found " + links.length + " links:\n" + links.slice(0, 10).join("\n"))
 ```
 
 ---

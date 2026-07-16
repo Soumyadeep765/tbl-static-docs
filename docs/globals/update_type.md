@@ -25,7 +25,7 @@ Pair it with [`request`](request.md) — `update_type` tells you *what*, `reques
 
 ```js
 if (update_type === "message") {
-  Bot.sendMessage(chat.id, "You wrote: " + message)
+  Bot.sendMessage("You wrote: " + message)
 }
 
 if (update_type === "callback_query") {

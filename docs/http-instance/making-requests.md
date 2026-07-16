@@ -57,7 +57,7 @@ HTTP.get("https://api.example.com/ping")
 let res = await HTTP.get("https://api.example.com/ping")
 
 if (res.ok) {
-  Bot.sendMessage(chat.id, res.data.status)
+  Bot.sendMessage(res.data.status)
 }
 ```
 
@@ -131,11 +131,11 @@ Default User-Agent format: `TBL/1.0.0 (Telegram Bot Lang; AppID:TBLAPP; +TBL-BOT
 let res = await HTTP.get("https://api.example.com/price/BTC")
 
 if (!res.ok) {
-  Bot.sendMessage(chat.id, "Price unavailable (" + res.status + ")")
+  Bot.sendMessage("Price unavailable (" + res.status + ")")
   return
 }
 
-Bot.sendMessage(chat.id, "BTC: $" + res.data.price)
+Bot.sendMessage("BTC: $" + res.data.price)
 ```
 
 ### With fallback commands

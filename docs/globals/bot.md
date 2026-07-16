@@ -23,11 +23,11 @@ This is **platform metadata**, not Telegram update data. For sending messages, y
 
 ```js
 // Introduce yourself
-Bot.sendMessage(user.id, "Welcome! I'm " + bot.first_name + ".")
+Bot.sendMessage("Welcome! I'm " + bot.first_name + ".")
 
 // Health check
 if (bot.status !== "working") {
-  Bot.sendMessage(user.id, "Bot is currently offline. Try again later.")
+  Bot.sendMessage("Bot is currently offline. Try again later.")
 }
 
 // Admin debug

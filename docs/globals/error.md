@@ -47,11 +47,11 @@ When an [HTTP](../http-instance/index.md) request fails and routes to an error c
 ```js
 // Inside an HTTP error callback command
 if (error.status === 404) {
-  Bot.sendMessage(user.id, "Resource not found.")
+  Bot.sendMessage("Resource not found.")
 } else if (error.status === 429) {
-  Bot.sendMessage(user.id, "Too many requests. Slow down!")
+  Bot.sendMessage("Too many requests. Slow down!")
 } else {
-  Bot.sendMessage(user.id, "API error: " + error.status)
+  Bot.sendMessage("API error: " + error.status)
 }
 ```
 

@@ -23,8 +23,8 @@ Think of it like a vending machine: a user presses a button (sends a command), t
 By default, your code runs line-by-line, in order:
 
 ```js
-Bot.sendMessage(chat.id, "Line one");
-Bot.sendMessage(chat.id, "Line two");
+Bot.sendMessage("Line one");
+Bot.sendMessage("Line two");
 ```
 
 However, some actions take time to finish—like fetching data from another website or checking if a user is a member of a channel. When you need to wait for a line to finish before moving to the next one, use `await`:
@@ -46,7 +46,7 @@ Only use `await` when you actually need the result of that line before moving fo
 To test this out, go to a command in your dashboard (like `/test`), scroll down to the **Logic** field, and paste this line:
 
 ```js
-Bot.sendMessage(chat.id, "Hello from the Logic field!");
+Bot.sendMessage("Hello from the Logic field!");
 ```
 
 Save it, open your bot on Telegram, and send `/test`. The bot will respond with your message!

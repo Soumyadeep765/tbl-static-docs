@@ -24,12 +24,11 @@ For raw subscription dates and tier strings, check [`owner.plan`](owner.md). For
 ```js
 // Premium-only feature
 if (!plan.premium) {
-  return Bot.sendMessage(user.id, "This feature requires a Premium plan.")
+  return Bot.sendMessage("This feature requires a Premium plan.")
 }
 
 // Show plan info to the owner
-Bot.sendMessage(user.id,
-  "Your plan: " + plan.name +
+Bot.sendMessage("Your plan: " + plan.name +
   " (" + (plan.timeout / 1000) + "s script timeout)"
 )
 

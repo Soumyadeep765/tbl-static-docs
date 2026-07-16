@@ -29,7 +29,7 @@ Let's build a name-prompting command:
 4. **Need Reply:** Toggle this setting **ON** (enabled).
 5. **Logic:** Paste this standard JavaScript code:
    ```js
-   Bot.sendMessage(chat.id, "Nice to meet you, " + message + "!");
+   Bot.sendMessage("Nice to meet you, " + message + "!");
    ```
 6. Click **Save Command**.
 

@@ -26,7 +26,7 @@ Network-wide ban in three lines:
 let isBanned = await db.global.get("banned:" + user.id, false)
 
 if (isBanned) {
-  return Bot.sendMessage(chat.id, "Access denied across this network of bots.")
+  return Bot.sendMessage("Access denied across this network of bots.")
 }
 ```
 
@@ -58,7 +58,7 @@ All [unified CRUD methods](unified-methods.md) and [advanced operations](advance
 let isBanned = await db.global.get("banned:" + user.id, false)
 
 if (isBanned) {
-  return Bot.sendMessage(chat.id, "Access denied across this network of bots.")
+  return Bot.sendMessage("Access denied across this network of bots.")
 }
 
 // Ban a user account-wide
@@ -71,7 +71,7 @@ await db.global.set("banned:" + user.id, true)
 await db.global.set("global_maintenance", true, { ttl: 3600 })
 
 if (await db.global.get("global_maintenance", false)) {
-  Bot.sendMessage(chat.id, "All bots are in maintenance mode.")
+  Bot.sendMessage("All bots are in maintenance mode.")
 }
 ```
 

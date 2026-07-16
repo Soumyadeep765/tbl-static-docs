@@ -73,9 +73,9 @@ let hi = await Libs.translate.t("Hello", "hi")
 ```js
 let r = await Libs.translate.tryTranslate("Hello!", { to: "es" })
 if (r.ok) {
-  Bot.sendMessage(chat.id, r.text)
+  Bot.sendMessage(r.text)
 } else {
-  Bot.sendMessage(chat.id, "Translation unavailable")
+  Bot.sendMessage("Translation unavailable")
 }
 ```
 
@@ -84,7 +84,7 @@ if (r.ok) {
 ```js
 // Command: /language
 let rows = Libs.translate.langButtons({ perRow: 2, prefix: "lang_" })
-Bot.sendMessage(chat.id, "Choose language:", {
+Bot.sendMessage("Choose language:", {
   reply_markup: { inline_keyboard: rows }
 })
 
@@ -92,7 +92,7 @@ Bot.sendMessage(chat.id, "Choose language:", {
 let code = Libs.translate.parseLangCallback(callback_data, "lang_")
 if (code) {
   await Libs.translate.setUserLang(user.id, code)
-  Bot.sendMessage(chat.id, "Language set to " + Libs.translate.langName(code))
+  Bot.sendMessage("Language set to " + Libs.translate.langName(code))
 }
 ```
 
@@ -103,7 +103,7 @@ let reply = await Libs.translate.translate(
   "Your order has been confirmed!",
   { userId: user.id, silent: true }
 )
-Bot.sendMessage(chat.id, reply)
+Bot.sendMessage(reply)
 ```
 
 ### Configure providers

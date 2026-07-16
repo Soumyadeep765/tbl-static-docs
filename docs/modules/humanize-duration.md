@@ -52,7 +52,7 @@ Common options:
 let ms = 9000000  // 2.5 hours
 let readable = modules.humanizeDuration(ms, { largest: 2 })
 
-Bot.sendMessage(chat.id, "Event starts in " + readable)
+Bot.sendMessage("Event starts in " + readable)
 ```
 
 ### Format a cooldown for the user
@@ -65,9 +65,9 @@ let remaining = cooldownEnd - Date.now()
 
 if (remaining > 0) {
   let wait = modules.humanizeDuration(remaining, { largest: 1 })
-  Bot.sendMessage(chat.id, "Slow down — try again in " + wait + ".")
+  Bot.sendMessage("Slow down — try again in " + wait + ".")
 } else {
-  Bot.sendMessage(chat.id, "You're good to go!")
+  Bot.sendMessage("You're good to go!")
 }
 ```
 
@@ -80,9 +80,9 @@ let expires = modules.dayjs(db.user.get("sub_expires"))
 let ms = expires.diff(modules.dayjs())
 
 if (ms > 0) {
-  Bot.sendMessage(chat.id, "Subscription expires in " + modules.humanizeDuration(ms))
+  Bot.sendMessage("Subscription expires in " + modules.humanizeDuration(ms))
 } else {
-  Bot.sendMessage(chat.id, "Subscription expired. Time to renew.")
+  Bot.sendMessage("Subscription expired. Time to renew.")
 }
 ```
 

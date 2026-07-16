@@ -24,13 +24,13 @@ For just the body, [`content`](content.md) is a shorter path. For failures, the 
 ```js
 // Inside HTTP success callback (/onSuccess)
 if (response.ok && response.isJson) {
-  Bot.sendMessage(user.id, "API says: " + response.data.message)
+  Bot.sendMessage("API says: " + response.data.message)
 }
 
 // Read a rate-limit header
 let remaining = headers["x-ratelimit-remaining"]
 if (remaining && Number(remaining) < 5) {
-  Bot.sendMessage(user.id, "Running low on API quota!")
+  Bot.sendMessage("Running low on API quota!")
 }
 
 // Check what you originally requested

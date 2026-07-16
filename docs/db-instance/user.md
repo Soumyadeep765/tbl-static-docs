@@ -24,7 +24,7 @@ The happy path — read, write, increment:
 
 ```js
 let balance = await db.user.incr("credits", 10)
-Bot.sendMessage(chat.id, "New balance: " + balance + " credits")
+Bot.sendMessage("New balance: " + balance + " credits")
 ```
 
 Three things worth knowing upfront:
@@ -47,7 +47,7 @@ All [unified CRUD methods](unified-methods.md) and [advanced operations](advance
 
 ```js
 let balance = await db.user.incr("credits", 10)
-Bot.sendMessage(chat.id, "New balance: " + balance + " credits")
+Bot.sendMessage("New balance: " + balance + " credits")
 ```
 
 ### Save preference

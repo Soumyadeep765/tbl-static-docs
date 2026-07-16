@@ -28,7 +28,7 @@ Drop this in any command's **Logic** field:
 let res = await HTTP.get("https://api.example.com/status")
 
 if (res.ok) {
-  Bot.sendMessage(chat.id, "API says: " + res.data.message)
+  Bot.sendMessage("API says: " + res.data.message)
 }
 ```
 
@@ -64,7 +64,7 @@ Start simple. Each example only introduces what it needs.
 let res = await HTTP.get("https://api.example.com/users", { query: { page: 1 } })
 
 if (res.ok) {
-  Bot.sendMessage(chat.id, "Found " + res.data.length + " users")
+  Bot.sendMessage("Found " + res.data.length + " users")
 }
 ```
 
@@ -81,11 +81,11 @@ let res = await HTTP.post("https://api.example.com/notify", {
 })
 
 if (!res.ok) {
-  Bot.sendMessage(chat.id, "Could not reach server (" + res.status + ")")
+  Bot.sendMessage("Could not reach server (" + res.status + ")")
   return
 }
 
-Bot.sendMessage(chat.id, "Registered! ID: " + res.data.id)
+Bot.sendMessage("Registered! ID: " + res.data.id)
 ```
 
 ENV setup: [`process.env`](../globals/process.md)

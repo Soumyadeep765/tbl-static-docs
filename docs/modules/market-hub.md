@@ -16,7 +16,7 @@ Check a price and send it to the user:
 
 ```js
 let btc = modules.marketHub.getCrypto("BTC")
-Bot.sendMessage(chat.id, "BTC: $" + modules.marketHub.formatPrice("BTC"))
+Bot.sendMessage("BTC: $" + modules.marketHub.formatPrice("BTC"))
 ```
 
 Symbols are **case-insensitive** — `"btc"`, `"BTC"`, and `"Btc"` all work.
@@ -143,7 +143,7 @@ let usd = modules.marketHub.fiat.USD
 
 ```js
 if (!modules.marketHub.isReady()) {
-  return Bot.sendMessage(chat.id, "Market data is still loading. Try again shortly.")
+  return Bot.sendMessage("Market data is still loading. Try again shortly.")
 }
 
 let symbol = params.toUpperCase()
@@ -151,7 +151,7 @@ let symbol = params.toUpperCase()
 if (!modules.marketHub.has(symbol)) {
   let found = modules.marketHub.search(symbol, 5)
   let list = found.crypto.map(c => c.symbol).join(", ")
-  return Bot.sendMessage(chat.id, "Unknown symbol. Try: " + list)
+  return Bot.sendMessage("Unknown symbol. Try: " + list)
 }
 
 let type = modules.marketHub.getType(symbol)
@@ -159,13 +159,12 @@ let formatted = modules.marketHub.formatPrice(symbol)
 
 if (type === "crypto") {
   let coin = modules.marketHub.getCrypto(symbol)
-  Bot.sendMessage(chat.id,
-    coin.name + " (" + symbol + ")\n" +
+  Bot.sendMessage(coin.name + " (" + symbol + ")\n" +
     "Price: $" + formatted + "\n" +
     "24h: " + (coin.change_24h?.toFixed(2) || "—") + "%"
   )
 } else {
-  Bot.sendMessage(chat.id, symbol + " rate: " + formatted + " (vs USD)")
+  Bot.sendMessage(symbol + " rate: " + formatted + " (vs USD)")
 }
 ```
 
@@ -180,7 +179,7 @@ for (let [symbol, amount] of Object.entries(holdings)) {
   if (price) total += amount * price
 }
 
-Bot.sendMessage(chat.id, "Portfolio: $" + total.toLocaleString("en-US", { maximumFractionDigits: 2 }))
+Bot.sendMessage("Portfolio: $" + total.toLocaleString("en-US", { maximumFractionDigits: 2 }))
 ```
 
 ### Top 5 coins
@@ -190,7 +189,7 @@ let top = modules.marketHub.getTopCrypto(5)
 let lines = top.map((c, i) =>
   (i + 1) + ". " + c.name + " ($" + modules.marketHub.formatPrice(c.symbol) + ")"
 )
-Bot.sendMessage(chat.id, "Top 5:\n" + lines.join("\n"))
+Bot.sendMessage("Top 5:\n" + lines.join("\n"))
 ```
 
 ---

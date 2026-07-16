@@ -67,7 +67,7 @@ let summary = [
   "Device: " + (ua.device.type || "desktop")
 ].join("\n")
 
-Bot.sendMessage(chat.id, "Visitor info:\n" + summary)
+Bot.sendMessage("Visitor info:\n" + summary)
 ```
 
 ### Customize message for mobile users
@@ -76,9 +76,9 @@ Bot.sendMessage(chat.id, "Visitor info:\n" + summary)
 let ua = modules.uaParser.parse(request.headers["user-agent"] || "")
 
 if (ua.device.type === "mobile") {
-  Bot.sendMessage(chat.id, "Tip: open our mini-app for the best mobile experience.")
+  Bot.sendMessage("Tip: open our mini-app for the best mobile experience.")
 } else {
-  Bot.sendMessage(chat.id, "Welcome! Use /help to get started.")
+  Bot.sendMessage("Welcome! Use /help to get started.")
 }
 ```
 

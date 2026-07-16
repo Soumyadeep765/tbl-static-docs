@@ -57,9 +57,9 @@ Common `parse` options:
 let query = modules.qs.parse(params, { ignoreQueryPrefix: true })
 
 if (query.token) {
-  Bot.sendMessage(chat.id, "Token received: " + query.token.slice(0, 8) + "...")
+  Bot.sendMessage("Token received: " + query.token.slice(0, 8) + "...")
 } else {
-  Bot.sendMessage(chat.id, "No token in query string.")
+  Bot.sendMessage("No token in query string.")
 }
 ```
 
@@ -75,7 +75,7 @@ let query = modules.qs.stringify({
 })
 
 let url = process.env.API_BASE + "?" + query
-Bot.sendMessage(chat.id, "Request URL built. Ready to fetch.")
+Bot.sendMessage("Request URL built. Ready to fetch.")
 ```
 
 ### Parse nested params

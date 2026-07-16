@@ -27,7 +27,7 @@ await db.bot.set("maintenance", true)
 let maintenance = await db.bot.get("maintenance", false)
 
 if (maintenance) {
-  return Bot.sendMessage(chat.id, "Bot is under maintenance. Back soon!")
+  return Bot.sendMessage("Bot is under maintenance. Back soon!")
 }
 ```
 
@@ -59,7 +59,7 @@ Also supports [advanced operations](advanced-operations.md): `incr`, `decr`, `pu
 let maintenance = await db.bot.get("maintenance_mode", false)
 
 if (maintenance) {
-  return Bot.sendMessage(chat.id, "Bot is under maintenance. Try again later.")
+  return Bot.sendMessage("Bot is under maintenance. Try again later.")
 }
 ```
 
@@ -67,7 +67,7 @@ if (maintenance) {
 
 ```js
 let totalRuns = await db.bot.incr("total_commands_run", 1)
-Bot.sendMessage(chat.id, "Commands run: " + totalRuns)
+Bot.sendMessage("Commands run: " + totalRuns)
 ```
 
 ### Cached data with TTL

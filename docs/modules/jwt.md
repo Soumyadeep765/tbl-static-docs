@@ -71,9 +71,9 @@ let token = modules.JWT.sign(
 ```js
 try {
   let payload = modules.JWT.verify(token, process.env.JWT_SECRET)
-  Bot.sendMessage(chat.id, "Welcome back, user " + payload.userId)
+  Bot.sendMessage("Welcome back, user " + payload.userId)
 } catch (err) {
-  Bot.sendMessage(chat.id, "Invalid or expired token.")
+  Bot.sendMessage("Invalid or expired token.")
 }
 ```
 
@@ -106,15 +106,15 @@ let session = modules.JWT.sign(
   { expiresIn: "30d" }
 )
 db.user.set("session_token", session)
-Bot.sendMessage(chat.id, "Logged in. Session saved.")
+Bot.sendMessage("Logged in. Session saved.")
 
 // /dashboard — validate session
 let stored = db.user.get("session_token")
 try {
   let data = modules.JWT.verify(stored, process.env.JWT_SECRET)
-  Bot.sendMessage(chat.id, "Session valid for user " + data.uid)
+  Bot.sendMessage("Session valid for user " + data.uid)
 } catch (err) {
-  Bot.sendMessage(chat.id, "Session expired. Use /login again.")
+  Bot.sendMessage("Session expired. Use /login again.")
 }
 ```
 

@@ -28,7 +28,7 @@ Variables are **read-only** during command execution unless noted otherwise.
 Drop this in any command's **Logic** field:
 
 ```js
-Bot.sendMessage(chat.id, "Hey " + user.first_name + "! You said: " + params)
+Bot.sendMessage("Hey " + user.first_name + "! You said: " + params)
 ```
 
 Three things worth knowing upfront:
@@ -74,7 +74,7 @@ Start simple. Each example only introduces what it needs.
 
 ```js
 if (user) {
-  Bot.sendMessage(chat.id, "Welcome back, " + user.first_name + "!")
+  Bot.sendMessage("Welcome back, " + user.first_name + "!")
 }
 ```
 
@@ -84,9 +84,9 @@ if (user) {
 
 ```js
 if (!params) {
-  return Bot.sendMessage(chat.id, "Usage: /search <query>")
+  return Bot.sendMessage("Usage: /search <query>")
 }
-Bot.sendMessage(chat.id, "Searching for: " + params)
+Bot.sendMessage("Searching for: " + params)
 ```
 
 ### Check your plan limits
@@ -102,7 +102,7 @@ Store API keys in dashboard **ENV** settings:
 ```js
 let apiKey = process.env.MY_API_KEY
 if (!apiKey) {
-  return Bot.sendMessage(chat.id, "API key not configured.")
+  return Bot.sendMessage("API key not configured.")
 }
 ```
 

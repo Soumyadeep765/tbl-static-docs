@@ -217,9 +217,9 @@ let res = await HTTP.get("https://api.example.com/data", {
 
 if (!res.ok) {
   if (res.error?.code === "WORKER_PROXY_ERROR") {
-    Bot.sendMessage(chat.id, "Worker proxy failed — check your Worker is deployed.")
+    Bot.sendMessage("Worker proxy failed — check your Worker is deployed.")
   } else {
-    Bot.sendMessage(chat.id, "API error: " + res.status)
+    Bot.sendMessage("API error: " + res.status)
   }
 }
 ```

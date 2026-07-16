@@ -59,7 +59,7 @@ let defaults = {
 let saved = db.user.get("settings") || {}
 let settings = modules.deepmerge(defaults, saved)
 
-Bot.sendMessage(chat.id, "Theme: " + settings.theme.color + ", size: " + settings.theme.size)
+Bot.sendMessage("Theme: " + settings.theme.color + ", size: " + settings.theme.size)
 ```
 
 ### Apply a partial config update
@@ -73,7 +73,7 @@ let update = JSON.parse(params)
 let config = modules.deepmerge(current, update)
 db.bot.set("config", config)
 
-Bot.sendMessage(chat.id, "Config updated.")
+Bot.sendMessage("Config updated.")
 ```
 
 ---

@@ -29,12 +29,12 @@ For script-friendly plan limits (timeouts, buffer sizes, rate limits), use [`pla
 ```js
 // Nudge free-tier owners
 if (owner.plan.tier === "FREE") {
-  Bot.sendMessage(user.id, "Upgrade your plan for more features!")
+  Bot.sendMessage("Upgrade your plan for more features!")
 }
 
 // Use resolved limits for feature gating
 if (plan.premium) {
-  Bot.sendMessage(user.id, "Premium features are enabled on this bot.")
+  Bot.sendMessage("Premium features are enabled on this bot.")
 }
 
 // Alert the owner on errors (in your ! handler)

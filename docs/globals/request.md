@@ -68,7 +68,7 @@ let page = request.query.page || "1"
 
 // Webhook POST: read body
 let name = request.body?.name
-Bot.sendMessage(chat.id, "Hello, " + name)
+Bot.sendMessage("Hello, " + name)
 ```
 
 [`params`](params.md) may also be populated from query or body — handy for simple single-value input.

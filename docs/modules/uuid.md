@@ -62,7 +62,7 @@ let recordId = modules.UUID.uuidv6()
 
 ```js
 let ref = modules.UUID.uuidv4().slice(0, 8).toUpperCase()
-Bot.sendMessage(chat.id, "Your order reference: #" + ref)
+Bot.sendMessage("Your order reference: #" + ref)
 ```
 
 ### Unique file key
@@ -72,7 +72,7 @@ Tie an upload to [user](../globals/user.md) in [db](../db-instance/index.md):
 ```js
 let fileKey = modules.UUID.uuidv4() + ".json"
 db.bot.set("uploads/" + fileKey, { user: user.id, data: params })
-Bot.sendMessage(chat.id, "File saved as " + fileKey)
+Bot.sendMessage("File saved as " + fileKey)
 ```
 
 ### Ordered event log

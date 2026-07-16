@@ -26,7 +26,7 @@ Economy engine — coins, XP, health, passive growth, transfers. Uses async [`db
 let gold = Libs.ResourcesLibv2.userRes("gold")
 await gold.add(50)
 let balance = await gold.value()
-Bot.sendMessage(chat.id, "Gold: " + balance)
+Bot.sendMessage("Gold: " + balance)
 ```
 
 ---
@@ -86,7 +86,7 @@ let craft = await Libs.ResourcesLibv2.spendAll([
   { res: gold, amount: 50 },
   { res: wood, amount: 10 }
 ])
-if (!craft.ok) Bot.sendMessage(chat.id, "Need " + craft.need + " " + craft.missing)
+if (!craft.ok) Bot.sendMessage("Need " + craft.need + " " + craft.missing)
 ```
 
 ---
@@ -98,9 +98,9 @@ if (!craft.ok) Bot.sendMessage(chat.id, "Need " + craft.need + " " + craft.missi
 ```js
 let gold = Libs.ResourcesLibv2.userRes("gold")
 if (await gold.spend(30)) {
-  Bot.sendMessage(chat.id, "Purchased! Balance: " + await gold.peek())
+  Bot.sendMessage("Purchased! Balance: " + await gold.peek())
 } else {
-  Bot.sendMessage(chat.id, "Not enough gold.")
+  Bot.sendMessage("Not enough gold.")
 }
 ```
 
@@ -116,8 +116,7 @@ await myGold.transferTo(theirGold, 20)
 
 ```js
 let s = await gold.stats()
-Bot.sendMessage(chat.id,
-  await gold.format({ suffix: "gold", compact: true }) +
+Bot.sendMessage(await gold.format({ suffix: "gold", compact: true }) +
   "\nPending: +" + s.pending +
   "\nNext tick: " + Math.ceil(s.growth?.nextTickIn || 0) + "s"
 )

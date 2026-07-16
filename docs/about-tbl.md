@@ -41,7 +41,7 @@ Here is exactly what happens when someone interacts with your bot:
 
 When you write code on TeleBotHost, you don't need to run `npm install` or import libraries. Everything you need is already global and ready to use:
 
-*   **`Bot`**: Your go-to helper. Want to send a simple message? Just use `Bot.sendMessage(chat.id, "Hi!")`.
+*   **`Bot`**: Your go-to helper. Want to send a simple message? Just use `Bot.sendMessage("Hi!")`.
 *   **`Api`**: The raw Telegram Bot API power. Use this when you want to send inline keyboards, edit existing messages, or upload files.
 *   **`user` & `chat`**: Objects that tell you exactly *who* sent the message and *where* they sent it from.
 *   **`db`**: A built-in database that works out of the box. No setup required. You can save user high scores, settings, or bot states instantly.

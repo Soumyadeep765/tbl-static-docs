@@ -46,7 +46,7 @@ Units include `"day"`, `"hour"`, `"minute"`, `"month"`, `"year"`, etc.
 
 ```js
 let formatted = modules.dayjs().format("dddd, MMMM D, YYYY")
-Bot.sendMessage(chat.id, "Today is " + formatted)
+Bot.sendMessage("Today is " + formatted)
 ```
 
 ### Countdown to a deadline
@@ -56,9 +56,9 @@ let deadline = modules.dayjs("2025-12-31")
 let daysLeft = deadline.diff(modules.dayjs(), "day")
 
 if (daysLeft > 0) {
-  Bot.sendMessage(chat.id, daysLeft + " days until the deadline. No pressure.")
+  Bot.sendMessage(daysLeft + " days until the deadline. No pressure.")
 } else {
-  Bot.sendMessage(chat.id, "Deadline passed. Hope you finished.")
+  Bot.sendMessage("Deadline passed. Hope you finished.")
 }
 ```
 
@@ -67,7 +67,7 @@ if (daysLeft > 0) {
 ```js
 let now = modules.dayjs().format()
 db.user.set("last_seen", now)
-Bot.sendMessage(chat.id, "Logged your visit at " + now)
+Bot.sendMessage("Logged your visit at " + now)
 ```
 
 ---

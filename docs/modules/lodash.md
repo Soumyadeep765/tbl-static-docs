@@ -55,7 +55,7 @@ This is a sampler, not the full menu — see [lodash docs](https://lodash.com/do
 let users = db.bot.get("members") || []
 let active = modules.lodash.filter(users, u => u.lastSeen > Date.now() - 86400000)
 
-Bot.sendMessage(chat.id, active.length + " users active in the last 24 hours.")
+Bot.sendMessage(active.length + " users active in the last 24 hours.")
 ```
 
 ### Group scores by team
@@ -74,7 +74,7 @@ let summary = Object.entries(byTeam).map(([team, players]) =>
   team + ": " + players.map(p => p.name).join(", ")
 ).join("\n")
 
-Bot.sendMessage(chat.id, "Teams:\n" + summary)
+Bot.sendMessage("Teams:\n" + summary)
 ```
 
 ### Safe nested read
@@ -83,7 +83,7 @@ Bot.sendMessage(chat.id, "Teams:\n" + summary)
 let config = db.bot.get("config") || {}
 let color = modules.lodash.get(config, "theme.color", "blue")
 
-Bot.sendMessage(chat.id, "Theme color: " + color)
+Bot.sendMessage("Theme color: " + color)
 ```
 
 ---

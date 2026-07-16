@@ -26,7 +26,7 @@ Drop this in any command's **Logic** field:
 
 ```js
 let id = modules.UUID.uuidv4()
-Bot.sendMessage(chat.id, "Your order ID: " + id)
+Bot.sendMessage("Your order ID: " + id)
 ```
 
 Three things worth knowing upfront:
@@ -114,7 +114,7 @@ No setup, no secrets — just an ID:
 
 ```js
 let ref = modules.UUID.uuidv4().slice(0, 8).toUpperCase()
-Bot.sendMessage(chat.id, "Your reference: #" + ref)
+Bot.sendMessage("Your reference: #" + ref)
 ```
 
 ### Validate an email
@@ -123,9 +123,9 @@ Bot.sendMessage(chat.id, "Your reference: #" + ref)
 
 ```js
 if (!modules.validator.isEmail(params)) {
-  return Bot.sendMessage(chat.id, "That doesn't look like an email. Try again.")
+  return Bot.sendMessage("That doesn't look like an email. Try again.")
 }
-Bot.sendMessage(chat.id, "Email accepted. Welcome aboard!")
+Bot.sendMessage("Email accepted. Welcome aboard!")
 ```
 
 ### Markdown → HTML for Telegram
@@ -134,7 +134,7 @@ Telegram's HTML mode is picky. `md2html` translates your Markdown:
 
 ```js
 let html = modules.md2html("**Sale!** Visit [our site](https://example.com)")
-Bot.sendMessage(chat.id, html, { parse_mode: "HTML" })
+Bot.sendMessage(html, { parse_mode: "HTML" })
 ```
 
 ### Sign a session token
@@ -147,7 +147,7 @@ let token = modules.JWT.sign(
   process.env.JWT_SECRET,
   { expiresIn: "7d" }
 )
-Bot.sendMessage(chat.id, "Logged in. Token saved.")
+Bot.sendMessage("Logged in. Token saved.")
 ```
 
 ENV setup: [`process.env`](../globals/process.md) · JWT details: [JWT module](jwt.md)
@@ -157,9 +157,9 @@ ENV setup: [`process.env`](../globals/process.md) · JWT details: [JWT module](j
 ```js
 let btc = modules.marketHub.getCrypto("BTC")
 if (btc) {
-  Bot.sendMessage(chat.id, "BTC: $" + modules.marketHub.formatPrice("BTC"))
+  Bot.sendMessage("BTC: $" + modules.marketHub.formatPrice("BTC"))
 } else {
-  Bot.sendMessage(chat.id, "Price feed is taking a coffee break. Try again soon.")
+  Bot.sendMessage("Price feed is taking a coffee break. Try again soon.")
 }
 ```
 
@@ -172,7 +172,7 @@ let csvText = "name,score\nAlice,9001\nBob,42"
 let rows = await modules.ParseCSV.parse(csvText)
 
 for (let row of rows) {
-  Bot.sendMessage(chat.id, row.name + " scored " + row.score)
+  Bot.sendMessage(row.name + " scored " + row.score)
 }
 ```
 

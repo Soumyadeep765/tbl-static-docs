@@ -25,11 +25,10 @@ Storage key: `cd:{name}` — stores expiry timestamp. TTL auto-cleans expired ke
 ```js
 let run = await Libs.cooldown.tryRun("daily_bonus", 86400)
 if (!run.ok) {
-  return Bot.sendMessage(chat.id,
-    "Wait " + await Libs.cooldown.format("daily_bonus")
+  return Bot.sendMessage("Wait " + await Libs.cooldown.format("daily_bonus")
   )
 }
-Bot.sendMessage(chat.id, "Bonus claimed!")
+Bot.sendMessage("Bonus claimed!")
 ```
 
 ---
@@ -63,8 +62,7 @@ Bot.sendMessage(chat.id, "Bonus claimed!")
 
 ```js
 if (await Libs.cooldown.active("attack")) {
-  return Bot.sendMessage(chat.id,
-    "Attack ready in " + await Libs.cooldown.format("attack")
+  return Bot.sendMessage("Attack ready in " + await Libs.cooldown.format("attack")
   )
 }
 await Libs.cooldown.set("attack", 300)
@@ -76,11 +74,11 @@ await Libs.cooldown.set("attack", 300)
 ```js
 let claim = await Libs.cooldown.tryRun("daily", 86400)
 if (!claim.ok) {
-  return Bot.sendMessage(chat.id, "Daily reward in " + claim.remaining + "s")
+  return Bot.sendMessage("Daily reward in " + claim.remaining + "s")
 }
 let gold = Libs.ResourcesLibv2.userRes("gold")
 await gold.add(100)
-Bot.sendMessage(chat.id, "Daily +100 gold!")
+Bot.sendMessage("Daily +100 gold!")
 ```
 
 ### Global event lock
@@ -88,7 +86,7 @@ Bot.sendMessage(chat.id, "Daily +100 gold!")
 ```js
 await Libs.cooldown.setGlobal("tournament", 3600)
 if (await Libs.cooldown.activeGlobal("tournament")) {
-  Bot.sendMessage(chat.id, "Tournament running! Ends in " +
+  Bot.sendMessage("Tournament running! Ends in " +
     await Libs.cooldown.formatGlobal("tournament"))
 }
 ```
@@ -98,7 +96,7 @@ if (await Libs.cooldown.activeGlobal("tournament")) {
 ```js
 let cds = await Libs.cooldown.checkAll(["daily", "spin", "attack"])
 if (cds.spin.active) {
-  Bot.sendMessage(chat.id, "Spin ready in " + cds.spin.remaining + "s")
+  Bot.sendMessage("Spin ready in " + cds.spin.remaining + "s")
 }
 ```
 

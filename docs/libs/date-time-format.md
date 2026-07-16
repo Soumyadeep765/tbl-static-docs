@@ -20,14 +20,14 @@ The quickest win — today's date as an ISO string:
 
 ```js
 let today = Libs.dateTimeFormat.getCurrentDate("isoDate")
-Bot.sendMessage(chat.id, "Today: " + today)
+Bot.sendMessage("Today: " + today)
 ```
 
 Need a date seven days from now?
 
 ```js
 let nextWeek = Libs.dateTimeFormat.addDays(new Date(), 7)
-Bot.sendMessage(chat.id, "Event date: " + Libs.dateTimeFormat.format(nextWeek, "isoDate"))
+Bot.sendMessage("Event date: " + Libs.dateTimeFormat.format(nextWeek, "isoDate"))
 ```
 
 All methods return immediately — **no `await` needed**.
@@ -42,8 +42,7 @@ All methods return immediately — **no `await` needed**.
 let eventDate = Libs.dateTimeFormat.addDays(new Date(), 7)
 let diff = Libs.dateTimeFormat.getTimeDifference(new Date(), eventDate)
 
-Bot.sendMessage(chat.id,
-  "Event in " + diff.days + " days, " + (diff.hours % 24) + " hours"
+Bot.sendMessage("Event in " + diff.days + " days, " + (diff.hours % 24) + " hours"
 )
 ```
 
@@ -53,10 +52,10 @@ Bot.sendMessage(chat.id,
 let expiry = Libs.dateTimeFormat.addTime(new Date(), { months: 1 })
 
 if (new Date() > expiry) {
-  Bot.sendMessage(chat.id, "Subscription expired.")
+  Bot.sendMessage("Subscription expired.")
 } else {
   let left = Libs.dateTimeFormat.getTimeDifference(new Date(), expiry)
-  Bot.sendMessage(chat.id, "Active — " + left.days + " days left.")
+  Bot.sendMessage("Active — " + left.days + " days left.")
 }
 ```
 
@@ -67,7 +66,7 @@ let formatted = Libs.dateTimeFormat.format(
   user.joined_at,
   "dddd, mmmm d 'at' h:MM TT"
 )
-Bot.sendMessage(chat.id, "You joined on " + formatted)
+Bot.sendMessage("You joined on " + formatted)
 ```
 
 ---

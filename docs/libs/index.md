@@ -66,7 +66,7 @@ let name = Libs.tgutil.getNameFor(user)
 
 ```js
 let roll = Libs.random.randomInt(1, 6)
-Bot.sendMessage(chat.id, "You rolled: " + roll)
+Bot.sendMessage("You rolled: " + roll)
 ```
 
 ### Coin balance (async economy)
@@ -74,7 +74,7 @@ Bot.sendMessage(chat.id, "You rolled: " + roll)
 ```js
 let gold = Libs.ResourcesLibv2.userRes("gold")
 await gold.add(50)
-Bot.sendMessage(chat.id, "Gold: " + await gold.value())
+Bot.sendMessage("Gold: " + await gold.value())
 ```
 
 ### Referral tracking
@@ -82,7 +82,7 @@ Bot.sendMessage(chat.id, "Gold: " + await gold.value())
 ```js
 let result = await Libs.refLib.track({
   onJoin: async ({ referrer, count }) => {
-    Bot.sendMessage(chat.id, "Referred by " + referrer.first_name + "! They have " + count + " refs.")
+    Bot.sendMessage("Referred by " + referrer.first_name + "! They have " + count + " refs.")
   }
 })
 let link = await Libs.refLib.register()
@@ -93,7 +93,7 @@ let link = await Libs.refLib.register()
 ```js
 let run = await Libs.cooldown.tryRun("daily_bonus", 86400)
 if (!run.ok) {
-  return Bot.sendMessage(chat.id, "Come back in " + await Libs.cooldown.format("daily_bonus"))
+  return Bot.sendMessage("Come back in " + await Libs.cooldown.format("daily_bonus"))
 }
 ```
 
@@ -101,7 +101,7 @@ if (!run.ok) {
 
 ```js
 let text = await Libs.translate.translate("Welcome!", { to: "hi" })
-Bot.sendMessage(chat.id, text)
+Bot.sendMessage(text)
 ```
 
 ### Channel gate

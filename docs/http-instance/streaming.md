@@ -228,7 +228,7 @@ let res = await HTTP.get("https://api.example.com/live", {
 })
 
 if (!res.ok || !res.isStream) {
-  Bot.sendMessage(chat.id, "Feed unavailable.")
+  Bot.sendMessage("Feed unavailable.")
   return
 }
 
@@ -242,7 +242,7 @@ try {
     }
   }
 } catch (err) {
-  Bot.sendMessage(chat.id, "Stream ended: " + err.message)
+  Bot.sendMessage("Stream ended: " + err.message)
 }
 ```
 
@@ -258,7 +258,7 @@ let res = await HTTP.get("https://api.example.com/export.ndjson", {
 let raw = await res.stream.collect()
 let records = raw.split("\n").filter(Boolean).map(JSON.parse)
 
-Bot.sendMessage(chat.id, "Loaded " + records.length + " records.")
+Bot.sendMessage("Loaded " + records.length + " records.")
 ```
 
 ### Read until enough, then cancel
@@ -285,7 +285,7 @@ let res = await HTTP.get("https://api.example.com/missing", {
 
 if (!res.ok) {
   let errorBody = await res.stream.collect()
-  Bot.sendMessage(chat.id, "Error " + res.status + ": " + errorBody)
+  Bot.sendMessage("Error " + res.status + ": " + errorBody)
 }
 ```
 

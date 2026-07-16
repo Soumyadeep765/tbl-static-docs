@@ -25,9 +25,9 @@ When you need to **reply, edit, or react** to the message, switch to [`msg`](msg
 ```js
 // Simple echo
 if (message) {
-  Bot.sendMessage(chat.id, "You said: " + message)
+  Bot.sendMessage("You said: " + message)
 } else {
-  Bot.sendMessage(chat.id, "I only understand text messages right now.")
+  Bot.sendMessage("I only understand text messages right now.")
 }
 ```
 

@@ -26,9 +26,9 @@ let body = content
 
 // JSON response? Use response.data for the parsed object
 if (response.isJson) {
-  Bot.sendMessage(user.id, "API says: " + response.data.message)
+  Bot.sendMessage("API says: " + response.data.message)
 } else {
-  Bot.sendMessage(user.id, "Raw response: " + body)
+  Bot.sendMessage("Raw response: " + body)
 }
 ```
 

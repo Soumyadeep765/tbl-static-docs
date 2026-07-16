@@ -32,7 +32,7 @@ Answers are formatted automatically. Messages **you** send in Logic need an expl
 [`Bot`](../bot-instance/index.md) for quick sends:
 
 ```js
-Bot.sendMessage(chat.id, "*Done!* Your settings were saved.", { parse_mode: "Markdown" })
+Bot.sendMessage("*Done!* Your settings were saved.", { parse_mode: "Markdown" })
 ```
 
 [`Api`](../api-instance/index.md) when you need full control:

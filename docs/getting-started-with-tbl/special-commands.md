@@ -49,7 +49,7 @@ Without `!`, users might see a generic platform error. With it, you control the 
 
 ```js
 // ! command Logic
-Bot.sendMessage(chat.id, "Oops — something broke. Try /start to reset.")
+Bot.sendMessage("Oops — something broke. Try /start to reset.")
 ```
 
 ---

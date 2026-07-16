@@ -237,12 +237,12 @@ let step = await db.user.get("onboard_step", 0)
 
 if (step === 0) {
   await db.user.set("onboard_step", 1)
-  Bot.sendMessage(chat.id, "Step 1 complete.")
+  Bot.sendMessage("Step 1 complete.")
 }
 
 // Check storage result
 let res = await db.bot.set("cache", largeObject)
-if (!res.ok) Bot.sendMessage(chat.id, res.message)
+if (!res.ok) Bot.sendMessage(res.message)
 ```
 
 For counters and lists, see [Advanced Operations](advanced-operations.md).

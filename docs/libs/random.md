@@ -27,7 +27,7 @@ Drop this in your command's **Logic** field:
 
 ```js
 let roll = Libs.random.randomInt(1, 6)
-Bot.sendMessage(chat.id, "You rolled: " + roll)
+Bot.sendMessage("You rolled: " + roll)
 ```
 
 All methods return immediately — **no `await` needed**.
@@ -43,14 +43,14 @@ All methods return immediately — **no `await` needed**.
 
 ```js
 let flip = Libs.random.randomBoolean()
-Bot.sendMessage(chat.id, flip ? "Heads!" : "Tails!")
+Bot.sendMessage(flip ? "Heads!" : "Tails!")
 ```
 
 ### Promo code
 
 ```js
 let code = Libs.random.randomString(8, { charset: "alphanumeric" })
-Bot.sendMessage(chat.id, "Your code: " + code.toUpperCase())
+Bot.sendMessage("Your code: " + code.toUpperCase())
 ```
 
 ### Giveaway winner
@@ -58,7 +58,7 @@ Bot.sendMessage(chat.id, "Your code: " + code.toUpperCase())
 ```js
 let entrants = [111, 222, 333, 444]
 let winner = Libs.random.randomChoice(entrants)
-Bot.sendMessage(chat.id, "Winner: " + winner)
+Bot.sendMessage("Winner: " + winner)
 ```
 
 ---
@@ -79,7 +79,7 @@ let dice = Libs.random.randomInt(1, 6)
 
 // Lottery numbers (sorted, unique)
 let picks = Libs.random.randomUniqueInts(1, 50, 6, true)
-Bot.sendMessage(chat.id, picks.join(", "))
+Bot.sendMessage(picks.join(", "))
 ```
 
 ---

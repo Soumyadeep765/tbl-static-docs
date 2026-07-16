@@ -29,7 +29,7 @@ The most common pattern — greet someone with a clickable mention:
 
 ```js
 let mention = Libs.tgutil.getUserMention(user, "html")
-Bot.sendMessage(chat.id, "Hello " + mention + "!", { parse_mode: "HTML" })
+Bot.sendMessage("Hello " + mention + "!", { parse_mode: "HTML" })
 ```
 
 **Important:** match the `parseMode` argument in tgutil to `parse_mode` on `Bot.sendMessage`. HTML mention + Markdown parse mode = sad bot.
@@ -42,14 +42,14 @@ Bot.sendMessage(chat.id, "Hello " + mention + "!", { parse_mode: "HTML" })
 
 ```js
 let mention = Libs.tgutil.getUserMention(user, "html")
-Bot.sendMessage(chat.id, "Welcome " + mention + "!", { parse_mode: "HTML" })
+Bot.sendMessage("Welcome " + mention + "!", { parse_mode: "HTML" })
 ```
 
 ### Safe user input in bold
 
 ```js
 let safe = Libs.tgutil.escapeText(params, "html")
-Bot.sendMessage(chat.id, "<b>You said:</b> " + safe, { parse_mode: "HTML" })
+Bot.sendMessage("<b>You said:</b> " + safe, { parse_mode: "HTML" })
 ```
 
 ### Split a long reply
@@ -57,7 +57,7 @@ Bot.sendMessage(chat.id, "<b>You said:</b> " + safe, { parse_mode: "HTML" })
 ```js
 let chunks = Libs.tgutil.splitMessage(longText, 4096)
 for (let part of chunks) {
-  Bot.sendMessage(chat.id, part)
+  Bot.sendMessage(part)
 }
 ```
 
@@ -71,7 +71,7 @@ let info = [
   "Photo: " + (Libs.tgutil.getProfilePhotoUrl(user) || "none")
 ].join("\n")
 
-Bot.sendMessage(chat.id, info)
+Bot.sendMessage(info)
 ```
 
 ---
@@ -214,7 +214,7 @@ Returns:
 ```js
 let result = Libs.tgutil.validateWebAppData(params.webapp_data)
 if (!result.valid) {
-  return Bot.sendMessage(chat.id, "Invalid WebApp data: " + result.error)
+  return Bot.sendMessage("Invalid WebApp data: " + result.error)
 }
 let webUser = result.data.user
 ```

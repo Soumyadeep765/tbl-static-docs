@@ -79,10 +79,10 @@ let check = schema.safeParse(JSON.parse(params))
 
 if (!check.success) {
   let issues = check.error.issues.map(i => i.path.join(".") + ": " + i.message)
-  return Bot.sendMessage(chat.id, "Invalid input:\n" + issues.join("\n"))
+  return Bot.sendMessage("Invalid input:\n" + issues.join("\n"))
 }
 
-Bot.sendMessage(chat.id, "Payment of $" + check.data.amount + " for " + check.data.email)
+Bot.sendMessage("Payment of $" + check.data.amount + " for " + check.data.email)
 ```
 
 ### Validate and save user profile
@@ -98,9 +98,9 @@ let profileSchema = modules.zod.object({
 try {
   let profile = profileSchema.parse(JSON.parse(params))
   db.user.set("profile", profile)
-  Bot.sendMessage(chat.id, "Profile saved, " + profile.displayName + "!")
+  Bot.sendMessage("Profile saved, " + profile.displayName + "!")
 } catch (err) {
-  Bot.sendMessage(chat.id, "Profile invalid: " + err.issues[0].message)
+  Bot.sendMessage("Profile invalid: " + err.issues[0].message)
 }
 ```
 
@@ -108,7 +108,7 @@ try {
 
 ```js
 let name = modules.zod.string().min(2).parse(params)
-Bot.sendMessage(chat.id, "Hello, " + name + "!")
+Bot.sendMessage("Hello, " + name + "!")
 ```
 
 ---
