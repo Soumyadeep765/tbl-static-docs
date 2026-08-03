@@ -8,8 +8,6 @@ Live crypto and fiat prices — cached, refreshed, and ready before your command
 
 Access it as `modules.marketHub`.
 
-The object exposed to bots is **read-only** — you can look up prices and search, but you cannot start/stop refresh or mutate cached entries.
-
 ---
 
 ## How to use
@@ -86,7 +84,7 @@ let inr = modules.marketHub.getFiat("INR")
 
 `rate` is **units of that currency per 1 USD**. So `100 USD → INR` is `100 * rate`.
 
-Some fiat codes may appear from the name catalog with `hasRate: false` (name/flag only, no convertible rate yet). Prefer `hasRate` or `getPrice` before converting.
+If `hasRate` is `false`, the currency has a name/flag but no convertible rate — check before converting.
 
 ---
 
@@ -134,8 +132,6 @@ let usd = modules.marketHub.fiat.USD
 "INR" in modules.marketHub.fiat    // true
 ```
 
-These maps are read-only. Returned entries are frozen — treat them as snapshots, not mutable objects.
-
 ---
 
 ## Status methods
@@ -150,13 +146,12 @@ These maps are read-only. Returned entries are frozen — treat them as snapshot
 
 ## Data sources
 
-| Type | Source | What it provides | Refresh |
-| --- | --- | --- | --- |
-| Crypto (top 200) | [CoinGecko](https://www.coingecko.com/) markets API | Prices, caps, 24h stats | ~2 minutes |
-| Fiat rates | [Frankfurter](https://frankfurter.dev/) | Official-style FX rates vs USD | ~30 minutes |
-| Fiat names | [fawazahmed0/currency-api](https://github.com/fawazahmed0/exchange-api) | Currency display names | With fiat refresh |
+| Type | Source | Refresh |
+| --- | --- | --- |
+| Crypto (top 200) | [CoinGecko](https://www.coingecko.com/) | ~2 minutes |
+| Fiat rates | [Frankfurter](https://frankfurter.dev/) | ~30 minutes |
 
-Flags come from the platform’s currency → country mapping (e.g. `INR` → 🇮🇳).
+Fiat entries also include display names and flags (e.g. `INR` → 🇮🇳 Indian Rupee).
 
 ---
 
@@ -234,9 +229,8 @@ Bot.sendMessage(hits.map(f => f.displayName).join("\n"))
 
 ## Notes
 
-- **Sync** — all methods are synchronous, no `await`
-- **Read-only** — no lifecycle controls (`start` / `stop` / stats) from bot code
+- All methods are synchronous — no `await`
 - Prices are indicative — not for financial trading decisions
 - Crypto prices are in **USD**; fiat rates are vs **USD** base
-- If `isReady()` is false, the server may still be loading initial data — retry shortly
+- If `isReady()` is false, data may still be loading — retry shortly
 - For on-chain data (balances, transactions), use [ethers](ethers.md)
