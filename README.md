@@ -31,9 +31,16 @@ After deploy, verify:
 
 | File | Served as | Purpose |
 |------|-----------|---------|
-| `docs/llms.txt` | `/llms.txt` | Machine-readable URL list (MkDocs copies non-md files as-is) |
-| `docs/for-agents.md` | `/for-agents/` | Human + agent “what is what” router |
+| `docs/llms.txt` | `/llms.txt` | **Complete** machine-readable URL list (every page + subpath) |
+| `docs/for-agents.md` | `/for-agents/` | What-is-what + full section/subpath map |
 
-Keep both in sync when you add major doc sections. Agents should open **one** page per task — not crawl the whole site.
+Regenerate the complete URL list after adding/removing docs pages:
+
+```bash
+node scripts/generate_llms_txt.js
+# or: python scripts/generate_llms_txt.py
+```
+
+Agents should open **one** page per task — `llms.txt` lists everything so they can find the right URL, not so they fetch all of them.
 
 To add SEO for a new page, add an entry under `pages:` in `hooks/seo_pages.yaml` using the docs-relative path (e.g. `api-instance/new-page.md`).

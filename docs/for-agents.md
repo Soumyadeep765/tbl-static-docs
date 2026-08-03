@@ -1,57 +1,64 @@
 # Docs for AI agents
 
-TeleBotHost docs are large. Agents should **not** load the whole site.
+This site teaches **TBL** (Tele Bot Language) on TeleBotHost: JavaScript commands for Telegram bots.
 
-Use this page (or [`/llms.txt`](https://docs.telebothost.com/llms.txt)) as a **router**: pick one topic → open **one** URL → write TBL code.
+**How to use docs**
 
-## Rules
+1. Find your topic in the table below (or in [/llms.txt](https://docs.telebothost.com/llms.txt)).
+2. Open **one** page: `https://docs.telebothost.com` + the path.
+3. Write code from that page. Open a second page only if you still need it.
+4. Do **not** download or read every docs page.
 
-1. Open **one** docs page for the current task.
-2. Prefer this map / [`llms.txt`](https://docs.telebothost.com/llms.txt) over guessing APIs.
-3. Open a second page only if needed.
-4. In a VS Code / Cursor bot workspace, also follow local `AGENTS.md` (command headers, `id:`, upload flow).
+Full list of every page path: [llms.txt](https://docs.telebothost.com/llms.txt)
 
-## What is what
+## If you need this → open this page
 
-| Need | Open this |
-|------|-----------|
-| What is TBL / language | [What is TBL?](about-tbl.md), [The TBL Language](used-language.md) |
-| Command header fields | [Command Fields](getting-started-with-tbl/command-fields.md) |
-| Answer text / `{{user…}}` | [Answer Field](getting-started-with-tbl/answer-field.md) |
-| Reply keyboard (bottom buttons) | [Adding a Keyboard](getting-started-with-tbl/adding-keyboard.md) |
-| Inline buttons (in message) | [Inline Keyboards](api-instance/inline-keyboards.md) |
-| Callbacks / `callback_query` | [Handling Callbacks](getting-started-with-tbl/handling-callbacks.md) |
-| Wait for next user message | [Need Reply](getting-started-with-tbl/handle-need-reply.md) |
-| Wildcard `*` command | [Using Wildcard](getting-started-with-tbl/using-wildcard.md) |
-| Matching order / priority | [Matching & Priority](getting-started-with-tbl/matching-order.md) |
-| Quick send in current chat | [Bot · Sending Messages](bot-instance/sending-messages.md) |
-| Full Telegram API / other chats | [Api · Sending Messages](api-instance/sending-messages.md) |
-| Bot vs Api | [Bot vs Api](guides/bot-vs-api.md) |
-| `user` / `chat` / `params` | [Globals](globals/index.md) |
-| Store data | [db](db-instance/index.md) → `db.bot` / `db.user` / `db.global` |
-| Outbound HTTP | [HTTP](http-instance/making-requests.md) |
+| You need… | Open |
+|-----------|------|
+| What TBL is | [What is TBL?](about-tbl.md) |
+| Language / JS rules | [The TBL Language](used-language.md) |
+| First steps for humans | [Start here](start-here/index.md) |
+| Command name, answer, keyboard, aliases | [Command fields](getting-started-with-tbl/command-fields.md) |
+| How a command is structured | [Command structure](getting-started-with-tbl/command-structure.md) |
+| Answer text / `{{user.first_name}}` | [Answer field](getting-started-with-tbl/answer-field.md) |
+| Buttons under the chat input | [Adding a keyboard](getting-started-with-tbl/adding-keyboard.md) |
+| Buttons inside the message (inline) | [Inline keyboards](api-instance/inline-keyboards.md) |
+| Inline button presses / callbacks | [Handling callbacks](getting-started-with-tbl/handling-callbacks.md) |
+| Wait for the user’s next message | [Need reply](getting-started-with-tbl/handle-need-reply.md) |
+| Catch-all `*` command | [Using wildcard](getting-started-with-tbl/using-wildcard.md) |
+| Which command wins when several match | [Matching order](getting-started-with-tbl/matching-order.md) |
+| Extra trigger names | [Aliases](getting-started-with-tbl/adding-aliases.md) |
+| Markdown / HTML in answers | [Markdown and formatting](getting-started-with-tbl/markdown-and-formatting.md) |
+| Quick send to the current chat | [Bot · Sending messages](bot-instance/sending-messages.md) |
+| Full Telegram methods / other chats | [Api · Sending messages](api-instance/sending-messages.md) |
+| When to use Bot vs Api | [Bot vs Api](guides/bot-vs-api.md) |
+| `user`, `chat`, `params`, `message`, … | [Globals](globals/index.md) |
+| Save data (`db.bot` / `db.user` / `db.global`) | [Database](db-instance/index.md) |
+| Call external HTTP APIs | [HTTP · Making requests](http-instance/making-requests.md) |
 | Incoming webhooks | [Webhooks](webhook-instance/index.md) |
-| Webapp / public URL | [Webapps](webapp-instance/index.md), [Public Web Commands](getting-started-with-tbl/public-web-commands.md) |
-| `res.send` / HTML for web | [res](res-instance/index.md) |
-| Built-in modules (`modules.*`) | [Modules](modules/index.md) |
-| Hosted libs (`Libs.*`) | [TBL Libraries](libs/index.md) |
-| Photos / files | [Media and Files](api-instance/media-and-files.md) |
-| Edit / delete messages | [Editing Messages](api-instance/editing-messages.md) |
-| Broadcast | [Broadcasting](bot-instance/broadcasting.md) |
+| Mini apps / public web URLs | [Webapps](webapp-instance/index.md) |
+| Reply to web/webhook with HTML/JSON | [res](res-instance/index.md) |
+| Photos, files, voice | [Media and files](api-instance/media-and-files.md) |
+| Edit or delete a sent message | [Editing messages](api-instance/editing-messages.md) |
+| Message many users | [Broadcasting](bot-instance/broadcasting.md) |
+| Built-in helpers (`modules.*`) | [Modules](modules/index.md) |
+| Hosted libraries (`Libs.*`) | [TBL Libraries](libs/index.md) |
 
-## Machine index
+## Sections (folder = topic)
 
-Plain-text URL list for crawlers and agents:
+| Folder | What is inside |
+|--------|----------------|
+| `/getting-started-with-tbl/` | Commands, answer, keyboard, matching, tutorials |
+| `/globals/` | Runtime variables (`user`, `chat`, `params`, …) |
+| `/bot-instance/` | Short helpers for the current chat |
+| `/api-instance/` | Full Telegram Bot API wrappers |
+| `/msg-instance/` | Helpers on the current message |
+| `/db-instance/` | Persistent storage |
+| `/http-instance/` | Outbound HTTP |
+| `/webhook-instance/` | Incoming signed webhooks |
+| `/webapp-instance/` | Telegram Web Apps / public routes |
+| `/res-instance/` | HTTP responses for web/webhook commands |
+| `/modules/` | Extra JS modules |
+| `/libs/` | TeleBotHost `Libs.*` packages |
 
-**https://docs.telebothost.com/llms.txt**
-
-## Tutorials
-
-| Lesson | Page |
-|--------|------|
-| 1 — First bot | [First Hello Bot](getting-started-with-tbl/first-hello-bot.md) |
-| 2 — Keyboard | [Adding a Keyboard](getting-started-with-tbl/adding-keyboard.md) |
-| 3 — Aliases | [Adding Aliases](getting-started-with-tbl/adding-aliases.md) |
-| 4 — User input | [Need Reply](getting-started-with-tbl/handle-need-reply.md) |
-| 5 — Callbacks | [Handling Callbacks](getting-started-with-tbl/handling-callbacks.md) |
-| 6 — Wildcard `*` | [Using Wildcard](getting-started-with-tbl/using-wildcard.md) |
+Every path under those folders is listed in [llms.txt](https://docs.telebothost.com/llms.txt).
