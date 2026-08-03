@@ -1,0 +1,192 @@
+# TeleBotHost TBL Documentation
+> Full page catalog for AI agents. Site: https://docs.telebothost.com
+
+Do not load this entire file into context. Pick one URL that matches the task, then fetch that page.
+
+Generated from mkdocs.yml — 142 pages.
+
+## Home
+- [Home](https://docs.telebothost.com/): index.md
+- [Bot vs Api](https://docs.telebothost.com/guides/bot-vs-api/): guides/bot-vs-api.md
+
+## Introduction
+- [Getting Started](https://docs.telebothost.com/getting-started/): getting-started.md
+- [What is TBL?](https://docs.telebothost.com/about-tbl/): about-tbl.md
+- [The TBL Language](https://docs.telebothost.com/used-language/): used-language.md
+- [Learning TBL](https://docs.telebothost.com/learning-tbl/): learning-tbl.md
+
+## Tutorials
+- [Overview](https://docs.telebothost.com/tutorials/): tutorials/index.md
+- [Lesson 1 - Your First Bot](https://docs.telebothost.com/getting-started-with-tbl/first-hello-bot/): getting-started-with-tbl/first-hello-bot.md
+- [Lesson 2 - Adding a Keyboard](https://docs.telebothost.com/getting-started-with-tbl/adding-keyboard/): getting-started-with-tbl/adding-keyboard.md
+- [Lesson 3 - Using Aliases](https://docs.telebothost.com/getting-started-with-tbl/adding-aliases/): getting-started-with-tbl/adding-aliases.md
+- [Lesson 4 - Handling User Input](https://docs.telebothost.com/getting-started-with-tbl/handle-need-reply/): getting-started-with-tbl/handle-need-reply.md
+- [Lesson 5 - Handling Callbacks](https://docs.telebothost.com/getting-started-with-tbl/handling-callbacks/): getting-started-with-tbl/handling-callbacks.md
+- [Lesson 6 - Wildcard Command (*)](https://docs.telebothost.com/getting-started-with-tbl/using-wildcard/): getting-started-with-tbl/using-wildcard.md
+
+## Command Flow
+- [Overview](https://docs.telebothost.com/getting-started-with-tbl/): getting-started-with-tbl/index.md
+
+## Command Flow / Core Mechanics
+- [Command Structure](https://docs.telebothost.com/getting-started-with-tbl/command-structure/): getting-started-with-tbl/command-structure.md
+- [Command Fields](https://docs.telebothost.com/getting-started-with-tbl/command-fields/): getting-started-with-tbl/command-fields.md
+- [Answer Field](https://docs.telebothost.com/getting-started-with-tbl/answer-field/): getting-started-with-tbl/answer-field.md
+- [Execution Flow](https://docs.telebothost.com/getting-started-with-tbl/execution-flow/): getting-started-with-tbl/execution-flow.md
+- [Matching & Priority](https://docs.telebothost.com/getting-started-with-tbl/matching-order/): getting-started-with-tbl/matching-order.md
+
+## Command Flow / Advanced Routing
+- [Special Commands](https://docs.telebothost.com/getting-started-with-tbl/special-commands/): getting-started-with-tbl/special-commands.md
+- [Dynamic Handlers](https://docs.telebothost.com/getting-started-with-tbl/dynamic-commands/): getting-started-with-tbl/dynamic-commands.md
+
+## Command Flow / Presentation & Web
+- [Markdown & Formatting](https://docs.telebothost.com/getting-started-with-tbl/markdown-and-formatting/): getting-started-with-tbl/markdown-and-formatting.md
+- [Public Web Commands](https://docs.telebothost.com/getting-started-with-tbl/public-web-commands/): getting-started-with-tbl/public-web-commands.md
+
+## Guides
+- [Overview](https://docs.telebothost.com/guides/): guides/index.md
+- [Handling Callbacks](https://docs.telebothost.com/getting-started-with-tbl/handling-callbacks/): getting-started-with-tbl/handling-callbacks.md
+- [Markdown & Formatting](https://docs.telebothost.com/getting-started-with-tbl/markdown-and-formatting/): getting-started-with-tbl/markdown-and-formatting.md
+- [Public Web Commands](https://docs.telebothost.com/getting-started-with-tbl/public-web-commands/): getting-started-with-tbl/public-web-commands.md
+
+## Global Variables
+- [Overview](https://docs.telebothost.com/globals/): globals/index.md
+- [update](https://docs.telebothost.com/globals/update/): globals/update.md
+- [request](https://docs.telebothost.com/globals/request/): globals/request.md
+- [update_type](https://docs.telebothost.com/globals/update_type/): globals/update_type.md
+- [message](https://docs.telebothost.com/globals/message/): globals/message.md
+- [user](https://docs.telebothost.com/globals/user/): globals/user.md
+- [chat](https://docs.telebothost.com/globals/chat/): globals/chat.md
+- [bot](https://docs.telebothost.com/globals/bot/): globals/bot.md
+- [owner](https://docs.telebothost.com/globals/owner/): globals/owner.md
+- [plan](https://docs.telebothost.com/globals/plan/): globals/plan.md
+- [params](https://docs.telebothost.com/globals/params/): globals/params.md
+- [options](https://docs.telebothost.com/globals/options/): globals/options.md
+- [tbl_options](https://docs.telebothost.com/globals/tbl_options/): globals/tbl_options.md
+- [content](https://docs.telebothost.com/globals/content/): globals/content.md
+- [msg (global)](https://docs.telebothost.com/globals/msg/): globals/msg.md
+- [error](https://docs.telebothost.com/globals/error/): globals/error.md
+- [http_response](https://docs.telebothost.com/globals/http_response/): globals/http_response.md
+- [process](https://docs.telebothost.com/globals/process/): globals/process.md
+
+## Bot
+- [Overview](https://docs.telebothost.com/bot-instance/): bot-instance/index.md
+- [Running Commands](https://docs.telebothost.com/bot-instance/running-commands/): bot-instance/running-commands.md
+- [Reading Commands](https://docs.telebothost.com/bot-instance/reading-commands/): bot-instance/reading-commands.md
+- [Sending Messages](https://docs.telebothost.com/bot-instance/sending-messages/): bot-instance/sending-messages.md
+- [Bot Properties (Deprecated)](https://docs.telebothost.com/bot-instance/bot-properties/): bot-instance/bot-properties.md
+- [Listing Users](https://docs.telebothost.com/bot-instance/listing-users/): bot-instance/listing-users.md
+- [Broadcasting](https://docs.telebothost.com/bot-instance/broadcasting/): bot-instance/broadcasting.md
+
+## Api
+- [Overview](https://docs.telebothost.com/api-instance/): api-instance/index.md
+- [Sending Messages](https://docs.telebothost.com/api-instance/sending-messages/): api-instance/sending-messages.md
+- [Inline Keyboards](https://docs.telebothost.com/api-instance/inline-keyboards/): api-instance/inline-keyboards.md
+- [Media and Files](https://docs.telebothost.com/api-instance/media-and-files/): api-instance/media-and-files.md
+- [Editing Messages](https://docs.telebothost.com/api-instance/editing-messages/): api-instance/editing-messages.md
+- [Async Requests](https://docs.telebothost.com/api-instance/async-requests/): api-instance/async-requests.md
+- [Callbacks (on_run)](https://docs.telebothost.com/api-instance/callbacks/): api-instance/callbacks.md
+- [Method Chaining](https://docs.telebothost.com/api-instance/method-chaining/): api-instance/method-chaining.md
+- [Bot Admin Methods](https://docs.telebothost.com/api-instance/bot-admin-methods/): api-instance/bot-admin-methods.md
+- [Dynamic Methods](https://docs.telebothost.com/api-instance/dynamic-methods/): api-instance/dynamic-methods.md
+- [Tips and Limitations](https://docs.telebothost.com/api-instance/tips-and-limitations/): api-instance/tips-and-limitations.md
+
+## TBL Instance
+- [Overview](https://docs.telebothost.com/tbl-instance/): tbl-instance/index.md
+- [Cloning Bots](https://docs.telebothost.com/tbl-instance/clone/): tbl-instance/clone.md
+- [Transferring Bots](https://docs.telebothost.com/tbl-instance/transfer/): tbl-instance/transfer.md
+
+## HTTP
+- [Overview](https://docs.telebothost.com/http-instance/): http-instance/index.md
+- [Making Requests](https://docs.telebothost.com/http-instance/making-requests/): http-instance/making-requests.md
+- [Request Options](https://docs.telebothost.com/http-instance/request-options/): http-instance/request-options.md
+- [HTTP Proxies](https://docs.telebothost.com/http-instance/proxies/): http-instance/proxies.md
+- [Cloudflare Worker Proxy](https://docs.telebothost.com/http-instance/cf-proxy/): http-instance/cf-proxy.md
+- [Responses](https://docs.telebothost.com/http-instance/responses/): http-instance/responses.md
+- [Streaming](https://docs.telebothost.com/http-instance/streaming/): http-instance/streaming.md
+- [Fallback Commands](https://docs.telebothost.com/http-instance/fallback-commands/): http-instance/fallback-commands.md
+- [Limits & Timeouts](https://docs.telebothost.com/http-instance/limits/): http-instance/limits.md
+
+## Database (db)
+- [Overview](https://docs.telebothost.com/db-instance/): db-instance/index.md
+- [Bot Storage (db.bot)](https://docs.telebothost.com/db-instance/bot/): db-instance/bot.md
+- [User Storage (db.user)](https://docs.telebothost.com/db-instance/user/): db-instance/user.md
+- [Global Storage (db.global)](https://docs.telebothost.com/db-instance/global/): db-instance/global.md
+- [Unified Methods](https://docs.telebothost.com/db-instance/unified-methods/): db-instance/unified-methods.md
+- [Advanced Operations](https://docs.telebothost.com/db-instance/advanced-operations/): db-instance/advanced-operations.md
+- [Analytics & Stats](https://docs.telebothost.com/db-instance/analytics/): db-instance/analytics.md
+
+## User Storage (Deprecated)
+- [Overview](https://docs.telebothost.com/user-instance/): user-instance/index.md
+- [Basics](https://docs.telebothost.com/user-instance/basics/): user-instance/basics.md
+- [Advanced & Migration](https://docs.telebothost.com/user-instance/advanced-use/): user-instance/advanced-use.md
+
+## Global Storage (Removed)
+- [Overview](https://docs.telebothost.com/global-instance/): global-instance/index.md
+- [Basics](https://docs.telebothost.com/global-instance/basics/): global-instance/basics.md
+- [Storage Monitoring](https://docs.telebothost.com/global-instance/storage-monitor/): global-instance/storage-monitor.md
+
+## msg
+- [Overview](https://docs.telebothost.com/msg-instance/): msg-instance/index.md
+- [Replying](https://docs.telebothost.com/msg-instance/replying/): msg-instance/replying.md
+- [Editing](https://docs.telebothost.com/msg-instance/editing/): msg-instance/editing.md
+- [Actions](https://docs.telebothost.com/msg-instance/actions/): msg-instance/actions.md
+- [Message Data](https://docs.telebothost.com/msg-instance/message-data/): msg-instance/message-data.md
+
+## Webhooks
+- [Overview](https://docs.telebothost.com/webhook-instance/): webhook-instance/index.md
+- [Webhook Types](https://docs.telebothost.com/webhook-instance/webhook-types/): webhook-instance/webhook-types.md
+- [User-Based Webhooks](https://docs.telebothost.com/webhook-instance/user-webhook/): webhook-instance/user-webhook.md
+- [Global Webhooks](https://docs.telebothost.com/webhook-instance/global-webhook/): webhook-instance/global-webhook.md
+- [Handling Requests](https://docs.telebothost.com/webhook-instance/handle-webhook/): webhook-instance/handle-webhook.md
+- [Limits & Security](https://docs.telebothost.com/webhook-instance/limits-and-security/): webhook-instance/limits-and-security.md
+- [Sending Responses](https://docs.telebothost.com/webhook-instance/sending-webhook-response/): webhook-instance/sending-webhook-response.md
+
+## Webapps
+- [Overview](https://docs.telebothost.com/webapp-instance/): webapp-instance/index.md
+- [Webapp Methods](https://docs.telebothost.com/webapp-instance/webapp-methods/): webapp-instance/webapp-methods.md
+- [Public Web](https://docs.telebothost.com/webapp-instance/public-web/): webapp-instance/public-web.md
+- [Examples](https://docs.telebothost.com/webapp-instance/examples/): webapp-instance/examples.md
+- [Best Practices](https://docs.telebothost.com/webapp-instance/best-practices/): webapp-instance/best-practices.md
+
+## HTTP Responses (res)
+- [Overview](https://docs.telebothost.com/res-instance/): res-instance/index.md
+- [Headers & Status](https://docs.telebothost.com/res-instance/headers-and-status/): res-instance/headers-and-status.md
+- [JSON, Text & XML](https://docs.telebothost.com/res-instance/send-json-text-xml/): res-instance/send-json-text-xml.md
+- [HTML & EJS](https://docs.telebothost.com/res-instance/html-and-ejs/): res-instance/html-and-ejs.md
+- [Redirects](https://docs.telebothost.com/res-instance/redirect/): res-instance/redirect.md
+- [res.render()](https://docs.telebothost.com/res-instance/render/): res-instance/render.md
+- [Defaults & Protection](https://docs.telebothost.com/res-instance/defaults-and-protection/): res-instance/defaults-and-protection.md
+
+## Modules
+- [Overview](https://docs.telebothost.com/modules/): modules/index.md
+- [JWT](https://docs.telebothost.com/modules/jwt/): modules/jwt.md
+- [bcrypt](https://docs.telebothost.com/modules/bcrypt/): modules/bcrypt.md
+- [crypto](https://docs.telebothost.com/modules/crypto/): modules/crypto.md
+- [ParseCSV](https://docs.telebothost.com/modules/parse-csv/): modules/parse-csv.md
+- [ParseYML](https://docs.telebothost.com/modules/parse-yml/): modules/parse-yml.md
+- [UUID](https://docs.telebothost.com/modules/uuid/): modules/uuid.md
+- [dayjs](https://docs.telebothost.com/modules/dayjs/): modules/dayjs.md
+- [lodash](https://docs.telebothost.com/modules/lodash/): modules/lodash.md
+- [uaParser](https://docs.telebothost.com/modules/uaparser/): modules/uaparser.md
+- [randomstring](https://docs.telebothost.com/modules/randomstring/): modules/randomstring.md
+- [validator](https://docs.telebothost.com/modules/validator/): modules/validator.md
+- [qs](https://docs.telebothost.com/modules/qs/): modules/qs.md
+- [cheerio](https://docs.telebothost.com/modules/cheerio/): modules/cheerio.md
+- [zod](https://docs.telebothost.com/modules/zod/): modules/zod.md
+- [deepmerge](https://docs.telebothost.com/modules/deepmerge/): modules/deepmerge.md
+- [humanizeDuration](https://docs.telebothost.com/modules/humanize-duration/): modules/humanize-duration.md
+- [md2html](https://docs.telebothost.com/modules/md2html/): modules/md2html.md
+- [ethers](https://docs.telebothost.com/modules/ethers/): modules/ethers.md
+- [marketHub](https://docs.telebothost.com/modules/market-hub/): modules/market-hub.md
+
+## TBL Libraries
+- [Overview](https://docs.telebothost.com/libs/): libs/index.md
+- [ResourcesLib](https://docs.telebothost.com/libs/resourceslib/): libs/resourceslib.md
+- [ResourcesLibv2](https://docs.telebothost.com/libs/resourceslibv2/): libs/resourceslibv2.md
+- [refLib](https://docs.telebothost.com/libs/reflib/): libs/reflib.md
+- [translate](https://docs.telebothost.com/libs/translate/): libs/translate.md
+- [cooldown](https://docs.telebothost.com/libs/cooldown/): libs/cooldown.md
+- [MCL (Membership Checker)](https://docs.telebothost.com/libs/mcl/): libs/mcl.md
+- [dateTimeFormat](https://docs.telebothost.com/libs/date-time-format/): libs/date-time-format.md
+- [random](https://docs.telebothost.com/libs/random/): libs/random.md
+- [tgutil](https://docs.telebothost.com/libs/tgutil/): libs/tgutil.md

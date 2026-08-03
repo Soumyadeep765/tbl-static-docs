@@ -143,6 +143,7 @@ nav:
       - What is TBL?: about-tbl.md
       - The TBL Language: used-language.md
       - Learning TBL: learning-tbl.md
+      - Docs for AI agents: for-agents.md
 
   - Tutorials:
       - Overview: tutorials/index.md

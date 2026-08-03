@@ -1,0 +1,177 @@
+# TeleBotHost / TBL — LLM docs index
+# Site: https://docs.telebothost.com/
+# Rule for agents: open ONE page for the task. Do not crawl the whole site.
+# Human-readable map: https://docs.telebothost.com/for-agents/
+
+## How to use
+1. Match the user task to a topic below.
+2. Fetch that single URL.
+3. Write TBL code from that page + the bot workspace AGENTS.md rules.
+4. Only open a second page if the first is not enough.
+
+## Start here
+https://docs.telebothost.com/
+https://docs.telebothost.com/for-agents/
+https://docs.telebothost.com/getting-started/
+https://docs.telebothost.com/about-tbl/
+https://docs.telebothost.com/used-language/
+
+## Command basics (headers, answer, keyboard, matching)
+https://docs.telebothost.com/getting-started-with-tbl/
+https://docs.telebothost.com/getting-started-with-tbl/command-structure/
+https://docs.telebothost.com/getting-started-with-tbl/command-fields/
+https://docs.telebothost.com/getting-started-with-tbl/answer-field/
+https://docs.telebothost.com/getting-started-with-tbl/execution-flow/
+https://docs.telebothost.com/getting-started-with-tbl/matching-order/
+https://docs.telebothost.com/getting-started-with-tbl/adding-keyboard/
+https://docs.telebothost.com/getting-started-with-tbl/adding-aliases/
+https://docs.telebothost.com/getting-started-with-tbl/handle-need-reply/
+https://docs.telebothost.com/getting-started-with-tbl/handling-callbacks/
+https://docs.telebothost.com/getting-started-with-tbl/using-wildcard/
+https://docs.telebothost.com/getting-started-with-tbl/special-commands/
+https://docs.telebothost.com/getting-started-with-tbl/dynamic-commands/
+https://docs.telebothost.com/getting-started-with-tbl/markdown-and-formatting/
+https://docs.telebothost.com/getting-started-with-tbl/public-web-commands/
+
+## Tutorials (step-by-step)
+https://docs.telebothost.com/tutorials/
+https://docs.telebothost.com/getting-started-with-tbl/first-hello-bot/
+https://docs.telebothost.com/getting-started-with-tbl/adding-keyboard/
+https://docs.telebothost.com/getting-started-with-tbl/adding-aliases/
+https://docs.telebothost.com/getting-started-with-tbl/handle-need-reply/
+https://docs.telebothost.com/getting-started-with-tbl/handling-callbacks/
+https://docs.telebothost.com/getting-started-with-tbl/using-wildcard/
+
+## Global variables (user, chat, message, params, …)
+https://docs.telebothost.com/globals/
+https://docs.telebothost.com/globals/user/
+https://docs.telebothost.com/globals/chat/
+https://docs.telebothost.com/globals/bot/
+https://docs.telebothost.com/globals/message/
+https://docs.telebothost.com/globals/msg/
+https://docs.telebothost.com/globals/params/
+https://docs.telebothost.com/globals/update/
+https://docs.telebothost.com/globals/request/
+https://docs.telebothost.com/globals/owner/
+https://docs.telebothost.com/globals/plan/
+https://docs.telebothost.com/globals/process/
+https://docs.telebothost.com/globals/error/
+https://docs.telebothost.com/globals/options/
+https://docs.telebothost.com/globals/tbl_options/
+https://docs.telebothost.com/globals/content/
+https://docs.telebothost.com/globals/update_type/
+https://docs.telebothost.com/globals/http_response/
+
+## Bot helpers (quick send to current chat)
+https://docs.telebothost.com/bot-instance/
+https://docs.telebothost.com/bot-instance/sending-messages/
+https://docs.telebothost.com/bot-instance/running-commands/
+https://docs.telebothost.com/bot-instance/reading-commands/
+https://docs.telebothost.com/bot-instance/listing-users/
+https://docs.telebothost.com/bot-instance/broadcasting/
+https://docs.telebothost.com/guides/bot-vs-api/
+
+## Api (full Telegram methods, inline keyboards, media)
+https://docs.telebothost.com/api-instance/
+https://docs.telebothost.com/api-instance/sending-messages/
+https://docs.telebothost.com/api-instance/inline-keyboards/
+https://docs.telebothost.com/api-instance/media-and-files/
+https://docs.telebothost.com/api-instance/editing-messages/
+https://docs.telebothost.com/api-instance/async-requests/
+https://docs.telebothost.com/api-instance/callbacks/
+https://docs.telebothost.com/api-instance/method-chaining/
+https://docs.telebothost.com/api-instance/bot-admin-methods/
+https://docs.telebothost.com/api-instance/dynamic-methods/
+https://docs.telebothost.com/api-instance/tips-and-limitations/
+
+## msg helpers
+https://docs.telebothost.com/msg-instance/
+https://docs.telebothost.com/msg-instance/replying/
+https://docs.telebothost.com/msg-instance/editing/
+https://docs.telebothost.com/msg-instance/actions/
+https://docs.telebothost.com/msg-instance/message-data/
+
+## Database (db.bot / db.user / db.global)
+https://docs.telebothost.com/db-instance/
+https://docs.telebothost.com/db-instance/bot/
+https://docs.telebothost.com/db-instance/user/
+https://docs.telebothost.com/db-instance/global/
+https://docs.telebothost.com/db-instance/unified-methods/
+https://docs.telebothost.com/db-instance/advanced-operations/
+https://docs.telebothost.com/db-instance/analytics/
+
+## HTTP client
+https://docs.telebothost.com/http-instance/
+https://docs.telebothost.com/http-instance/making-requests/
+https://docs.telebothost.com/http-instance/request-options/
+https://docs.telebothost.com/http-instance/proxies/
+https://docs.telebothost.com/http-instance/cf-proxy/
+https://docs.telebothost.com/http-instance/responses/
+https://docs.telebothost.com/http-instance/streaming/
+https://docs.telebothost.com/http-instance/fallback-commands/
+https://docs.telebothost.com/http-instance/limits/
+
+## Webhooks
+https://docs.telebothost.com/webhook-instance/
+https://docs.telebothost.com/webhook-instance/webhook-types/
+https://docs.telebothost.com/webhook-instance/user-webhook/
+https://docs.telebothost.com/webhook-instance/global-webhook/
+https://docs.telebothost.com/webhook-instance/handle-webhook/
+https://docs.telebothost.com/webhook-instance/limits-and-security/
+https://docs.telebothost.com/webhook-instance/sending-webhook-response/
+
+## Webapps / public web
+https://docs.telebothost.com/webapp-instance/
+https://docs.telebothost.com/webapp-instance/webapp-methods/
+https://docs.telebothost.com/webapp-instance/public-web/
+https://docs.telebothost.com/webapp-instance/examples/
+https://docs.telebothost.com/webapp-instance/best-practices/
+https://docs.telebothost.com/getting-started-with-tbl/public-web-commands/
+
+## HTTP responses (res) for web/webhook
+https://docs.telebothost.com/res-instance/
+https://docs.telebothost.com/res-instance/headers-and-status/
+https://docs.telebothost.com/res-instance/send-json-text-xml/
+https://docs.telebothost.com/res-instance/html-and-ejs/
+https://docs.telebothost.com/res-instance/redirect/
+https://docs.telebothost.com/res-instance/render/
+https://docs.telebothost.com/res-instance/defaults-and-protection/
+
+## Modules (npm-style helpers in TBL)
+https://docs.telebothost.com/modules/
+https://docs.telebothost.com/modules/jwt/
+https://docs.telebothost.com/modules/bcrypt/
+https://docs.telebothost.com/modules/crypto/
+https://docs.telebothost.com/modules/uuid/
+https://docs.telebothost.com/modules/dayjs/
+https://docs.telebothost.com/modules/lodash/
+https://docs.telebothost.com/modules/zod/
+https://docs.telebothost.com/modules/cheerio/
+https://docs.telebothost.com/modules/parse-csv/
+https://docs.telebothost.com/modules/parse-yml/
+https://docs.telebothost.com/modules/validator/
+https://docs.telebothost.com/modules/qs/
+https://docs.telebothost.com/modules/md2html/
+https://docs.telebothost.com/modules/ethers/
+https://docs.telebothost.com/modules/market-hub/
+
+## TBL Libraries (Libs.*)
+https://docs.telebothost.com/libs/
+https://docs.telebothost.com/libs/resourceslib/
+https://docs.telebothost.com/libs/resourceslibv2/
+https://docs.telebothost.com/libs/reflib/
+https://docs.telebothost.com/libs/translate/
+https://docs.telebothost.com/libs/cooldown/
+https://docs.telebothost.com/libs/mcl/
+https://docs.telebothost.com/libs/date-time-format/
+https://docs.telebothost.com/libs/random/
+https://docs.telebothost.com/libs/tgutil/
+
+## Bot account ops
+https://docs.telebothost.com/tbl-instance/
+https://docs.telebothost.com/tbl-instance/clone/
+https://docs.telebothost.com/tbl-instance/transfer/
+
+## Guides
+https://docs.telebothost.com/guides/
+https://docs.telebothost.com/guides/bot-vs-api/

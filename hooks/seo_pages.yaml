@@ -33,6 +33,12 @@ pages:
     keywords: "learn TBL, TBL tutorial, Telegram bot code, Bot.sendMessage example, TeleBotHost coding"
     priority: 0.85
 
+  for-agents.md:
+    description: "Router for AI coding agents: which TeleBotHost / TBL docs page to open for each task. Use with /llms.txt — fetch one page, do not crawl the whole site."
+    keywords: "TBL AI agents, TeleBotHost llms.txt, docs for Cursor Claude Copilot, TBL documentation index"
+    priority: 0.95
+    changefreq: weekly
+
   tutorials/index.md:
     description: "Six hands-on TBL tutorials — from command structure and /start to keyboards, aliases, user input, and wildcard handlers."
     keywords: "TBL tutorials, Telegram bot lessons, TeleBotHost walkthrough, bot command tutorial"
